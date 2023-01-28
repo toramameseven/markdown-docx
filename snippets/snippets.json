@@ -1,0 +1,57 @@
+{
+  "word front all": {
+    "prefix": "word properties",
+    "body": [
+      "<!-- word title ${1:title} -->",
+      "<!-- word subTitle ${2:subTitle} -->",
+      "<!-- word author ${3:author} -->",
+      "<!-- word division ${4:division} -->",
+      "<!-- word date ${5:date} -->",
+      "<!-- word docNumber ${6:XXXX-XXXX} -->",
+      "<!-- word toc ${7|1,2,3|} TOC -->$0"
+    ],
+    "description": "word properties"
+  },
+  "table columns": {
+    "prefix": "word cols",
+    "body": ["<!-- word cols $1,$2 -->"],
+    "description": "word cols"
+  },
+  "table rowMerge": {
+    "prefix": "word rowMerge",
+    "body": ["<!-- word rowMerge $1-$2, -->"]
+  },
+  "table emptyMerge": {
+    "prefix": "word emptyMerge",
+    "body": ["<!-- word emptyMerge -->"]
+  },
+  "newPage": {
+    "prefix": "word newPage",
+    "body": ["<!-- word newPage -->"],
+    "description": "New Page"
+  },
+  "export": {
+    "prefix": "word export",
+    "body": ["<!-- word export $1.md-->"],
+    "description": "word export"
+  },
+  "import": {
+    "prefix": "word import",
+    "body": ["<!-- word import $1.md-->"],
+    "description": "word import"
+  },
+  "page setup": {
+    "prefix": "word page setup",
+    "body": [
+      "<!-- word pageSetup ${1|wdOrientationLandscape,wdOrientationPortrait|} ${2|wdSizeA4,wdSizeA3|} -->"
+    ]
+  },
+  "docx engine": {
+    "prefix": "word docxEngine",
+    "body": ["<!-- word docxEngine $1.vbs -->"]
+  },
+  "docx docxTemplate": {
+    "prefix": "word docxTemplate",
+    "body": ["<!-- word docxTemplate $1.docx -->"]
+  }
+}

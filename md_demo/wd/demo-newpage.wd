@@ -1,0 +1,21 @@
+section	1	new page	new-page
+newLine	convertHeading	tm
+text	markdown
+newLine	convertParagraph	tm
+code	next line is `<!-- word newPage -->`
+newLine	convertCode	tm
+code	
+newLine	convertCode	tm
+code	<!-- word newPage -->
+newLine	convertCode	tm
+code	
+newLine	convertCode	tm
+code	upper line is `<!-- word newPage -->`
+newLine	convertCode	tm
+text	result
+newLine	convertParagraph	tm
+text	next line is <codespan><!-- word newPage --></codespan>
+newLine	convertParagraph	tm
+newPage				tm
+text	upper line is <codespan><!-- word newPage --></codespan>
+newLine	convertParagraph	tm

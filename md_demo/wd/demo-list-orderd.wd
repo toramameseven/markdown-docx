@@ -1,0 +1,57 @@
+section	1	Lists ordered	lists-ordered
+newLine	convertHeading	tm
+text	markdown
+newLine	convertParagraph	tm
+code	1. Lorem ipsum dolor sit amet
+newLine	convertCode	tm
+code	2. Consectetur adipiscing elit
+newLine	convertCode	tm
+code	3. Integer molestie lorem at massa
+newLine	convertCode	tm
+code	
+newLine	convertCode	tm
+code	4. You can use sequential numbers...
+newLine	convertCode	tm
+code	5. ...or keep all the numbers as `1.`
+newLine	convertCode	tm
+code	
+newLine	convertCode	tm
+code	NOTE: **markdown to docx** does not support numbering with offset:
+newLine	convertCode	tm
+code	
+newLine	convertCode	tm
+code	57. foo
+newLine	convertCode	tm
+code	1. bar
+newLine	convertCode	tm
+text	result
+newLine	convertParagraph	tm
+indentPlus
+OderList	1	
+text	Lorem ipsum dolor sit amet
+text	 				tm
+text	fffffa2<sup>x</sup><sub>y</sub>affff
+newLine	convertParagraph	tm
+OderList	1	
+text	Consectetur adipiscing elit
+newLine	convertParagraph	tm
+OderList	1	
+text	Integer molestie lorem at massa
+newLine	convertParagraph	tm
+OderList	1	
+text	You can use sequential numbers...
+newLine	convertParagraph	tm
+OderList	1	
+text	...or keep all the numbers as <codespan>1.</codespan>
+newLine	convertParagraph	tm
+indentMinus
+text	NOTE: <b>markdown to docx</b> does not support numbering with offset:
+newLine	convertParagraph	tm
+indentPlus
+OderList	1	
+text	foo
+newLine	convertListItem End	tm
+OderList	1	
+text	bar
+newLine	convertListItem End	tm
+indentMinus

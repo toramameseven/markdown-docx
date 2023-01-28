@@ -1,0 +1,64 @@
+section	1	Lists Unordered	lists-unordered
+newLine	convertHeading	tm
+text	NOTE: <b>markdown to docx</b>  supports only three layers.
+newLine	convertParagraph	tm
+text	markdown
+newLine	convertParagraph	tm
+code	- Create a list by starting a line with `+`, `-`, or `*`
+newLine	convertCode	tm
+code	- Sub-lists are made by indenting 2 spaces:
+newLine	convertCode	tm
+code	  - Marker character change forces new list start:
+newLine	convertCode	tm
+code	    - Ac tristique libero volutpat at
+newLine	convertCode	tm
+code	    * Facilisis in pretium nisl aliquet
+newLine	convertCode	tm
+code	    - Nulla volutpat aliquam velit
+newLine	convertCode	tm
+code	- Very easy!
+newLine	convertCode	tm
+code	
+newLine	convertCode	tm
+code	* look me [](#links) send you
+newLine	convertCode	tm
+text	result
+newLine	convertParagraph	tm
+indentPlus
+NormalList	1	
+text	Create a list by starting a line with <codespan>+</codespan>, <codespan>-</codespan>, or <codespan>*</codespan>
+newLine	convertListItem End	tm
+NormalList	1	
+text	Sub-lists are made by indenting 2 spaces:
+newLine	convertList In	tm
+indentPlus
+NormalList	2	
+text	Marker character change forces new list start:
+newLine	convertList In	tm
+indentPlus
+NormalList	3	
+text	Ac tristique libero volutpat at
+newLine	convertListItem End	tm
+indentMinus
+indentPlus
+NormalList	3	
+text	Facilisis in pretium nisl aliquet
+newLine	convertListItem End	tm
+indentMinus
+indentPlus
+NormalList	3	
+text	Nulla volutpat aliquam velit
+newLine	convertListItem End	tm
+indentMinus
+indentMinus
+NormalList	1	
+text	Very easy!
+newLine	convertListItem End	tm
+indentMinus
+indentPlus
+NormalList	1	
+text	look me 
+link	links			tm
+text	 send you
+newLine	convertListItem End	tm
+indentMinus

@@ -1,0 +1,22 @@
+section	1	Indented code	indented-code
+newLine	convertHeading	tm
+text	markdown
+newLine	convertParagraph	tm
+code	    // Some comments
+newLine	convertCode	tm
+code	    line 1 of code
+newLine	convertCode	tm
+code	    line 2 of code
+newLine	convertCode	tm
+code	    line 3 of code
+newLine	convertCode	tm
+text	result
+newLine	convertParagraph	tm
+code	// Some comments
+newLine	convertCode	tm
+code	line 1 of code
+newLine	convertCode	tm
+code	line 2 of code
+newLine	convertCode	tm
+code	line 3 of code
+newLine	convertCode	tm

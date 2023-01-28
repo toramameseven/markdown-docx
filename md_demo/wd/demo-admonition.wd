@@ -1,0 +1,16 @@
+section	1	Admonition	admonition
+newLine	convertHeading	tm
+text	markdown
+newLine	convertParagraph	tm
+code	NOTE: admonition note.
+newLine	convertCode	tm
+code	
+newLine	convertCode	tm
+code	WARNING: admonition warning.
+newLine	convertCode	tm
+text	result
+newLine	convertParagraph	tm
+text	NOTE: admonition note.
+newLine	convertParagraph	tm
+text	WARNING: admonition warning.
+newLine	convertParagraph	tm

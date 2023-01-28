@@ -2,6 +2,8 @@
 
 This is the README **Markdown Docx**. 
 
+We are creating a docx template file. So now, this does not work.
+
 
 ## Requirements
 
@@ -10,11 +12,11 @@ This is the README **Markdown Docx**.
 
 ## Features
 
-* **Markdown Docx** Docx is a markdown converter to docx.
-* **Markdown Docx** Docx works for common mark md(s).
-* Click **convert Docx** at the context menu on the explore or the editor.
+* **Markdown Docx** is a markdown converter to docx.
+* **Markdown Docx** works for common mark md(s).
+* Click **Convert Docx** at the context menu on the explore or the editor.
   
-## extensions for word
+## Extensions for word
 
 ##### general
 

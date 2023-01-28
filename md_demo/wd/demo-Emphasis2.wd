@@ -1,0 +1,32 @@
+section	1	Emphasis2	emphasis2
+newLine	convertHeading	tm
+text	markdown
+newLine	convertParagraph	tm
+code	**This is bold text**
+newLine	convertCode	tm
+code	**This is bold text**
+newLine	convertCode	tm
+code	_This is italic text_
+newLine	convertCode	tm
+code	_This is italic text_
+newLine	convertCode	tm
+code	~~Strikethrough~~ 
+newLine	convertCode	tm
+code	2<sup>x</sup><sub>y</sub>
+newLine	convertCode	tm
+text	result
+newLine	convertParagraph	tm
+text	<b>This is bold text</b>
+text	 				tm
+text	<b>This is bold text</b>
+text	 				tm
+text	<i>This is italic text</i>
+text	 				tm
+text	<i>This is italic text</i>
+text	 				tm
+text	<~~>Strikethrough</~~> 
+text	 				tm
+text	2<sup>x</sup><sub>y</sub>
+newLine	convertParagraph	tm
+text	NOTE: Sometime Emphasis does not work. That time, please add some spaces between words.
+newLine	convertParagraph	tm

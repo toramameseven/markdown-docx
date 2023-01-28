@@ -1,0 +1,34 @@
+section	2	cross reference in a docx	cross-reference-in-a-docx
+newLine	convertHeading	tm
+text	markdown
+newLine	convertParagraph	tm
+code	## refs1
+newLine	convertCode	tm
+code	
+newLine	convertCode	tm
+code	## refs2 with space
+newLine	convertCode	tm
+code	
+newLine	convertCode	tm
+code	* look me [refs1](#refs1) send you
+newLine	convertCode	tm
+code	* look me [refs2 with space](#refs2-with-space) send you
+newLine	convertCode	tm
+text	result
+newLine	convertParagraph	tm
+section	2	refs1	refs1
+newLine	convertHeading	tm
+section	2	refs2 with space	refs2-with-space
+newLine	convertHeading	tm
+indentPlus
+NormalList	1	
+text	look me 
+link	refs1			tm
+text	 send you
+newLine	convertListItem End	tm
+NormalList	1	
+text	look me 
+link	refs2-with-space			tm
+text	 send you
+newLine	convertListItem End	tm
+indentMinus

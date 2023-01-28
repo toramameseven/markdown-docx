@@ -1,0 +1,31 @@
+section	1	Blockquotes	blockquotes
+newLine	convertHeading	tm
+text	NOTE: <b>markdown to docx</b> does not support blockquote.
+newLine	convertParagraph	tm
+text	markdown
+newLine	convertParagraph	tm
+code	> Blockquotes can also be nested...
+newLine	convertCode	tm
+code	>
+newLine	convertCode	tm
+code	> > ...by using additional greater-than *signs* _right_ next to each other...
+newLine	convertCode	tm
+code	> >
+newLine	convertCode	tm
+code	> > * eeeeeeeee
+newLine	convertCode	tm
+code	> > > ...or with spaces between arrows.
+newLine	convertCode	tm
+text	result
+newLine	convertParagraph	tm
+text	Blockquotes can also be nested...
+newLine	convertParagraph	tm
+text	...by using additional greater-than <i>signs</i> <i>right</i> next to each other...
+newLine	convertParagraph	tm
+indentPlus
+NormalList	1	
+text	eeeeeeeee
+text	 				tm
+text	...or with spaces between arrows.
+newLine	convertParagraph	tm
+indentMinus

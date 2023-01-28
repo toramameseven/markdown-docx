@@ -1,0 +1,12 @@
+section	1	Block code syntax highlighting	block-code-syntax-highlighting
+newLine	convertHeading	tm
+text	NOTE: <b>markdown to docx</b> does not support Syntax highlighting.
+newLine	convertParagraph	tm
+code	var foo = function (bar) {
+newLine	convertCode	tm
+code	  return bar++;
+newLine	convertCode	tm
+code	};
+newLine	convertCode	tm
+code	console.log(foo(5));
+newLine	convertCode	tm

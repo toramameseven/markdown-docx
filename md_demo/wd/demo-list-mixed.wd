@@ -1,0 +1,27 @@
+section	1	Lists mixed	lists-mixed
+newLine	convertHeading	tm
+text	markdown
+newLine	convertParagraph	tm
+code	1.  ordered1
+newLine	convertCode	tm
+code	    - unordered2
+newLine	convertCode	tm
+code	        1. ordered3
+newLine	convertCode	tm
+text	result
+newLine	convertParagraph	tm
+indentPlus
+OderList	1	
+text	ordered1
+newLine	convertList In	tm
+indentPlus
+NormalList	2	
+text	unordered2
+newLine	convertList In	tm
+indentPlus
+OderList	3	
+text	ordered3
+newLine	convertListItem End	tm
+indentMinus
+indentMinus
+indentMinus
