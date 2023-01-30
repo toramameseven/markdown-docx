@@ -1,5 +1,4 @@
 <!-- word export demo-admonition.md-->
-<!-- word property hhhh kkkkks akakak akakka -->
 # Admonition
 
 markdown

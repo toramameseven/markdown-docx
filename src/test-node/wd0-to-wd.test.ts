@@ -56,11 +56,11 @@ newLine\tconvertTitle\ttm`;
   test("toc", () => {
     // marked
     const markdown = `
-<!-- word toc 1 -->`;
+<!-- word toc 1 table of content-->`;
 
     // expect
     const expect = `
-toc	1	TOC	tm
+toc	1	table of content	tm
 newLine	convertToc	tm`;
 
     // assert
