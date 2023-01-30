@@ -104,6 +104,7 @@ Const wcPropertyDate = "dDate"
 Const wcPropertyDivision = "dDivision"
 Const wcPropertyAuthor = "dAuthor"
 Const wcPropertyNumber = "dNumber"
+Const wcProperty = "property"
 
 
 call main
@@ -367,6 +368,8 @@ Class XWord
                 call me.AddDate(params(1))
             case wcAuthor
                 call me.AddAuthor(params(1))
+            case wcProperty
+                call me.SetCustomDocumentProperty(params(1), params(2))
 
             case wcDivision
                 call me.AddDivision(params(1))

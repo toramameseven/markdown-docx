@@ -50,6 +50,7 @@ const wd0Command = {
   pageSetup: "pageSetup",
   toc: "toc",
 
+  property: "property",
   docNumber: "docNumber",
   indentPlus: "indentPlus",
   indentMinus: "indentMinus",
@@ -576,6 +577,21 @@ function convertDocNumber(params: DocxParam, isCommandEnd?: boolean) {
   outputWd(r);
 }
 
+function convertProperty(params: DocxParam, isCommandEnd?: boolean) {
+  if (isCommandEnd) {
+    return;
+  }
+  const r = [
+    "property",
+    params.propertyKey,
+    params.propertyValue,
+    "",
+    "",
+    "tm",
+  ].join(_sp);
+  outputWd(r);
+}
+
 function convertDate(params: DocxParam, isCommandEnd?: boolean) {
   if (isCommandEnd) {
     return;
@@ -772,6 +788,12 @@ function resolveCommand(
         return;
       }
       convertDocNumber(params, isCommandEnd);
+      break;
+    case wd0Command.property:
+      if (isCommandEnd) {
+        return;
+      }
+      convertProperty(params, isCommandEnd);
       break;
     case wd0Command.date:
       if (isCommandEnd) {

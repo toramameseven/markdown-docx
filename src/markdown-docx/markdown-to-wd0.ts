@@ -51,6 +51,7 @@ const wordCommand = {
   export: "export",
   docxEngine: "docxEngine",
   docxTemplate: "docxTemplate",
+  property: "property",
 } as const;
 
 const _sp = "\t";
@@ -161,10 +162,21 @@ function getWordCommand(content: string) {
       case wordCommand.toc:
         // default toc is to 3 heading level
         const tocTo = params[0] ? params[0] : "3";
-        const tocCaption = params[1] ? params[1] : "TOC";
+
+        const tocCaption = params.slice(1).join(" ");
         return createBlockCommand(wordCommand.toc, {
           tocTo,
           tocCaption,
+        });
+      case wordCommand.property:
+        const propertyKey = params[0];
+        const propertyValue = params.slice(1).join(" ");
+        if (!propertyKey) {
+          return;
+        }
+        return createBlockCommand(wordCommand.property, {
+          propertyKey,
+          propertyValue,
         });
       case wordCommand.title:
         // default ''

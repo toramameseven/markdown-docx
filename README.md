@@ -15,61 +15,69 @@ We are creating a docx template file. So now, this does not work.
 * **Markdown Docx** is a markdown converter to docx.
 * **Markdown Docx** works for common mark md(s).
 * Click **Convert Docx** at the context menu on the explore or the editor.
+* In the editor, you can convert the selection in markdown.
   
 ## Extensions for word
 
 ##### general
 
-`<!-- word [command] parameters -->` is used.
+`<!-- word [command] parameters -->` is used for word command.
 
-`<!-- word title Title -->`
+* `<!-- word title Title -->`
 
-`<!-- word subTitle SubTitle -->`
+    add title
 
-`<!-- word author Author -->`
+* `<!-- word subTitle SubTitle -->`
+  
+    add sub title
+* `<!-- word author Author -->`
 
-`<!-- word division Division -->`
+    add author
+* `<!-- word division Division -->`
 
-`<!-- word date Date -->`
+    add division
+* `<!-- word date Date -->`
 
-`<!-- word toc 1 TOC -->`
+    add Date
+* `<!-- word toc 1 TOC -->`
 
-    1: levels of toc.
-    TOC: toc caption
+    * add toc
+    * 1: levels of toc.
+    * TOC: toc caption
 
-`<!-- word import imported.md-->`
+* `<!-- word import imported.md-->`
 
   imported.md will be imported.
 
-`<!-- word pageSetup wdOrientationLandscape wdSizeA4 -->`
+* `<!-- word pageSetup wdOrientationLandscape wdSizeA4 -->`
   
-  page setup sample
+    page setup sample. landscape and a4 size.
 
-`<!-- word pageSetup wdOrientationPortrait wdSizeA3 -->`
+* `<!-- word pageSetup wdOrientationPortrait wdSizeA3 -->`
 
-  page setup sample
+    page setup sample. portrait and a3 size
 
-`<!-- word newPage -->`
+* `<!-- word newPage -->`
 
-  insert new page
+    insert new page
 
 ##### table
 
-`<!-- word cols 1,2 -->`
+* `<!-- word cols 1,2 -->`
 
     columns width are 1:2
 
-`<!-- word rowMerge 1-4,5-6 -->`
+* `<!-- word rowMerge 1-4,5-6 -->`
 
-  rows 1-4 and 5-6 are merged.
+    rows 1-4 and 5-6 are merged.
 
-`<!-- word emptyMerge -->`
+* `<!-- word emptyMerge -->`
   
-  empty cells are merged. only row direction.
+    empty cells are merged. only row direction.
 
 ## sample markdown file
 
-You can see the sample file.
+You can see the sample file in the [markdown-docx site](https://github.com/toramameseven/markdown-docx) md_demo folder.
 
 ## Extension Settings
 
@@ -85,7 +93,7 @@ You can see the sample file.
 
 * markdown-docx.docxEngine.mathExtension
    
-   If set true, 
+   If set true, `$x+1$` type math is rendered.
 
 * markdown-docx.docxEngine.timeout
 
@@ -116,6 +124,8 @@ like below
 
 ## word template
 
+It is better, set your language font.
+
 ##### styles
 
 next styles are created.
@@ -145,7 +155,6 @@ next styles are created.
 ### user properties
 
 * dNumber
-  
   * number is displayed at header.
 * dDivision
 * dDate
@@ -169,7 +178,7 @@ We thank for the wonderful npm packages.
 And we use some useful articles below. 
 
 * [Marked](https://www.npmjs.com/package/marked) is a very useful package for this extension.
-* [markdown-to-txt](https://www.npmjs.com/package/markdown-to-txt) tell us how to use **Marked**.
+* [markdown-to-txt](https://www.npmjs.com/package/markdown-to-txt) tells us how to use **Marked**.
 * [木村工の Office 仕事術](https://koukimra.com/) is used to resize pictures.
 * [みんなのワードマクロ](https://www.wordvbalab.com/) is used for emphasis styles.
 * To Slugify, we use Mr. Sato 's code (https://qiita.com/satokaz/items/64582da4640898c4bf42)
@@ -178,6 +187,7 @@ And we use some useful articles below.
 
 ## Release Notes
 
-* No Release
+* 0.0.1
+  * first Release.
 
 

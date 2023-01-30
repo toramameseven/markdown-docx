@@ -17,6 +17,11 @@
     "body": ["<!-- word cols $1,$2 -->"],
     "description": "word cols"
   },
+  "word property": {
+    "prefix": "word property",
+    "body": ["<!-- word property $1 $2 -->$0"],
+    "description": "word property"
+  },
   "table rowMerge": {
     "prefix": "word rowMerge",
     "body": ["<!-- word rowMerge $1-$2, -->"]
