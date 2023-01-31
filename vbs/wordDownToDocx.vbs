@@ -81,6 +81,7 @@ Const wcNewPage= "newPage"
 Const wcPageSetup= "pageSetup"
 Const wcDocxTemplate= "docxTemplate"
 Const wcDocxEngine= "docxEngine"
+Const wcCrossRef = "crossRef"
 
 Const wcStyleAuthor ="author1"
 Const wcStyleDate ="date1"
@@ -186,7 +187,8 @@ Class XWord
     Dim m_toToc '' as long '' table of contents, 1 to tocTo
     Dim m_tocCaption 'default TOC
     dim m_isTocSet '' if toc is set once
-    Dim m_rngToc 
+    Dim m_rngToc
+    Dim m_crossRef '' cref format [[$n $t (p.$p)]]
 
     Private Sub Class_Initialize()
         Set WordApp = CreateObject("Word.Application")
@@ -210,6 +212,7 @@ Class XWord
         m_isToc = False
         m_indent = 1
         m_markdownDirPath = markdownDirPath
+        m_crossRef = "[[$n $t (p.$p)]]"
         
         Set HeaderCollection = New Collection
         Set RefCollection = New Collection
@@ -370,7 +373,8 @@ Class XWord
                 call me.AddAuthor(params(1))
             case wcProperty
                 call me.SetCustomDocumentProperty(params(1), params(2))
-
+            case wcCrossRef
+                m_crossRef = params(1)
             case wcDivision
                 call me.AddDivision(params(1))
 
@@ -760,13 +764,13 @@ Class XWord
         End if
 
         '' word xref
-        AddText "[["
+        'AddText "[["
         '' only add to ref collection, and set docx later
         dim rngRef
         set rngRef = addText(ref)
         ''call RefCollection.AddRangeRefTitle(GetCurrentRangeStart, ref)
-        call RefCollection.AddRangeRefTitle(rngRef, ref)
-        AddText "]]" 
+        call RefCollection.AddRangeRefTitle(rngRef, ref, m_crossRef)
+        'AddText "]]" 
     End Sub
 
 
@@ -1238,30 +1242,73 @@ Class XWord
             End With
         Next        
     End Sub
+
     Sub AddXRef()
         Dim Items
-        Items = HeaderCollection.Keys()
+        ''Items = HeaderCollection.Keys()
         Items = RefCollection.Items()
         Dim pos
         Dim HeadingNo
         Dim rngInsert
+        Dim fmt
         Dim ii
         for ii = 0 to ubound(Items)
+            fmt = Items(ii).RefFormat
             pos =  Items(ii).RefPosition.Start
             if HeaderCollection.Exists(Items(ii).RefTitle) Then
                 Items(ii).RefPosition.Text = String_Empty
                 HeadingNo = HeaderCollection.Item(Items(ii).RefTitle) 
-                WordDoc.Range(pos, pos).InsertBefore ")"
-                WordDoc.Range(pos, pos).InsertCrossReference wdRefTypeHeading, wdPageNumber, HeadingNo, True, False, False, String_Space 
-                WordDoc.Range(pos, pos).InsertBefore "(p."
-                WordDoc.Range(pos, pos).InsertCrossReference wdRefTypeHeading, wdContentText, HeadingNo, True, False, False, String_Space 
-                WordDoc.Range(pos, pos).InsertBefore String_Space
-                WordDoc.Range(pos, pos).InsertCrossReference wdRefTypeHeading, wdNumberFullContext, HeadingNo, True, False, False, String_Space 
+                ' WordDoc.Range(pos, pos).InsertBefore ")"
+                ' WordDoc.Range(pos, pos).InsertCrossReference wdRefTypeHeading, wdPageNumber, HeadingNo, True, False, False, String_Space 
+                ' WordDoc.Range(pos, pos).InsertBefore "(p."
+                ' WordDoc.Range(pos, pos).InsertCrossReference wdRefTypeHeading, wdContentText, HeadingNo, True, False, False, String_Space 
+                ' WordDoc.Range(pos, pos).InsertBefore String_Space
+                ' WordDoc.Range(pos, pos).InsertCrossReference wdRefTypeHeading, wdNumberFullContext, HeadingNo, True, False, False, String_Space
+                AddXrefCore "[[$n $t (p.$p)]]", pos, HeadingNo
             else
                 LogWarn "No xref", Items(ii).RefTitle
             End if
         Next
     End Sub 
+
+    sub AddXrefCore(sRef, pos, HeadingNo)
+        sRef = sRef + " "
+        Dim sArrRef(100)
+        Dim i
+        dim t
+        dim c
+        c = 0
+        for i = 1 to len(sRef) - 1
+            t = mid(sRef,i,2)
+            if t ="$n" then
+                sArrRef(c) = t
+                i = i + 1
+            elseif t = "$t" then
+                sArrRef(c) = t
+                i = i + 1
+            elseif t = "$p" then
+                sArrRef(c) = t
+                i = i + 1
+            else
+                sArrRef(c) = left(t, 1)
+            end if
+            c = c + 1
+        next
+
+        for i = c to 0 step -1
+            t = sArrRef(i)
+            if t ="$n" then
+                WordDoc.Range(pos, pos).InsertCrossReference wdRefTypeHeading, wdNumberFullContext, HeadingNo, True, False, False, String_Space 
+            elseif t = "$t" then
+                WordDoc.Range(pos, pos).InsertCrossReference wdRefTypeHeading, wdContentText, HeadingNo, True, False, False, String_Space
+            elseif t = "$p" then
+                WordDoc.Range(pos, pos).InsertCrossReference wdRefTypeHeading, wdPageNumber, HeadingNo, True, False, False, String_Space 
+            else
+                WordDoc.Range(pos, pos).InsertBefore t
+            end if
+        next
+    end sub
+
 
     ' Name	Value	Description
     ' wdCommentsStory	4	Comments story.
@@ -1454,15 +1501,14 @@ Class Collection
             rKey = rKey & "-" & CStr(numberForDuplicated)
         Loop
 
-
         m_collection.Add rKey, CStr(m_collection.Count + 1)
         AddKyeNumber = rKey
     End Function
 
-    Public Sub AddRangeRefTitle(rng, title)
+    Public Sub AddRangeRefTitle(rng, title, fmt)
         dim ref '' XRef
         set ref = new XRef
-        call ref.SetRef(rng, title)
+        call ref.SetRef(rng, title, fmt)
         m_collection.Add CStr(m_collection.Count + 1), ref
         set ref = Nothing
     End Sub
@@ -1524,14 +1570,16 @@ End Class
 Class XRef
     Public RefPosition ''As Range
     Public RefTitle ''As String
+    Public RefFormat '' as string 
 
-    Sub SetRef(position, title)
+    Sub SetRef(position, title, fmt)
         Set RefPosition = position
         RefTitle = title
+        RefFormat = fmt
     End Sub
 End Class
 
-Sub LogDebug(title, value)
+Sub LogDebug(ByVal title, Byval value)
   call LogCore("DBG", title, value)
 End Sub
 

@@ -52,6 +52,7 @@ const wordCommand = {
   docxEngine: "docxEngine",
   docxTemplate: "docxTemplate",
   property: "property",
+  crossRef: "crossRef",
 } as const;
 
 const _sp = "\t";
@@ -177,6 +178,11 @@ function getWordCommand(content: string) {
         return createBlockCommand(wordCommand.property, {
           propertyKey,
           propertyValue,
+        });
+      case wordCommand.crossRef:
+        const crossRef = params.join(" ");
+        return createBlockCommand(wordCommand.crossRef, {
+          crossRef,
         });
       case wordCommand.title:
         // default ''
