@@ -2,9 +2,10 @@ title	sample document
 newLine	convertTitle	tm
 subTitle	sample document subTitle
 newLine	convertSubTitle	tm
-division	division				tm
-date	date				tm
-author	author				tm
+division	divisionXXX				tm
+date	dateXXX				tm
+author	authorXXX				tm
+docNumber	XXXX-0004				tm
 newLine	wd0NewLine	tm
 toc	3	toc caption	tm
 newLine	convertToc	tm

@@ -2,7 +2,7 @@ title	sample document
 newLine	convertTitle	tm
 subTitle	sample document subTitle
 newLine	convertSubTitle	tm
-toc	3	TOC	tm
+toc	1	TOC	tm
 newLine	convertToc	tm
 section	1	title subtitle and table of content	title-subtitle-and-table-of-content
 newLine	convertHeading	tm

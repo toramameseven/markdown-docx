@@ -1,6 +1,6 @@
 <!-- word title sample document -->
 <!-- word subTitle sample document subTitle -->
-<!-- word toc 3 -->
+<!-- word toc 1 TOC -->
 
 <!-- https://markdown-it.github.io/ -->
 
@@ -15,6 +15,7 @@ markdown
 ```
 
 The result is above.
+
 
 
 This sample markdown is modified from the document of [markdown-it](https://markdown-it.github.io/).
