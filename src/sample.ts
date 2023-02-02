@@ -1,5 +1,3 @@
-const a = `ssssss`;
+console.log(`ddd   "ddd"`.split(/\s(?=(?:[^"]*"[^"]*")*[^"]*$)/i));
 
-const c = a.split("\t");
-
-console.log(c);
+console.log(`"ss""ssffffffffffffff"""`.replace(/"{1}/gi, ""));

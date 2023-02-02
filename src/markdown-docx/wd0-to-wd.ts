@@ -52,6 +52,7 @@ const wd0Command = {
 
   crossRef: "crossRef",
   property: "property",
+  clearContent:"clearContent",
   docNumber: "docNumber",
   indentPlus: "indentPlus",
   indentMinus: "indentMinus",
@@ -600,7 +601,20 @@ function convertCrossRef(params: DocxParam, isCommandEnd?: boolean) {
   const r = ["crossRef", params.crossRef, "", "", "", "tm"].join(_sp);
   outputWd(r);
 }
-
+function convertClearContent(params: DocxParam, isCommandEnd?: boolean) {
+  if (isCommandEnd) {
+    return;
+  }
+  const r = [
+    "clearContent",
+    params.isClearContent,
+    "",
+    "",
+    "",
+    "tm",
+  ].join(_sp);
+  outputWd(r);
+}
 function convertDate(params: DocxParam, isCommandEnd?: boolean) {
   if (isCommandEnd) {
     return;
@@ -810,6 +824,12 @@ function resolveCommand(
       }
       convertCrossRef(params, isCommandEnd);
       break;
+    case wd0Command.clearContent:
+        if (isCommandEnd) {
+          return;
+        }
+        convertClearContent(params, isCommandEnd);
+        break;
     case wd0Command.date:
       if (isCommandEnd) {
         return;

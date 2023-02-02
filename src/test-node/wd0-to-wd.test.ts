@@ -68,6 +68,20 @@ newLine	convertToc	tm`;
   });
 
   // ==========================================
+  test("property", () => {
+    // marked
+    const markdown = `
+<!-- word property ppp "table of content" -->`;
+
+    // expect
+    const expect = `
+property	ppp	table of content			tm`;
+
+    // assert
+    assert.strictEqual(mdToWd(removeTopN(markdown)), removeTopN(expect));
+  });
+
+  // ==========================================
   test("heading1", () => {
     // marked
     const markdown = `

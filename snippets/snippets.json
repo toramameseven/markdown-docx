@@ -17,11 +17,6 @@
     "body": ["<!-- word cols $1,$2 -->"],
     "description": "word cols"
   },
-  "word property": {
-    "prefix": "word property",
-    "body": ["<!-- word property $1 $2 -->$0"],
-    "description": "word property"
-  },
   "table rowMerge": {
     "prefix": "word rowMerge",
     "body": ["<!-- word rowMerge $1-$2, -->"]
@@ -29,6 +24,11 @@
   "table emptyMerge": {
     "prefix": "word emptyMerge",
     "body": ["<!-- word emptyMerge -->"]
+  },
+  "word property": {
+    "prefix": "word property",
+    "body": ["<!-- word property $1 $2 -->$0"],
+    "description": "word property"
   },
   "newPage": {
     "prefix": "word newPage",
@@ -50,6 +50,14 @@
     "body": [
       "<!-- word pageSetup ${1|wdOrientationLandscape,wdOrientationPortrait|} ${2|wdSizeA4,wdSizeA3|} -->"
     ]
+  },
+  "clear content": {
+    "prefix": "word clear content",
+    "body": ["<!-- word clearContent ${1|true,false|} -->$0"]
+  },
+  "cross reference": {
+    "prefix": "word crossRef",
+    "body": ["<!-- word crossRef [[\\$n \\$t (p.\\$p)]] -->"]
   },
   "docx engine": {
     "prefix": "word docxEngine",

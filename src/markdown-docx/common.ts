@@ -87,7 +87,7 @@ export function getFileContents(filePath: string) {
 export function getWordDownCommand(wd: string) {
   const testMatch = wd.match(/^<!--(?<name>.*)-->/i);
   const command = testMatch?.groups?.name ?? "";
-  const commandList = command.trim().split(" ");
+  const commandList = command.trim().split(/\s(?=(?:[^"]*"[^"]*")*[^"]*$)/i);
   if (commandList[0] === "word" && commandList[1]) {
     return { command: commandList[1], params: commandList.slice(2) ?? [] };
   }

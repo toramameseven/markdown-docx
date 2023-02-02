@@ -1,6 +1,7 @@
 import { marked } from "marked";
 import { unescape } from "lodash";
 import { getWordDownCommand, MessageType, ShowMessage } from "./common";
+import { info } from "console";
 
 const source = "markdown-to-wd";
 let showMessage: ShowMessage | undefined;
@@ -52,6 +53,7 @@ const wordCommand = {
   docxEngine: "docxEngine",
   docxTemplate: "docxTemplate",
   property: "property",
+  clearContent: "clearContent",
   crossRef: "crossRef",
 } as const;
 
@@ -184,6 +186,11 @@ function getWordCommand(content: string) {
         return createBlockCommand(wordCommand.crossRef, {
           crossRef,
         });
+    case wordCommand.clearContent:
+          const isClearContent = params[0] ?? false;
+          return createBlockCommand(command, {
+            isClearContent,
+          });
       case wordCommand.title:
         // default ''
         const title = params.join(" ");
@@ -319,6 +326,7 @@ const blockHeading = (content: string, index: number) => {
 
   let idTitle = (r && r[4]) ?? title;
   idTitle = slugify(idTitle);
+
 
   const headings = {
     index: (index - headingOffset).toString(),
