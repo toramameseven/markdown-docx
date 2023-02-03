@@ -41,7 +41,7 @@ suite("Extension Test Suite", () => {
   test("title", () => {
     // marked
     const markdown = `
-<!-- word title Markdown to Docx samples -->`;
+<!-- word title "Markdown to Docx samples" -->`;
 
     // expect
     const expect = `
@@ -56,7 +56,7 @@ newLine\tconvertTitle\ttm`;
   test("toc", () => {
     // marked
     const markdown = `
-<!-- word toc 1 table of content-->`;
+<!-- word toc 1 "table of content"-->`;
 
     // expect
     const expect = `

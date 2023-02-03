@@ -1,5 +1,5 @@
-<!-- word title sample document -->
-<!-- word subTitle sample document subTitle -->
+<!-- word title "sample document" -->
+<!-- word subTitle "sample document subTitle" -->
 <!-- word toc 1 TOC -->
 
 <!-- https://markdown-it.github.io/ -->

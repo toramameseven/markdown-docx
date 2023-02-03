@@ -1,11 +1,11 @@
-<!-- word title sample document -->
-<!-- word subTitle sample document subTitle -->
+<!-- word title "sample document" -->
+<!-- word subTitle "sample document subTitle" -->
 <!-- word division divisionXXX -->
 <!-- word date dateXXX -->
 <!-- word author authorXXX -->
 <!-- word docNumber XXXX-0004 -->
 <!-- word newLine -->
-<!-- word toc 3 toc caption -->
+<!-- word toc 3 "toc caption" -->
 
 
 <!-- https://markdown-it.github.io/ -->

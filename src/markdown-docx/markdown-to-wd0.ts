@@ -165,15 +165,14 @@ function getWordCommand(content: string) {
       case wordCommand.toc:
         // default toc is to 3 heading level
         const tocTo = params[0] ? params[0] : "3";
-
-        const tocCaption = params.slice(1).join(" ");
+        const tocCaption = params[1] ?? "table of contents";
         return createBlockCommand(wordCommand.toc, {
           tocTo,
           tocCaption,
         });
       case wordCommand.property:
         const propertyKey = params[0];
-        const propertyValue = params.slice(1).join(" ");
+        const propertyValue = params[1];
         if (!propertyKey) {
           return;
         }
@@ -182,48 +181,48 @@ function getWordCommand(content: string) {
           propertyValue,
         });
       case wordCommand.crossRef:
-        const crossRef = params.join(" ");
+        const crossRef = params[0];
         return createBlockCommand(wordCommand.crossRef, {
           crossRef,
         });
-    case wordCommand.clearContent:
-          const isClearContent = params[0] ?? false;
-          return createBlockCommand(command, {
-            isClearContent,
-          });
+      case wordCommand.clearContent:
+        const isClearContent = params[0] ?? false;
+        return createBlockCommand(command, {
+          isClearContent,
+        });
       case wordCommand.title:
         // default ''
-        const title = params.join(" ");
+        const title = params[0];
         return createBlockCommand(wordCommand.title, {
           title,
         });
       case wordCommand.subTitle:
         // default ''
-        const subTitle = params.join(" ");
+        const subTitle = params[0];
         return createBlockCommand(wordCommand.subTitle, {
           subTitle,
         });
       case wordCommand.author:
         // default ''
-        const author = params.join(" ");
+        const author = params[0];
         return createBlockCommand(wordCommand.author, {
           author,
         });
       case wordCommand.docNumber:
         // default ''
-        const docNumber = params.join(" ");
+        const docNumber = params[0];
         return createBlockCommand(wordCommand.docNumber, {
           docNumber,
         });
       case wordCommand.date:
         // default ''
-        const date = params.join(" ");
+        const date = params[0];
         return createBlockCommand(wordCommand.date, {
           date,
         });
       case wordCommand.division:
         // default ''
-        const division = params.join(" ");
+        const division = params[0];
         return createBlockCommand(wordCommand.division, {
           division,
         });
@@ -256,7 +255,7 @@ function getWordCommand(content: string) {
 
 export function getWordTitle(wd: string) {
   const r = getWordDownCommand(wd);
-  const title = r?.command === "title" ? r.params.join(" ") : "no title";
+  const title = r?.command === "title" ? r.params[0] : "no title";
   return title;
 }
 
@@ -326,7 +325,6 @@ const blockHeading = (content: string, index: number) => {
 
   let idTitle = (r && r[4]) ?? title;
   idTitle = slugify(idTitle);
-
 
   const headings = {
     index: (index - headingOffset).toString(),

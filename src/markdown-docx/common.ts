@@ -89,7 +89,8 @@ export function getWordDownCommand(wd: string) {
   const command = testMatch?.groups?.name ?? "";
   const commandList = command.trim().split(/\s(?=(?:[^"]*"[^"]*")*[^"]*$)/i);
   if (commandList[0] === "word" && commandList[1]) {
-    return { command: commandList[1], params: commandList.slice(2) ?? [] };
+    const params = (commandList.slice(2) ?? []).map(l => l.replace(/\"/g, ""));
+    return { command: commandList[1], params };
   }
   return undefined;
 }
