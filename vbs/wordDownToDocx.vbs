@@ -8,19 +8,21 @@ Dim isResumeNext
 isResumeNext = False
 Dim logCycle '' As long
 logCycle = 10
-dim gLinesCount
+Dim gLinesCount
 
 Const Scripting_Dictionary = "Scripting.Dictionary"
 Const Scripting_FileSystemObject = "Scripting.FileSystemObject"
 Const String_Empty = ""
 Const String_Space = " "
 
-''on error resume next
+''on error resume Next
 Dim fso
-set fso = createObject(Scripting_FileSystemObject)
+Set fso = createObject(Scripting_FileSystemObject)
 
-Dim logWarns
-set logWarns = new XFiles
+
+Dim warnMessages
+Set warnMessages = New Collection
+
 
 '' styles
 '' https://learn.microsoft.com/ja-jp/office/vba/api/word.wdbuiltinstyle
@@ -127,10 +129,10 @@ WScript.Quit(0)
 
 Sub main
     Dim objArgs
-    set objArgs = WScript.Arguments
+    Set objArgs = WScript.Arguments
 
     Dim wdFilePath
-    If objArgs.Count = 0 then
+    If objArgs.Count = 0 Then
         '' for debug
         wdFilePath =  fso.getParentFolderName(WScript.ScriptFullName) + "\demo-headings.wd"
         wdFilePath =  fso.getParentFolderName(WScript.ScriptFullName) + "\empty.wd"
@@ -141,7 +143,7 @@ Sub main
     End If
 
     Dim templateDocxPath
-    templateDocxPath = fso.getParentFolderName(WScript.ScriptFullName) & "\sample-heder_.docx" 
+    templateDocxPath = fso.getParentFolderName(WScript.ScriptFullName) & "\sample-heder.docx" 
     If objArgs.Count > 1 Then
         If fso.FileExists(objArgs(1)) Then
             templateDocxPath = objArgs(1)
@@ -168,20 +170,25 @@ Sub main
 
     '' load wd file
     Dim wdLines
-    set wdLines = new XFiles
+    Set wdLines = new XFiles
     Call wdLines.Load(wdFilePath)
 
-    dim markdownDirPath
+    Dim markdownDirPath
     markdownDirPath = fso.getParentFolderName(wdFilePath)
     
     '' detect docxTemplate in wd file.
-    Call logWarns.Clear()
+    Call warnMessages.Clear()
     Dim w
-    set w = new XWord
+    Set w = new XWord
     Call w.CreateDocX(wdLines, markdownDirPath, templateDocxPath)
-    If logWarns.Count > 0 Then
-        logWarns.WriteToFile(wdFilePath + ".warn.log")
-    End If
+    
+    Dim i
+    If warnMessages.Count > 0 Then
+        Call LogCore("WRN", "Next: ", warnMessages.Count)
+        for i = 1 to warnMessages.Count
+            Call LogCore("WRN", warnMessages.ObjectItem(i).title, warnMessages.ObjectItem(i).value)
+        Next
+    end If
 End Sub
 
 Class XWord
@@ -189,17 +196,17 @@ Class XWord
     Public WordDoc ''As Word.Document
     Public m_indent '' As long
     Private m_templateInsideWd
-    Dim HeaderCollection '' As Collection
-    Dim RefCollection '' As Collection
+    Dim HeaderCollection '' As Dictionary
+    Dim RefCollection '' As Dictionary
     Dim m_markdownDirPath '' markdown path now convert
 
-    Dim rngCurrent ''As Range
+    Dim m_rngCurrent ''As Range
 
     '' options
     Dim m_isToc
     Dim m_toToc '' as long '' table of contents, 1 to tocTo
     Dim m_tocCaption 'default TOC
-    dim m_isTocSet '' If toc is set once
+    Dim m_isTocSet '' If toc is Set once
     Dim m_rngToc 
     Dim m_crossRef '' cref format [[$n $t (p.$p)]]
 
@@ -220,16 +227,14 @@ Class XWord
 
      '' main
     Sub CreateDocX(wdLines, markdownDirPath, templateDocxPath)
-        Call logWarns.clear()
-
         gLinesCount = wdLines.Count
         m_isToc = False
         m_indent = 1
         m_markdownDirPath = markdownDirPath
         m_crossRef = "[[$n $t (p.$p)]]"
         
-        Set HeaderCollection = New Collection
-        Set RefCollection = New Collection
+        Set HeaderCollection = New Dictionary
+        Set RefCollection = New Dictionary
 
         '' get docxTemplate inside wd file
         Call doCommands(wdLines.Item(1), wdLines, 1, "docxTemplate") 
@@ -242,7 +247,7 @@ Class XWord
             .Visible = True
             .WindowState = wdWindowStateMinimize
             '' get file As docxTemplate 
-            If m_templateInsideWd <> String_Empty then
+            If m_templateInsideWd <> String_Empty Then
                 templateDocxPath = m_templateInsideWd
             End If
 
@@ -258,8 +263,6 @@ Class XWord
             '' clear properties
             Call resetCustomProperties()
 
-            ''Call SetCurrentPositionRangeTop
-            
             '' add text to the template
             Call SetCurrentPositionRangeEnd
         End With
@@ -269,8 +272,8 @@ Class XWord
         Dim wdCommandLine ''As String
 
 
-        If isResumeNext then
-            on error resume next
+        If isResumeNext Then
+            on error resume Next
         End If
 
         For i = 1 To wdLines.Count
@@ -333,12 +336,12 @@ Class XWord
                 If m_isTocSet = false Then
                     m_tocCaption = params(2)
                     AddLineWithNewLine m_tocCaption, wdStyleNormal
-                    set m_rngToc = GetCurrentRangeStart
+                    Set m_rngToc = GetCurrentRangeStart
                     AddNewLine("toc")
                     m_isToc = True
                     m_toToc = params(1)
                     If IsNumeric(m_toToc) Then
-                        If m_toToc > 5 then
+                        If m_toToc > 5 Then
                             m_toToc = 5
                         End If
                     Else
@@ -434,7 +437,7 @@ Class XWord
         End If
         Dim r
         With WordDoc
-            set r = .TablesOfContents.Add(m_rngToc, True, 1, m_toToc)', '' True, String_Empty, True, True, True
+            Set r = .TablesOfContents.Add(m_rngToc, True, 1, m_toToc)', '' True, String_Empty, True, True, True
             .TablesOfContents(1).TabLeader = wdTabLeaderDots
             .TablesOfContents.Format = wdIndexIndent
         End With
@@ -476,38 +479,38 @@ Class XWord
     End Sub
 
     Sub SetIndent()
-        If (m_indent < 1) then
+        If (m_indent < 1) Then
             m_indent = 1
         End If
-        If (m_indent > 3) then
+        If (m_indent > 3) Then
             m_indent = 3
         End If
         Dim myStyle
         myStyle = "body" & CStr(m_indent)
-        rngCurrent.Style = GetStyle(myStyle)
+        m_rngCurrent.Style = GetStyle(myStyle)
     End Sub
 
     sub NewPage()
-        rngCurrent.InsertBreak wdPageBreak
-        SetCurrentByEnd rngCurrent
+        m_rngCurrent.InsertBreak wdPageBreak
+        SetCurrentByEnd m_rngCurrent
     End sub
 
     sub PageSetup(Orientation, pageSize)
         WordDoc.PageSetup.Orientation = wdOrientPortrait
 
-        If pageSize = "wdSizeA4" then
+        If pageSize = "wdSizeA4" Then
             WordDoc.PageSetup.PageHeight = WordApp.MillimetersToPoints(297)
             WordDoc.PageSetup.PageWidth = WordApp.MillimetersToPoints(210)
-        elseif pageSize = "wdSizeA3" then
+        elseif pageSize = "wdSizeA3" Then
             WordDoc.PageSetup.PageHeight = WordApp.MillimetersToPoints(419.9)
             WordDoc.PageSetup.PageWidth = WordApp.MillimetersToPoints(297)
         End If
 
-        If Orientation = "wdOrientationLandscape" then
+        If Orientation = "wdOrientationLandscape" Then
             WordDoc.PageSetup.Orientation = wdOrientLandscape
         End If
 
-        If Orientation = "wdOrientationPortrait" then
+        If Orientation = "wdOrientationPortrait" Then
             WordDoc.PageSetup.Orientation = wdOrientPortrait
         End If
     End sub
@@ -554,35 +557,35 @@ Class XWord
         Dim heading 'As long
         heading = -1 - CLng(head)
         Dim rngNew
-        set rngNew = AddText(text)
+        Set rngNew = AddText(text)
         rngNew.Style = heading
 
         Dim myParagraph
-        set myParagraph = rngNew.Paragraphs(1).Range
+        Set myParagraph = rngNew.Paragraphs(1).Range
         Dim keyOfHeading
         keyOfHeading = myParagraph.ListFormat.ListString & myParagraph.Text
         Dim r
         r = HeaderCollection.AddKyeNumber(idTitle)
-        SetCurrentByEnd rngCurrent
+        SetCurrentByEnd m_rngCurrent
     End Sub
 
     Sub AddHead5(ByVal head, ByRef text, ByRef idTitle)
         Dim rngNew
-        set rngNew = AddText(text)
+        Set rngNew = AddText(text)
         rngNew.Style = GetStyle(wcStyleHeading5)
 
         Dim myParagraph
-        set myParagraph = rngNew.Paragraphs(1).Range
-        SetCurrentByEnd rngCurrent
+        Set myParagraph = rngNew.Paragraphs(1).Range
+        SetCurrentByEnd m_rngCurrent
     End Sub
 
     sub showCurrentRange(info)
         LogInfo String_Empty,String_Empty
         LogInfo "----------->: ", "showCurrentRange: " & info
-        LogInfo "rngCurrent.start, End: ", rngCurrent.Start & ", " & rngCurrent.End
+        LogInfo "m_rngCurrent.start, End: ", m_rngCurrent.Start & ", " & m_rngCurrent.End
         Dim x
-        For Each x In rngCurrent.Characters
-            LogInfo "rngCurrent.Characters AscW: ", AscW(x)
+        For Each x In m_rngCurrent.Characters
+            LogInfo "m_rngCurrent.Characters AscW: ", AscW(x)
         Next
         LogInfo "<-----------: ", String_Empty
         LogInfo String_Empty,String_Empty                                                            
@@ -633,8 +636,8 @@ Class XWord
     End Sub
 
     sub SetCustomDocumentProperty(byval propertyName, byval value)
-        dim Properties
-        set Properties = WordDoc.CustomDocumentProperties
+        Dim Properties
+        Set Properties = WordDoc.CustomDocumentProperties
 
         If HasCustomDocumentProperty(propertyName) Then
             Properties.Item(propertyName) = value
@@ -644,8 +647,8 @@ Class XWord
     End Sub
 
     Function HasCustomDocumentProperty(byval propertyName)
-        dim Properties
-        set Properties = WordDoc.CustomDocumentProperties
+        Dim Properties
+        Set Properties = WordDoc.CustomDocumentProperties
         Dim i
         For i = 1 To Properties.Count
             If Properties.Item(i).Name = propertyName Then
@@ -666,119 +669,119 @@ Class XWord
             exit Function
         End If
 
-        dim rngReturn
-        set rngReturn = GetCurrentRangeStart()
+        Dim rngReturn
+        Set rngReturn = GetCurrentRangeStart()
         rngReturn.InsertAfter text
         ''emphasis rngReturn
-        set AddText = rngReturn
+        Set AddText = rngReturn
         SetCurrentByEnd rngReturn
     End Function
 
     Function AddLineWithNewLine(ByRef text, ByRef nStyle)
-        dim rngReturn
-        set rngReturn = GetCurrentRangeStart()
+        Dim rngReturn
+        Set rngReturn = GetCurrentRangeStart()
         rngReturn.InsertAfter text
-        set AddLineWithNewLine = rngReturn
+        Set AddLineWithNewLine = rngReturn
         SetCurrentByEnd rngReturn
         
         '' nStyle is wd... or GetStyle(myStyle)
-        rngCurrent.Style = nStyle
+        m_rngCurrent.Style = nStyle
 
-        rngCurrent.InsertParagraphBefore
-        emphasis rngCurrent.Paragraphs(1).range
-        SetCurrentByEnd rngCurrent
+        m_rngCurrent.InsertParagraphBefore
+        emphasis m_rngCurrent.Paragraphs(1).range
+        SetCurrentByEnd m_rngCurrent
 
     End Function
 
     Function AddRawText(ByRef text)
-        dim rngReturn
-        set rngReturn = GetCurrentRangeStart()
+        Dim rngReturn
+        Set rngReturn = GetCurrentRangeStart()
         rngReturn.InsertAfter text
-        set AddRawText = rngReturn
+        Set AddRawText = rngReturn
         SetCurrentByEnd rngReturn
     End Function
 
     Function SetCurrentByEnd(rng)
-        set rngCurrent = WordDoc.Range(rng.End, rng.End)
-        set  SetCurrentByEnd = rngCurrent
+        Set m_rngCurrent = WordDoc.Range(rng.End, rng.End)
+        Set  SetCurrentByEnd = m_rngCurrent
     End Function
 
     Sub SetCurrentNext()
-        set rngCurrent = WordDoc.Range(rngCurrent.Start + 1, rngCurrent.End + 1)
+        Set m_rngCurrent = WordDoc.Range(m_rngCurrent.Start + 1, m_rngCurrent.End + 1)
     End Sub
 
     Function SetCurrentByTop(rng)
-        set rngCurrent = WordDoc.Range(rng.Start, rng.Start)
-        set  SetCurrentByTop = rngCurrent
+        Set m_rngCurrent = WordDoc.Range(rng.Start, rng.Start)
+        Set  SetCurrentByTop = m_rngCurrent
     End Function
 
     Function SetCurrentPositionRangeTop()
-        set rngCurrent = WordDoc.Range(0, 0) 
-        set SetCurrentPositionRangeTop = rngCurrent
+        Set m_rngCurrent = WordDoc.Range(0, 0) 
+        Set SetCurrentPositionRangeTop = m_rngCurrent
     End Function
 
     Function SetCurrentPositionRangeEnd()
-        set rngCurrent = WordDoc.Bookmarks("\EndOfDoc").Range
-        set SetCurrentPositionRangeEnd = rngCurrent
+        Set m_rngCurrent = WordDoc.Bookmarks("\EndOfDoc").Range
+        Set SetCurrentPositionRangeEnd = m_rngCurrent
     End Function
 
     Function GetCurrentRangeStart()
-        set  GetCurrentRangeStart = WordDoc.Range(rngCurrent.Start, rngCurrent.Start)
+        Set  GetCurrentRangeStart = WordDoc.Range(m_rngCurrent.Start, m_rngCurrent.Start)
     End Function
 
     Function GetCurrentRangeEnd()
-        set  GetCurrentRangeEnd = WordDoc.Range(rngCurrent.End, rngCurrent.End)  
+        Set  GetCurrentRangeEnd = WordDoc.Range(m_rngCurrent.End, m_rngCurrent.End)  
     End Function
 
     sub AddHr()
-        dim r
-        set r = GetCurrentRangeStart()
+        Dim r
+        Set r = GetCurrentRangeStart()
         r.InlineShapes.AddHorizontalLineStandard
         SetCurrentNext
         SetCurrentNext
     End sub
 
     Sub AddNewLine(command)
-        If (m_indent < 1) then
+        If (m_indent < 1) Then
             m_indent = 1
         End If
-        If (m_indent > 3) then
+        If (m_indent > 3) Then
             m_indent = 3
         End If
 
         Dim myStyle
         myStyle = "body" & CStr(m_indent)
-        rngCurrent.InsertParagraphBefore
+        m_rngCurrent.InsertParagraphBefore
         If command <> "convertCode" Then
-            emphasis rngCurrent.Paragraphs(1).range
-            math rngCurrent.Paragraphs(1).range
+            emphasis m_rngCurrent.Paragraphs(1).range
+            math m_rngCurrent.Paragraphs(1).range
         End If
-        SetCurrentByEnd rngCurrent
+        SetCurrentByEnd m_rngCurrent
         If command <> "wd0NewLine" Then
-            rngCurrent.Style = GetStyle(myStyle)
+            m_rngCurrent.Style = GetStyle(myStyle)
         End If
     End Sub
 
     Sub AddEndParagraph(command)
-        If (m_indent < 1) then
+        If (m_indent < 1) Then
             m_indent = 1
         End If
-        If (m_indent > 3) then
+        If (m_indent > 3) Then
             m_indent = 3
         End If
 
         If command <> "convertCode" Then
-            emphasis rngCurrent.Paragraphs(1).range
-            math rngCurrent.Paragraphs(1).range
+            emphasis m_rngCurrent.Paragraphs(1).range
+            math m_rngCurrent.Paragraphs(1).range
         End If
     End Sub
 
     '' [text](ref "hover")
     Sub AddLink(ByRef ref, ByRef hover, ByRef text)
 
-        '' If ref = String_Empty, for index. now set only text.
+        '' If ref = String_Empty, for index. now Set only text.
         '' what is index?
-        If ref = String_Empty then
+        If ref = String_Empty Then
             AddText  "["
             AddText text
             AddText  "]" 
@@ -795,9 +798,9 @@ Class XWord
 
         '' word xref
         'AddText "[["
-        '' only add to ref collection, and set docx later
-        dim rngRef
-        set rngRef = addText(ref)
+        '' only add to ref Dictionary, and Set docx later
+        Dim rngRef
+        Set rngRef = addText(ref)
         ''Call RefCollection.AddRangeRefTitle(GetCurrentRangeStart, ref)
         Call RefCollection.AddRangeRefTitle(rngRef, ref, m_crossRef)
         'AddText "]]" 
@@ -811,8 +814,8 @@ Class XWord
         ' SubAddress	Optional	Variant	The SubAddress of the hyperlink.
         ' ScreenTip	Optional	Variant	The screen tip to be displayed when the mouse pointer is paused over the hyperlink.
         ' TextToDisplay	Optional	Variant	The text to be displayed for the hyperlink.
-        dim hyperlink
-        set hyperlink = WordDoc.Hyperlinks.Add(GetCurrentRangeStart, ref, String_Empty, hover, text)
+        Dim hyperlink
+        Set hyperlink = WordDoc.Hyperlinks.Add(GetCurrentRangeStart, ref, String_Empty, hover, text)
         SetCurrentByEnd hyperlink.Range
     End Sub
 
@@ -837,7 +840,7 @@ Class XWord
 
         ''WordApp..InlineShapes.AddPicture fileName:= imagePath, LinkToFile:=False, SaveWithDocument:= True
         If fso.FileExists(imagePath) Then
-            set thisShape = GetCurrentRangeStart.InlineShapes.AddPicture(imagePath)
+            Set thisShape = GetCurrentRangeStart.InlineShapes.AddPicture(imagePath)
             Call shapeMatch(thisShape.Range)
 
             thisShape.Range.Style = GetStyle(wcStylePicture1)
@@ -925,7 +928,7 @@ Class XWord
         Dim tablePosition
         Set tablePosition = GetCurrentRangeEnd
 
-        dim documentWidth
+        Dim documentWidth
         documentWidth = GetMaxWidthInRange(tablePosition)
         tablePosition.Select
 
@@ -962,7 +965,7 @@ Class XWord
                 Dim align
                 If alignInfo(x-1, y-1) = "right" Then
                     align = wdAlignParagraphRight
-                Elseif alignInfo(x-1, y-1) = "center" then
+                Elseif alignInfo(x-1, y-1) = "center" Then
                     align = wdAlignParagraphCenter
                 Else    
                     align = wdAlignParagraphLeft
@@ -970,13 +973,13 @@ Class XWord
                 oTable.Cell(x, y).Range.ParagraphFormat.Style = wdStyleNormal
                 oTable.Cell(x, y).Range.ParagraphFormat.Alignment = align
 
-                set rngCurrent = oTable.Cell(x, y).Range
+                Set m_rngCurrent = oTable.Cell(x, y).Range
                 Dim tableItem
-                set tableItem = table(x - 1, y - 1)
+                Set tableItem = table(x - 1, y - 1)
                 for k = 1 to tableItem.Count
                     '' todo markdown path for images
                     Call doCommands(tableItem.Item(k), String_Empty, String_Empty, String_Empty)
-                next
+                Next
             Next
         Next
 
@@ -1025,7 +1028,7 @@ Class XWord
         strSplit = Split(wdLines.Item(iCurrent), vbTab)
 
         Dim collectionValue
-        Set collectionValue = New Collection
+        Set collectionValue = New Dictionary
 
         '' get create table and rows , columns
         Dim tableInfo() ''As String()
@@ -1058,8 +1061,8 @@ Class XWord
                 Select Case strCommand
                     Case "tablecontents"
                         '' tablecontents, row, col, value, align
-                        Set collectionValue = New Collection
-                        set tableInfo(CLng(strSplit(1)), CLng(strSplit(2))) = collectionValue
+                        Set collectionValue = New Dictionary
+                        Set tableInfo(CLng(strSplit(1)), CLng(strSplit(2))) = collectionValue
                         alignInfo(CLng(strSplit(1)), CLng(strSplit(2))) = strSplit(4)
                     Case "tablecontentslist"
                         collectionValue.AddAutoNumKey mid(currentLine, len("tablecontentslist") + 2)
@@ -1068,8 +1071,8 @@ Class XWord
                     Case "tablemarge"
                         '' merge rows
                         '' tableMarge, start row, column, End row, column, value(start row, column)
-                        If ubound(strSplit) > 4 then
-                            If (strSplit(5)) <> String_Empty or True then
+                        If ubound(strSplit) > 4 Then
+                            If (strSplit(5)) <> String_Empty or True Then
                                 If strSplit(1) = strSplit(3) Then
                                     '
                                 Else
@@ -1085,7 +1088,7 @@ Class XWord
                 iCurrent = i
                 exit for
             End If
-        next
+        Next
 
         '' get columns size
         For i = 0 To UBound(columnWith)
@@ -1122,7 +1125,7 @@ Class XWord
 
         For i = 1 To 6
             '' If tRange.End, Find can not detect targets.
-            set myRange = WordDoc.range(tRange.Start, tRange.End + 1)
+            Set myRange = WordDoc.range(tRange.Start, tRange.End + 1)
             With myRange.Find
                 .Text = "\<" & myChr(i) & "\>*\</" & myChr(i) & "\>"
                 .Wrap = 0 ''wdFindStop: 0
@@ -1136,7 +1139,7 @@ Class XWord
                 .MatchWildcards = True
                 Do While .Execute = True
                     With myRange
-                        '' If the style codeSpan is set, no other emphasis does not need.
+                        '' If the style codeSpan is Set, no other emphasis does not need.
                         If .Style <> GetStyle(wcStyleCodeSpan) Then
                             Select Case myChr(i)
                                 Case wcEmphasisSubscript
@@ -1193,9 +1196,9 @@ Class XWord
         GetStyle = rStyle
     End Function
 
-    private Function GetTableStyle(strStyle)
-        dim rStyle
-        on error resume next
+    Private Function GetTableStyle(strStyle)
+        Dim rStyle
+        on error resume Next
         rStyle = WordDoc.Styles(strStyle)
 
         If Err.Number <> 0 Then
@@ -1229,7 +1232,7 @@ Class XWord
 
         For i = 1 To 2
             '' If tRange.End, Find can not detect targets.
-            set myRange = WordDoc.range(tRange.Start, tRange.End + 1)
+            Set myRange = WordDoc.range(tRange.Start, tRange.End + 1)
             With myRange.Find
                 .Text = myChr(i) & "*" & myChr(i)
                 .Wrap = 0 ''wdFindStop: 0
@@ -1299,38 +1302,38 @@ Class XWord
         sRef = sRef + " "
         Dim sArrRef(100)
         Dim i
-        dim t
-        dim c
+        Dim t
+        Dim c
         c = 0
         for i = 1 to len(sRef) - 1
             t = mid(sRef,i,2)
-            If t ="$n" then
+            If t ="$n" Then
                 sArrRef(c) = t
                 i = i + 1
-            elseif t = "$t" then
+            elseif t = "$t" Then
                 sArrRef(c) = t
                 i = i + 1
-            elseif t = "$p" then
+            elseif t = "$p" Then
                 sArrRef(c) = t
                 i = i + 1
             else
                 sArrRef(c) = left(t, 1)
             End If
             c = c + 1
-        next
+        Next
 
         for i = c to 0 step -1
             t = sArrRef(i)
-            If t ="$n" then
+            If t ="$n" Then
                 WordDoc.Range(pos, pos).InsertCrossReference wdRefTypeHeading, wdNumberFullContext, HeadingNo, True, False, False, String_Space 
-            elseif t = "$t" then
+            elseif t = "$t" Then
                 WordDoc.Range(pos, pos).InsertCrossReference wdRefTypeHeading, wdContentText, HeadingNo, True, False, False, String_Space
-            elseif t = "$p" then
+            elseif t = "$p" Then
                 WordDoc.Range(pos, pos).InsertCrossReference wdRefTypeHeading, wdPageNumber, HeadingNo, True, False, False, String_Space 
             else
                 WordDoc.Range(pos, pos).InsertBefore t
             End If
-        next
+        Next
     End sub
 
 
@@ -1376,9 +1379,9 @@ Class XWord
 ' IncludePosition	Optional	Variant	True to insert "above" or "below," depending on the location of the reference item 
 '                               in relation to the cross-reference.
 ' SeparateNumbers	Optional	Variant	True to use a separator to separate the numbers from the associated text.
-'                               (Use only If the ReferenceType parameter is set to wdRefTypeNumberedItem 
-'                               and the ReferenceKind parameter is set to wdNumberFullContext.)
-' SeparatorString	Optional	Variant	Specifies the string to use as a separator If the SeparateNumbers parameter is set to True.
+'                               (Use only If the ReferenceType parameter is Set to wdRefTypeNumberedItem 
+'                               and the ReferenceKind parameter is Set to wdNumberFullContext.)
+' SeparatorString	Optional	Variant	Specifies the string to use as a separator If the SeparateNumbers parameter is Set to True.
 
 '' ReferenceKind
 ' wdContentText	-1	Insert text value of the specified item. For example, insert text of the specified heading.
@@ -1410,7 +1413,7 @@ Class XFiles
     End Sub
 
     Public Function Files()
-        set Files = m_Files
+        Set Files = m_Files
     End Function
 
     Public Sub Clear()
@@ -1436,10 +1439,10 @@ Class XFiles
     Public Function ActiveWdItem(i)
         Dim r
         r =  m_Files.Item(i)
-        If Len(r) > 1 then
-            If left(r, 2) = "//" then
+        If Len(r) > 1 Then
+            If left(r, 2) = "//" Then
                 ActiveWdItem = String_Empty
-                exit function
+                exit Function
             End If
         End If
         ActiveWdItem = r
@@ -1469,14 +1472,14 @@ Class XFiles
                 ' adReadAll ' -1
                 ' for byte
                 ' adReadLine' -2
-                ' real next line (LineSeparator property)ÅB
+                ' real Next line (LineSeparator property)ÅB
                 '[; ] relative path | comment | info
                 currentLine = .ReadText(-2)
                 currentLineNo = currentLineNo + 1
                 m_Files.add currentLineNo, currentLine
             Loop
             .Close
-        End with
+        End With
     End Sub
 
     Sub WriteToFile(filename)
@@ -1496,7 +1499,7 @@ Class XFiles
         For i = 0 to m_Files.Count -1
             writeStream.WriteText m_Files.item(i)
             writeStream.WriteText String_Empty, 1
-        next
+        Next
 
         ' write to a file
         writeStream.SaveToFile filename, 2 'adSaveCreateOverWrite:2
@@ -1507,15 +1510,17 @@ Class XFiles
 End Class
 
 
-Class Collection
+Class Dictionary
     Dim m_collection
 
     Private Sub Class_Initialize
         Set m_collection = CreateObject(Scripting_Dictionary)
     End Sub
 
-    Public Sub AddNumberValue(value)
-        m_collection.Add CStr(m_collection.Count + 1), value
+    Public Sub AddAutoNumKey(value)
+        Dim key
+        key = m_collection.Count + 1
+        m_collection.Add key, value
     End Sub
 
     Public Function AddKyeNumber(Key)
@@ -1534,11 +1539,11 @@ Class Collection
     End Function
 
     Public Sub AddRangeRefTitle(rng, title, fmt)
-        dim ref '' XRef
-        set ref = new XRef
+        Dim ref '' XRef
+        Set ref = new XRef
         Call ref.SetRef(rng, title, fmt)
         m_collection.Add CStr(m_collection.Count + 1), ref
-        set ref = Nothing
+        Set ref = Nothing
     End Sub
 
     Public Function TrimNewLine(s)
@@ -1553,11 +1558,7 @@ Class Collection
         Set m_collection = CreateObject(Scripting_Dictionary)
     End Sub
 
-    Public Sub AddAutoNumKey(value)
-        dim key
-        key = m_collection.Count + 1
-        m_collection.Add key, value
-    End Sub
+
 
     Public Sub Add(key, value)
         m_collection.Add key, value
@@ -1595,6 +1596,51 @@ Class Collection
     End Sub
 End Class
 
+Class Collection
+    Dim m_collection
+
+    Private Sub Class_Initialize
+        Set m_collection = CreateObject(Scripting_Dictionary)
+    End Sub
+
+    Public Sub Add(value)
+        Dim key
+        key = m_collection.Count + 1
+        m_collection.Add key, value
+    End Sub
+
+    Public Sub Clear()
+        Set m_collection = CreateObject(Scripting_Dictionary)
+    End Sub
+
+    Public Function Items()
+        Items = m_collection.Items()
+    End Function
+
+    Public Function Count()
+        Count = m_collection.Count
+    End Function
+
+    Public Function Item(i)
+        Item = m_collection.Item(i)
+    End Function
+
+    Public Function ObjectItem(i)
+        Set ObjectItem = m_collection.Item(i)
+    End Function
+
+    Public Sub Remove(key)
+        m_collection.remove key
+    End Sub
+
+    ' vbUseCompareOption	-1	
+    ' vbBinaryCompare	0	
+    ' vbTextCompare	1	
+    Public Sub SetCompareMode(cMode)
+        m_collection.CompareMode = cMode
+    End Sub
+End Class
+
 Class XRef
     Public RefPosition ''As Range
     Public RefTitle ''As String
@@ -1617,9 +1663,22 @@ Sub LogInfo(title, value)
   End If
 End Sub
 
+Class ErrorMsg
+    Public title
+    Public value
+End Class
+
+Function CreateMessage(title, value)
+    Dim e
+    Set e = new ErrorMsg
+    e.title = title
+    e.value = value
+    Set CreateMessage = e
+End Function
+
 Sub LogWarn(title, value)
   Call LogCore("WRN", title, value)
-  Call logWarns.AddAuto("WRN" & ":" & title & " : " & value)
+  warnMessages.Add CreateMessage(title, value)
 End Sub
 
 Sub LogError(title, value)
@@ -1638,7 +1697,7 @@ Sub LogCore(messageType, title, value)
     If outValue = String_Empty Then
         outValue = "(_empty_)"
     End If
-    on error resume next
+    on error resume Next
     WScript.StdOut.WriteLine messageType & ":" & outTitle & " : " & outValue
     If err.number <> 0 Then
         WScript.StdErr.WriteLine "ERR" & ":" & Err.Description & " : " & Err.Number 
@@ -1647,7 +1706,7 @@ Sub LogCore(messageType, title, value)
 End Sub
 
 Function Catch(source, errCodeExit)
-    exit function
+    exit Function
     If Err.Number <> 0 Then
         WScript.StdErr.WriteLine (source)
         WScript.StdErr.WriteLine (errCodeExit)
@@ -1667,9 +1726,9 @@ Function Catch(source, errCodeExit)
         Catch = True
         On Error Goto 0
     Else
-        If isResumeNext then
+        If isResumeNext Then
             On Error Goto 0
-            on error resume next
+            on error resume Next
         End If
     End If
 End Function
