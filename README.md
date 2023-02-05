@@ -3,7 +3,7 @@
 This is the README **Markdown Docx**. 
 
 This extension uses a docx binary file for the template. 
-If security check happens, you can download the template form this repo and set it as template in the settings.
+If security check happens, you can download the template from this repo and set it as template in the settings.
 
 ## Requirements
 
