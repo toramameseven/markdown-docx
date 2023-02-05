@@ -12,5 +12,8 @@
     "[typescript]": {
         "editor.tabSize": 2,
         "editor.insertSpaces": true
-    }
+    },
+    "cSpell.enableFiletypes": [
+        "vb"
+    ]
 }

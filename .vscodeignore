@@ -8,7 +8,6 @@ vsc-extension-quickstart.md
 **/.eslintrc.json
 **/*.map
 **/*.ts
-docs/**
-md_sample/**
+md_demo/**
 node_modules/**
 

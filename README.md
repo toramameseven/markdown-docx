@@ -2,8 +2,8 @@
 
 This is the README **Markdown Docx**. 
 
-We are creating a docx template file. So now, this does not work.
-
+This extension uses a docx binary file for the template. 
+If security check happens, you can download the template form this repo and set it as template in the settings.
 
 ## Requirements
 
@@ -15,7 +15,8 @@ We are creating a docx template file. So now, this does not work.
 * **Markdown Docx** is a markdown converter to docx.
 * **Markdown Docx** works for common mark md(s).
 * Click **Convert Docx** at the context menu on the explore or the editor.
-* In the editor, you can convert the selection in markdown.
+* In the editor, you can convert only the selection in the text.
+* In the output tab, markdown-docx, the progress and the warns are displayed.
   
 ## Extensions for word
 
@@ -39,11 +40,11 @@ We are creating a docx template file. So now, this does not work.
 * `<!-- word date Date -->`
 
     add Date
-* `<!-- word toc 1 TOC -->`
+* `<!-- word toc 1 "table of contents" -->`
 
     * add toc
     * 1: levels of toc.
-    * TOC: toc caption
+    * table of contents: toc caption
 
 * `<!-- word import imported.md-->`
 
@@ -98,7 +99,6 @@ You can see the sample file in the [markdown-docx site](https://github.com/toram
 * markdown-docx.docxEngine.timeout
 
     60000 ms is default. docx rendering is so slow, you can set bigger value.
-
 
 * markdown-docx.docxEngine.debug
    
@@ -179,8 +179,8 @@ And we use some useful articles below.
 
 * [Marked](https://www.npmjs.com/package/marked) is a very useful package for this extension.
 * [markdown-to-txt](https://www.npmjs.com/package/markdown-to-txt) tells us how to use **Marked**.
-* [木村工の Office 仕事術](https://koukimra.com/) is used to resize pictures.
-* [みんなのワードマクロ](https://www.wordvbalab.com/) is used for emphasis styles.
+* [koukimura's page](https://koukimra.com/) is used to resize pictures.
+* [minnano macro page](https://www.wordvbalab.com/) is used for emphasis styles.
 * To Slugify, we use Mr. Sato 's code (https://qiita.com/satokaz/items/64582da4640898c4bf42)
 
 
