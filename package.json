@@ -1,0 +1,199 @@
+{
+  "name": "markdown-docx",
+  "displayName": "Markdown Docx",
+  "description": "Markdown docx converter",
+  "version": "0.0.1",
+  "publisher": "toramameseven",
+  "author": {
+    "name": "toramame-seven"
+  },
+  "icon": "images/markdown2docx.png",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "galleryBanner": {
+    "color": "#C80000",
+    "theme": "dark"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "markdown",
+    "docx",
+    "windows"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/toramameseven/markdown-docx.git"
+  },
+  "activationEvents": [
+    "workspaceContains:**/*.md"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "snippets": [
+      {
+        "language": "markdown",
+        "path": "./snippets/snippets.json"
+      }
+    ],
+    "commands": [
+      {
+        "enablement": "true",
+        "command": "explorer.ExportDocx",
+        "title": "Convert to Docx"
+      },
+      {
+        "enablement": "true",
+        "command": "explorer.ExportHtmlDocx",
+        "title": "Convert html to md"
+      },
+      {
+        "enablement": "true",
+        "command": "editor.ExportDocx",
+        "title": "Convert to Docx"
+      },
+      {
+        "enablement": "false",
+        "command": "editor.ExportHtmlDocx",
+        "title": "Convert html to md"
+      },
+      {
+        "enablement": "true",
+        "command": "editor.ExportStop",
+        "title": "stop signal"
+      },
+      {
+        "enablement": "false",
+        "command": "explorer.SplitForHugo",
+        "title": "Split To Hugo mds"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "when": "resourceExtname =~ /\\.wd$|\\.md$/i && !markdown-docx.isRunning",
+          "command": "explorer.ExportDocx",
+          "group": "myGroup@1"
+        },
+        {
+          "when": "resourceExtname =~ /\\.md$|\\.mds$/i && !markdown-docx.isRunning && false",
+          "command": "explorer.SplitForHugo",
+          "group": "myGroup@1"
+        },
+        {
+          "when": "resourceExtname =~ /\\.html$/i && !markdown-docx.isRunning",
+          "command": "explorer.ExportHtmlDocx",
+          "group": "myGroup@1"
+        }
+      ],
+      "editor/context": [
+        {
+          "when": "resourceExtname =~ /\\.wd$|\\.md$/i && !markdown-docx.isRunning",
+          "command": "editor.ExportDocx",
+          "group": "myGroup@1"
+        },
+        {
+          "when": "resourceExtname =~ /\\.html$/i && !markdown-docx.isRunning && false",
+          "command": "editor.ExportHtmlDocx",
+          "group": "myGroup@1"
+        },
+        {
+          "when": "(resourceExtname =~ /\\.html$/i || resourceExtname =~ /\\.md$/i) && markdown-docx.isRunning",
+          "command": "editor.ExportStop",
+          "group": "myGroup@1"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "markdown-docx",
+      "properties": {
+        "markdown-docx.path.docxEngine": {
+          "type": "string",
+          "default": "",
+          "description": "docx engine. if you use your own, set full path.",
+          "order": 1
+        },
+        "markdown-docx.path.docxTemplate": {
+          "type": "string",
+          "default": "",
+          "description": "docx template. if you use your own, set full path.",
+          "order": 2
+        },
+        "markdown-docx.docxEngine.mathExtension": {
+          "type": "boolean",
+          "default": false,
+          "description": "math extension. experimental feature.",
+          "order": 3
+        },
+        "markdown-docx.docxEngine.timeout": {
+          "type": "number",
+          "default": 60000,
+          "description": "create docx timeout(ms).default 60000 ms",
+          "order": 4
+        },
+        "markdown-docx.docxEngine.debug": {
+          "type": "boolean",
+          "default": false,
+          "description": "some debug feature.",
+          "order": 5
+        },
+        "markdown-docx.docxEngine.logInterval": {
+          "type": "number",
+          "default": 10,
+          "description": "more than 1. 1: many, 10 few.",
+          "order": 6,
+          "minProperties": "1"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run esbuild-base -- --minify",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js",
+    "prepackage": "npm run pretest",
+    "package": "vsce package --target win32-x64",
+    "clean": "rimraf out",
+    "preesbuild-base": "npm run clean",
+    "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
+    "esbuild": "npm run esbuild-base -- --sourcemap",
+    "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
+    "test-compile": "tsc -p ./",
+    "installEx": "npm run package && code --install-extension markdown-docx-win32-x64-0.0.1.vsix",
+    "testm": "set TS_NODE_COMPILER_OPTIONS={\"module\":\"commonjs\"} && mocha -r ts-node/register src/test-node/**/*.ts"
+  },
+  "devDependencies": {
+    "@types/encoding-japanese": "^2.0.1",
+    "@types/glob": "^8.0.0",
+    "@types/lodash": "^4.14.191",
+    "@types/marked": "^4.0.8",
+    "@types/mocha": "^10.0.0",
+    "@types/node": "^18.11.5",
+    "@types/vscode": "^1.74.0",
+    "@typescript-eslint/eslint-plugin": "^5.42.0",
+    "@typescript-eslint/parser": "^5.42.0",
+    "@vscode/test-electron": "^2.2.0",
+    "esbuild": "^0.16.13",
+    "eslint": "^8.26.0",
+    "glob": "^8.0.3",
+    "mocha": "^10.1.0",
+    "rimraf": "^3.0.2",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.8.4"
+  },
+  "dependencies": {
+    "encoding-japanese": "^2.0.0",
+    "front-matter": "^4.0.2",
+    "iconv-lite": "^0.6.3",
+    "lodash": "^4.17.21",
+    "marked": "^4.2.4",
+    "node-html-markdown": "^1.3.0",
+    "node-html-parser": "^6.1.4"
+  }
+}

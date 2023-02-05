@@ -1,0 +1,883 @@
+title	sample document
+newLine	convertTitle	tm
+subTitle	sample document subTitle
+newLine	convertSubTitle	tm
+toc	1	TOC	tm
+newLine	convertToc	tm
+section	1	title subtitle and table of content	title-subtitle-and-table-of-content
+newLine	convertHeading	tm
+text	markdown
+newLine	convertParagraph	tm
+code	<!-- word title sample document title -->
+newLine	convertCode	tm
+code	<!-- word subTitle sample document subTitle -->
+newLine	convertCode	tm
+code	<!-- word toc 3 -->
+newLine	convertCode	tm
+text	The result is above.
+newLine	convertParagraph	tm
+text	This sample markdown is modified from the document of 
+link	https://markdown-it.github.io/		markdown-it	tm
+text	.
+newLine	convertParagraph	tm
+section	1	Heading	heading
+newLine	convertHeading	tm
+text	markdown
+newLine	convertParagraph	tm
+code	# Heading1
+newLine	convertCode	tm
+code	
+newLine	convertCode	tm
+code	## Heading2
+newLine	convertCode	tm
+code	
+newLine	convertCode	tm
+code	### Heading3
+newLine	convertCode	tm
+code	
+newLine	convertCode	tm
+code	#### Heading4
+newLine	convertCode	tm
+code	
+newLine	convertCode	tm
+code	##### Heading5
+newLine	convertCode	tm
+code	
+newLine	convertCode	tm
+code	###### Heading6
+newLine	convertCode	tm
+text	result
+newLine	convertParagraph	tm
+section	2	Heading2	heading2
+newLine	convertHeading	tm
+section	3	Heading3	heading3
+newLine	convertHeading	tm
+section	4	Heading4	heading4
+newLine	convertHeading	tm
+section	5	Heading5	heading5
+newLine	convertHeading	tm
+section	6	Heading6	heading6
+newLine	convertHeading	tm
+section	1	Horizontal Rules	horizontal-rules
+newLine	convertHeading	tm
+text	markdown
+newLine	convertParagraph	tm
+code	___
+newLine	convertCode	tm
+code	
+newLine	convertCode	tm
+code	---
+newLine	convertCode	tm
+code	
+newLine	convertCode	tm
+code	***
+newLine	convertCode	tm
+text	result
+newLine	convertParagraph	tm
+hr	
+hr	
+hr	
+section	1	BR	br
+newLine	convertHeading	tm
+text	markdown
+newLine	convertParagraph	tm
+code	next line is `<br>`
+newLine	convertCode	tm
+code	
+newLine	convertCode	tm
+code	test<BR>
+newLine	convertCode	tm
+code	
+newLine	convertCode	tm
+code	<BR>
+newLine	convertCode	tm
+code	
+newLine	convertCode	tm
+code	upper line is `<br>`
+newLine	convertCode	tm
+text	result
+newLine	convertParagraph	tm
+text	next line is <codespan><br></codespan>
+newLine	convertParagraph	tm
+text	test
+newLine	wd0NewLine	tm
+text	upper line is <codespan><br></codespan>
+newLine	convertParagraph	tm
+section	1	new page	new-page
+newLine	convertHeading	tm
+text	markdown
+newLine	convertParagraph	tm
+code	next line is `<!-- word newPage -->`
+newLine	convertCode	tm
+code	
+newLine	convertCode	tm
+code	<!-- word newPage -->
+newLine	convertCode	tm
+code	
+newLine	convertCode	tm
+code	upper line is `<!-- word newPage -->`
+newLine	convertCode	tm
+text	result
+newLine	convertParagraph	tm
+text	next line is <codespan><!-- word newPage --></codespan>
+newLine	convertParagraph	tm
+newPage				tm
+text	upper line is <codespan><!-- word newPage --></codespan>
+newLine	convertParagraph	tm
+section	1	Typographic replacements	typographic-replacements
+newLine	convertHeading	tm
+text	NOTE: All @ are replaced to "\@" in <b>markdown to docx</b>. 
+newLine	convertParagraph	tm
+text	anonymous@com.com
+newLine	convertParagraph	tm
+section	1	Emphasis	emphasis
+newLine	convertHeading	tm
+text	markdown
+newLine	convertParagraph	tm
+code	**This is bold text**
+newLine	convertCode	tm
+code	
+newLine	convertCode	tm
+code	**This is bold text**
+newLine	convertCode	tm
+code	
+newLine	convertCode	tm
+code	_This is italic text_
+newLine	convertCode	tm
+code	
+newLine	convertCode	tm
+code	_This is italic text_
+newLine	convertCode	tm
+code	
+newLine	convertCode	tm
+code	~~Strikethrough~~
+newLine	convertCode	tm
+code	
+newLine	convertCode	tm
+code	2<sup>x</sup><sub>y</sub>
+newLine	convertCode	tm
+text	result
+newLine	convertParagraph	tm
+text	<b>This is bold text</b>
+newLine	convertParagraph	tm
+text	<b>This is bold text</b>
+newLine	convertParagraph	tm
+text	<i>This is italic text</i>
+newLine	convertParagraph	tm
+text	<i>This is italic text</i>
+newLine	convertParagraph	tm
+text	<~~>Strikethrough</~~>
+newLine	convertParagraph	tm
+text	2<sup>x</sup><sub>y</sub>
+newLine	convertParagraph	tm
+section	1	Emphasis2	emphasis2
+newLine	convertHeading	tm
+text	markdown
+newLine	convertParagraph	tm
+code	**This is bold text**
+newLine	convertCode	tm
+code	**This is bold text**
+newLine	convertCode	tm
+code	_This is italic text_
+newLine	convertCode	tm
+code	_This is italic text_
+newLine	convertCode	tm
+code	~~Strikethrough~~ 
+newLine	convertCode	tm
+code	2<sup>x</sup><sub>y</sub>
+newLine	convertCode	tm
+text	result
+newLine	convertParagraph	tm
+text	<b>This is bold text</b>
+text	 				tm
+text	<b>This is bold text</b>
+text	 				tm
+text	<i>This is italic text</i>
+text	 				tm
+text	<i>This is italic text</i>
+text	 				tm
+text	<~~>Strikethrough</~~> 
+text	 				tm
+text	2<sup>x</sup><sub>y</sub>
+newLine	convertParagraph	tm
+text	NOTE: Sometime Emphasis does not work. That time, please add some spaces between words.
+newLine	convertParagraph	tm
+section	1	Blockquotes	blockquotes
+newLine	convertHeading	tm
+text	NOTE: <b>markdown to docx</b> does not support blockquote.
+newLine	convertParagraph	tm
+text	markdown
+newLine	convertParagraph	tm
+code	> Blockquotes can also be nested...
+newLine	convertCode	tm
+code	>
+newLine	convertCode	tm
+code	> > ...by using additional greater-than *signs* _right_ next to each other...
+newLine	convertCode	tm
+code	> >
+newLine	convertCode	tm
+code	> > * eeeeeeeee
+newLine	convertCode	tm
+code	> > > ...or with spaces between arrows.
+newLine	convertCode	tm
+text	result
+newLine	convertParagraph	tm
+text	Blockquotes can also be nested...
+newLine	convertParagraph	tm
+text	...by using additional greater-than <i>signs</i> <i>right</i> next to each other...
+newLine	convertParagraph	tm
+indentPlus
+NormalList	1	
+text	eeeeeeeee
+text	 				tm
+text	...or with spaces between arrows.
+newLine	convertParagraph	tm
+indentMinus
+section	1	Lists Unordered	lists-unordered
+newLine	convertHeading	tm
+text	NOTE: <b>markdown to docx</b>  supports only three layers.
+newLine	convertParagraph	tm
+text	markdown
+newLine	convertParagraph	tm
+code	- Create a list by starting a line with `+`, `-`, or `*`
+newLine	convertCode	tm
+code	- Sub-lists are made by indenting 2 spaces:
+newLine	convertCode	tm
+code	  - Marker character change forces new list start:
+newLine	convertCode	tm
+code	    - Ac tristique libero volutpat at
+newLine	convertCode	tm
+code	    * Facilisis in pretium nisl aliquet
+newLine	convertCode	tm
+code	    - Nulla volutpat aliquam velit
+newLine	convertCode	tm
+code	- Very easy!
+newLine	convertCode	tm
+code	
+newLine	convertCode	tm
+code	* look me [](#links) send you
+newLine	convertCode	tm
+text	result
+newLine	convertParagraph	tm
+indentPlus
+NormalList	1	
+text	Create a list by starting a line with <codespan>+</codespan>, <codespan>-</codespan>, or <codespan>*</codespan>
+newLine	convertListItem End	tm
+NormalList	1	
+text	Sub-lists are made by indenting 2 spaces:
+newLine	convertList In	tm
+indentPlus
+NormalList	2	
+text	Marker character change forces new list start:
+newLine	convertList In	tm
+indentPlus
+NormalList	3	
+text	Ac tristique libero volutpat at
+newLine	convertListItem End	tm
+indentMinus
+indentPlus
+NormalList	3	
+text	Facilisis in pretium nisl aliquet
+newLine	convertListItem End	tm
+indentMinus
+indentPlus
+NormalList	3	
+text	Nulla volutpat aliquam velit
+newLine	convertListItem End	tm
+indentMinus
+indentMinus
+NormalList	1	
+text	Very easy!
+newLine	convertListItem End	tm
+indentMinus
+indentPlus
+NormalList	1	
+text	look me 
+link	links			tm
+text	 send you
+newLine	convertListItem End	tm
+indentMinus
+section	1	Lists ordered	lists-ordered
+newLine	convertHeading	tm
+text	markdown
+newLine	convertParagraph	tm
+code	1. Lorem ipsum dolor sit amet
+newLine	convertCode	tm
+code	2. Consectetur adipiscing elit
+newLine	convertCode	tm
+code	3. Integer molestie lorem at massa
+newLine	convertCode	tm
+code	
+newLine	convertCode	tm
+code	4. You can use sequential numbers...
+newLine	convertCode	tm
+code	5. ...or keep all the numbers as `1.`
+newLine	convertCode	tm
+code	
+newLine	convertCode	tm
+code	NOTE: **markdown to docx** does not support numbering with offset:
+newLine	convertCode	tm
+code	
+newLine	convertCode	tm
+code	57. foo
+newLine	convertCode	tm
+code	1. bar
+newLine	convertCode	tm
+text	result
+newLine	convertParagraph	tm
+indentPlus
+OderList	1	
+text	Lorem ipsum dolor sit amet
+text	 				tm
+text	fffffa2<sup>x</sup><sub>y</sub>affff
+newLine	convertParagraph	tm
+OderList	1	
+text	Consectetur adipiscing elit
+newLine	convertParagraph	tm
+OderList	1	
+text	Integer molestie lorem at massa
+newLine	convertParagraph	tm
+OderList	1	
+text	You can use sequential numbers...
+newLine	convertParagraph	tm
+OderList	1	
+text	...or keep all the numbers as <codespan>1.</codespan>
+newLine	convertParagraph	tm
+indentMinus
+text	NOTE: <b>markdown to docx</b> does not support numbering with offset:
+newLine	convertParagraph	tm
+indentPlus
+OderList	1	
+text	foo
+newLine	convertListItem End	tm
+OderList	1	
+text	bar
+newLine	convertListItem End	tm
+indentMinus
+section	1	Lists mixed	lists-mixed
+newLine	convertHeading	tm
+text	markdown
+newLine	convertParagraph	tm
+code	1.  ordered1
+newLine	convertCode	tm
+code	    - unordered2
+newLine	convertCode	tm
+code	        1. ordered3
+newLine	convertCode	tm
+text	result
+newLine	convertParagraph	tm
+indentPlus
+OderList	1	
+text	ordered1
+newLine	convertList In	tm
+indentPlus
+NormalList	2	
+text	unordered2
+newLine	convertList In	tm
+indentPlus
+OderList	3	
+text	ordered3
+newLine	convertListItem End	tm
+indentMinus
+indentMinus
+indentMinus
+section	1	Code	code
+newLine	convertHeading	tm
+text	markdown
+newLine	convertParagraph	tm
+code	Inline `code`
+newLine	convertCode	tm
+text	result
+newLine	convertParagraph	tm
+text	Inline <codespan>code</codespan>
+newLine	convertParagraph	tm
+section	1	Indented code	indented-code
+newLine	convertHeading	tm
+text	markdown
+newLine	convertParagraph	tm
+code	    // Some comments
+newLine	convertCode	tm
+code	    line 1 of code
+newLine	convertCode	tm
+code	    line 2 of code
+newLine	convertCode	tm
+code	    line 3 of code
+newLine	convertCode	tm
+text	result
+newLine	convertParagraph	tm
+code	// Some comments
+newLine	convertCode	tm
+code	line 1 of code
+newLine	convertCode	tm
+code	line 2 of code
+newLine	convertCode	tm
+code	line 3 of code
+newLine	convertCode	tm
+section	1	Block code syntax highlighting	block-code-syntax-highlighting
+newLine	convertHeading	tm
+text	NOTE: <b>markdown to docx</b> does not support Syntax highlighting.
+newLine	convertParagraph	tm
+code	var foo = function (bar) {
+newLine	convertCode	tm
+code	  return bar++;
+newLine	convertCode	tm
+code	};
+newLine	convertCode	tm
+code	console.log(foo(5));
+newLine	convertCode	tm
+section	1	Tables	tables
+newLine	convertHeading	tm
+section	2	normal table	normal-table
+newLine	convertHeading	tm
+text	markdown
+newLine	convertParagraph	tm
+code	| data1-1 | data1-2                 |
+newLine	convertCode	tm
+code	| ------- | ----------------------- |
+newLine	convertCode	tm
+code	| data2-1 | data2-2                 |
+newLine	convertCode	tm
+code	| data3-1 | data3-2                 |
+newLine	convertCode	tm
+code	| data4-1 | data4-2                 |
+newLine	convertCode	tm
+text	result
+newLine	convertParagraph	tm
+tableCreate	4	2
+tableWidthInfo	1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+tablecontents	0	0	next	left
+tablecontentslist	text	data1-1
+tablecontentslist	endParagraph		tm
+tablecontents	0	1	next	left
+tablecontentslist	text	data1-2
+tablecontentslist	endParagraph		tm
+tablecontents	1	0	next	left
+tablecontentslist	text	data2-1
+tablecontentslist	endParagraph		tm
+tablecontents	1	1	next	left
+tablecontentslist	text	data2-2
+tablecontentslist	endParagraph		tm
+tablecontents	2	0	next	left
+tablecontentslist	text	data3-1
+tablecontentslist	endParagraph		tm
+tablecontents	2	1	next	left
+tablecontentslist	text	data3-2
+tablecontentslist	endParagraph		tm
+tablecontents	3	0	next	left
+tablecontentslist	text	data4-1
+tablecontentslist	endParagraph		tm
+tablecontents	3	1	next	left
+tablecontentslist	text	data4-2
+tablecontentslist	endParagraph		tm
+section	2	merge cells No.1	merge-cells-no1
+newLine	convertHeading	tm
+indentPlus
+NormalList	1	
+text	cell(3,1) and cell(4,2) are merged.
+newLine	convertListItem End	tm
+indentMinus
+text	markdown
+newLine	convertParagraph	tm
+code	<!-- word emptyMerge -->
+newLine	convertCode	tm
+code	
+newLine	convertCode	tm
+code	| data1-1 | data1-2                 |
+newLine	convertCode	tm
+code	| ------- | ----------------------- |
+newLine	convertCode	tm
+code	| data2-1 | data2-2                 |
+newLine	convertCode	tm
+code	|         | data3-2                 |
+newLine	convertCode	tm
+code	| data4-1 |                         |
+newLine	convertCode	tm
+text	result
+newLine	convertParagraph	tm
+tableCreate	4	2
+tableWidthInfo	1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+tablecontents	0	0	next	left
+tablecontentslist	text	data1-1
+tablecontentslist	endParagraph		tm
+tablecontents	0	1	next	left
+tablecontentslist	text	data1-2
+tablecontentslist	endParagraph		tm
+tablecontents	1	0	next	left
+tablecontentslist	text	data2-1
+tablecontentslist	endParagraph		tm
+tablecontents	1	1	next	left
+tablecontentslist	text	data2-2
+tablecontentslist	endParagraph		tm
+tablecontents	2	0	next	left
+tablecontentslist	endParagraph		tm
+tablecontents	2	1	next	left
+tablecontentslist	text	data3-2
+tablecontentslist	endParagraph		tm
+tablecontents	3	0	next	left
+tablecontentslist	text	data4-1
+tablecontentslist	endParagraph		tm
+tablecontents	3	1	next	left
+tablecontentslist	endParagraph		tm
+tableMarge	1	0	2	0	text	data2-1
+tableMarge	2	1	3	1	text	data3-2
+section	2	merge cells No.2	merge-cells-no2
+newLine	convertHeading	tm
+text	markdown
+newLine	convertParagraph	tm
+code	<!-- word emptyMerge -->
+newLine	convertCode	tm
+code	
+newLine	convertCode	tm
+code	cell(4,2) is not merged. (comment cell)
+newLine	convertCode	tm
+code	
+newLine	convertCode	tm
+code	| data1-1 | data1-2                 |
+newLine	convertCode	tm
+code	| ------- | ----------------------- |
+newLine	convertCode	tm
+code	| data2-1 | data2-2                 |
+newLine	convertCode	tm
+code	|         | data3-2                 |
+newLine	convertCode	tm
+code	| data4-1 | <!-- not merged -->     |
+newLine	convertCode	tm
+text	result
+newLine	convertParagraph	tm
+text	cell(4,2) is not merged. (comment cell)
+newLine	convertParagraph	tm
+tableCreate	4	2
+tableWidthInfo	1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+tablecontents	0	0	next	left
+tablecontentslist	text	data1-1
+tablecontentslist	endParagraph		tm
+tablecontents	0	1	next	left
+tablecontentslist	text	data1-2
+tablecontentslist	endParagraph		tm
+tablecontents	1	0	next	left
+tablecontentslist	text	data2-1
+tablecontentslist	endParagraph		tm
+tablecontents	1	1	next	left
+tablecontentslist	text	data2-2
+tablecontentslist	endParagraph		tm
+tablecontents	2	0	next	left
+tablecontentslist	endParagraph		tm
+tablecontents	2	1	next	left
+tablecontentslist	text	data3-2
+tablecontentslist	endParagraph		tm
+tablecontents	3	0	next	left
+tablecontentslist	text	data4-1
+tablecontentslist	endParagraph		tm
+tablecontents	3	1	next	left
+tablecontentslist	text	
+tablecontentslist	endParagraph		tm
+tableMarge	1	0	2	0	text	data2-1
+section	2	table with emphasis	table-with-emphasis
+newLine	convertHeading	tm
+text	markdown
+newLine	convertParagraph	tm
+code	| data1-1 | data1-2                   |
+newLine	convertCode	tm
+code	| ------- | --------------------  --- |
+newLine	convertCode	tm
+code	| data2-1 | _This is italic text_     |
+newLine	convertCode	tm
+code	|         | 2<sup>x</sup><sub>y</sub> |
+newLine	convertCode	tm
+code	| data4-1 | **This is bold text**     |
+newLine	convertCode	tm
+text	result
+newLine	convertParagraph	tm
+tableCreate	4	2
+tableWidthInfo	1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+tablecontents	0	0	next	left
+tablecontentslist	text	data1-1
+tablecontentslist	endParagraph		tm
+tablecontents	0	1	next	left
+tablecontentslist	text	data1-2
+tablecontentslist	endParagraph		tm
+tablecontents	1	0	next	left
+tablecontentslist	text	data2-1
+tablecontentslist	endParagraph		tm
+tablecontents	1	1	next	left
+tablecontentslist	text	<i>This is italic text</i>
+tablecontentslist	endParagraph		tm
+tablecontents	2	0	next	left
+tablecontentslist	endParagraph		tm
+tablecontents	2	1	next	left
+tablecontentslist	text	2<sup>x</sup><sub>y</sub>
+tablecontentslist	endParagraph		tm
+tablecontents	3	0	next	left
+tablecontentslist	text	data4-1
+tablecontentslist	endParagraph		tm
+tablecontents	3	1	next	left
+tablecontentslist	text	<b>This is bold text</b>
+tablecontentslist	endParagraph		tm
+section	2	table column width	table-column-width
+newLine	convertHeading	tm
+text	markdown
+newLine	convertParagraph	tm
+code	<!-- word cols 2,1 -->
+newLine	convertCode	tm
+code	<!-- word emptyMerge -->
+newLine	convertCode	tm
+code	| data1-1 | data1-2                 |
+newLine	convertCode	tm
+code	| ------- | ----------------------- |
+newLine	convertCode	tm
+code	| data2-1 | data2-2                 |
+newLine	convertCode	tm
+code	| data3-1 | data3-2                 |
+newLine	convertCode	tm
+code	| data4-1 | data4-2                 |
+newLine	convertCode	tm
+text	result
+newLine	convertParagraph	tm
+tableCreate	4	2
+tableWidthInfo	2,1
+tablecontents	0	0	next	left
+tablecontentslist	text	data1-1
+tablecontentslist	endParagraph		tm
+tablecontents	0	1	next	left
+tablecontentslist	text	data1-2
+tablecontentslist	endParagraph		tm
+tablecontents	1	0	next	left
+tablecontentslist	text	data2-1
+tablecontentslist	endParagraph		tm
+tablecontents	1	1	next	left
+tablecontentslist	text	data2-2
+tablecontentslist	endParagraph		tm
+tablecontents	2	0	next	left
+tablecontentslist	text	data3-1
+tablecontentslist	endParagraph		tm
+tablecontents	2	1	next	left
+tablecontentslist	text	data3-2
+tablecontentslist	endParagraph		tm
+tablecontents	3	0	next	left
+tablecontentslist	text	data4-1
+tablecontentslist	endParagraph		tm
+tablecontents	3	1	next	left
+tablecontentslist	text	data4-2
+tablecontentslist	endParagraph		tm
+section	2	Right aligned and rows merge	right-aligned-and-rows-merge
+newLine	convertHeading	tm
+text	markdown
+newLine	convertParagraph	tm
+code	<!-- word cols 1,3 -->
+newLine	convertCode	tm
+code	<!-- word rowMerge 3-4 -->
+newLine	convertCode	tm
+code	| data1-1 | data1-2                 |
+newLine	convertCode	tm
+code	| -------:| -----------------------:|
+newLine	convertCode	tm
+code	| data2-1 | data2-2 XXXXX           |
+newLine	convertCode	tm
+code	| data3-1 | data3-2                 |
+newLine	convertCode	tm
+code	| data4-1 | data4-2                 |
+newLine	convertCode	tm
+text	result
+newLine	convertParagraph	tm
+tableCreate	4	2
+tableWidthInfo	1,3
+tablecontents	0	0	next	right
+tablecontentslist	text	data1-1
+tablecontentslist	endParagraph		tm
+tablecontents	0	1	next	right
+tablecontentslist	text	data1-2
+tablecontentslist	endParagraph		tm
+tablecontents	1	0	next	right
+tablecontentslist	text	data2-1
+tablecontentslist	endParagraph		tm
+tablecontents	1	1	next	right
+tablecontentslist	text	data2-2 XXXXX
+tablecontentslist	endParagraph		tm
+tablecontents	2	0	next	right
+tablecontentslist	text	data3-1
+tablecontentslist	endParagraph		tm
+tablecontents	2	1	next	right
+tablecontentslist	text	data3-2
+tablecontentslist	endParagraph		tm
+tablecontents	3	0	next	right
+tablecontentslist	text	data4-1
+tablecontentslist	endParagraph		tm
+tablecontents	3	1	next	right
+tablecontentslist	text	data4-2
+tablecontentslist	endParagraph		tm
+tableMarge	2	0	3	0	text	data3-1
+tableMarge	2	1	3	1	text	data3-2
+text	NOTE: aligned is not worked
+newLine	convertParagraph	tm
+section	2	table with new line	table-with-new-line
+newLine	convertHeading	tm
+text	markdown
+newLine	convertParagraph	tm
+code	| data1-1 | data1-2                 |
+newLine	convertCode	tm
+code	| ------- | ----------------------- |
+newLine	convertCode	tm
+code	| data2-1 | data2-2                 |
+newLine	convertCode	tm
+code	| data3-1 | data3-2<bR>data3-2-2    |
+newLine	convertCode	tm
+code	| data4-1 | data4-2                 |
+newLine	convertCode	tm
+text	result
+newLine	convertParagraph	tm
+tableCreate	4	2
+tableWidthInfo	1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+tablecontents	0	0	next	left
+tablecontentslist	text	data1-1
+tablecontentslist	endParagraph		tm
+tablecontents	0	1	next	left
+tablecontentslist	text	data1-2
+tablecontentslist	endParagraph		tm
+tablecontents	1	0	next	left
+tablecontentslist	text	data2-1
+tablecontentslist	endParagraph		tm
+tablecontents	1	1	next	left
+tablecontentslist	text	data2-2
+tablecontentslist	endParagraph		tm
+tablecontents	2	0	next	left
+tablecontentslist	text	data3-1
+tablecontentslist	endParagraph		tm
+tablecontents	2	1	next	left
+tablecontentslist	text	data3-2
+tablecontentslist	newLine	wd0NewLine	tm
+tablecontentslist	text	data3-2-2
+tablecontentslist	endParagraph		tm
+tablecontents	3	0	next	left
+tablecontentslist	text	data4-1
+tablecontentslist	endParagraph		tm
+tablecontents	3	1	next	left
+tablecontentslist	text	data4-2
+tablecontentslist	endParagraph		tm
+text	NOTE: does not work
+newLine	convertParagraph	tm
+section	1	Links	links
+newLine	convertHeading	tm
+section	2	cross reference in a docx	cross-reference-in-a-docx
+newLine	convertHeading	tm
+text	markdown
+newLine	convertParagraph	tm
+code	## refs1
+newLine	convertCode	tm
+code	
+newLine	convertCode	tm
+code	## refs2 with space
+newLine	convertCode	tm
+code	
+newLine	convertCode	tm
+code	* look me [refs1](#refs1) send you
+newLine	convertCode	tm
+code	* look me [refs2 with space](#refs2-with-space) send you
+newLine	convertCode	tm
+text	result
+newLine	convertParagraph	tm
+section	2	refs1	refs1
+newLine	convertHeading	tm
+section	2	refs2 with space	refs2-with-space
+newLine	convertHeading	tm
+indentPlus
+NormalList	1	
+text	look me 
+link	refs1			tm
+text	 send you
+newLine	convertListItem End	tm
+NormalList	1	
+text	look me 
+link	refs2-with-space			tm
+text	 send you
+newLine	convertListItem End	tm
+indentMinus
+section	2	normal link	normal-link
+newLine	convertHeading	tm
+code	look you [link text](http://dev.nodeca.com) see me
+newLine	convertCode	tm
+code	
+newLine	convertCode	tm
+code	Jason Campbell <jasoncampbell\@google.com> (http://twitter.com/jxson)
+newLine	convertCode	tm
+code	
+newLine	convertCode	tm
+code	* [link with title](http://nodeca.github.io/pica/demo/ "title text!")
+newLine	convertCode	tm
+code	
+newLine	convertCode	tm
+code	* Autoconverted link https://github.com/nodeca/pica (enable linkify to see)
+newLine	convertCode	tm
+text	look you 
+link	http://dev.nodeca.com		link text	tm
+text	 see me
+newLine	convertParagraph	tm
+text	Jason Campbell <jasoncampbell@google.com> (
+link	http://twitter.com/jxson		http://twitter.com/jxson	tm
+text	)
+newLine	convertParagraph	tm
+indentPlus
+NormalList	1	
+link	http://nodeca.github.io/pica/demo/	title text!	link with title	tm
+newLine	convertParagraph	tm
+NormalList	1	
+text	Autoconverted link 
+link	https://github.com/nodeca/pica		https://github.com/nodeca/pica	tm
+text	 (enable linkify to see)
+newLine	convertParagraph	tm
+indentMinus
+section	1	Images	images
+newLine	convertHeading	tm
+text	markdown
+newLine	convertParagraph	tm
+code	![logo](./markdown2docx.png)
+newLine	convertCode	tm
+code	
+newLine	convertCode	tm
+code	This extension logo is  ![logo](./markdown2docx.png) .
+newLine	convertCode	tm
+text	result
+newLine	convertParagraph	tm
+image	./markdown2docx.png	logo		tm
+newLine	convertParagraph	tm
+text	This extension logo is  
+image	./markdown2docx.png	logo		tm
+text	 .
+newLine	convertParagraph	tm
+text	NOTE: <b>markdown to docx</b>  supports only image files.
+newLine	convertParagraph	tm
+text	NOTE: Inline images do not work well.
+newLine	convertParagraph	tm
+section	1	Math	math
+newLine	convertHeading	tm
+text	markdown
+newLine	convertParagraph	tm
+code	This sentence uses dollar sign delimiters to show math inline: $\sqrt{3x-1}+(1+x)^2$  `$\sqrt{3x-1}+(1+x)^2$`
+newLine	convertCode	tm
+code	
+newLine	convertCode	tm
+code	$\sqrt{3x-1}+(1+x)^2$
+newLine	convertCode	tm
+text	result
+newLine	convertParagraph	tm
+text	This sentence uses dollar sign delimiters to show math inline: $\sqrt{3x-1}+(1+x)^2$  <codespan>$\sqrt{3x-1}+(1+x)^2$</codespan>
+newLine	convertParagraph	tm
+text	$\sqrt{3x-1}+(1+x)^2$
+newLine	convertParagraph	tm
+text	NOTE: math works so so.
+newLine	convertParagraph	tm
+section	1	Admonition	admonition
+newLine	convertHeading	tm
+text	markdown
+newLine	convertParagraph	tm
+code	NOTE: admonition note.
+newLine	convertCode	tm
+code	
+newLine	convertCode	tm
+code	WARNING: admonition warning.
+newLine	convertCode	tm
+text	result
+newLine	convertParagraph	tm
+text	NOTE: admonition note.
+newLine	convertParagraph	tm
+text	WARNING: admonition warning.
+newLine	convertParagraph	tm

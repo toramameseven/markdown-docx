@@ -1,0 +1,10 @@
+section	1	Code	code
+newLine	convertHeading	tm
+text	markdown
+newLine	convertParagraph	tm
+code	Inline `code`
+newLine	convertCode	tm
+text	result
+newLine	convertParagraph	tm
+text	Inline <codespan>code</codespan>
+newLine	convertParagraph	tm

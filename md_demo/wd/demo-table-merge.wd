@@ -1,0 +1,51 @@
+section	2	merge cells No.1	merge-cells-no1
+newLine	convertHeading	tm
+indentPlus
+NormalList	1	
+text	cell(3,1) and cell(4,2) are merged.
+newLine	convertListItem End	tm
+indentMinus
+text	markdown
+newLine	convertParagraph	tm
+code	<!-- word emptyMerge -->
+newLine	convertCode	tm
+code	
+newLine	convertCode	tm
+code	| data1-1 | data1-2                 |
+newLine	convertCode	tm
+code	| ------- | ----------------------- |
+newLine	convertCode	tm
+code	| data2-1 | data2-2                 |
+newLine	convertCode	tm
+code	|         | data3-2                 |
+newLine	convertCode	tm
+code	| data4-1 |                         |
+newLine	convertCode	tm
+text	result
+newLine	convertParagraph	tm
+tableCreate	4	2
+tableWidthInfo	1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+tablecontents	0	0	next	left
+tablecontentslist	text	data1-1
+tablecontentslist	endParagraph		tm
+tablecontents	0	1	next	left
+tablecontentslist	text	data1-2
+tablecontentslist	endParagraph		tm
+tablecontents	1	0	next	left
+tablecontentslist	text	data2-1
+tablecontentslist	endParagraph		tm
+tablecontents	1	1	next	left
+tablecontentslist	text	data2-2
+tablecontentslist	endParagraph		tm
+tablecontents	2	0	next	left
+tablecontentslist	endParagraph		tm
+tablecontents	2	1	next	left
+tablecontentslist	text	data3-2
+tablecontentslist	endParagraph		tm
+tablecontents	3	0	next	left
+tablecontentslist	text	data4-1
+tablecontentslist	endParagraph		tm
+tablecontents	3	1	next	left
+tablecontentslist	endParagraph		tm
+tableMarge	1	0	2	0	text	data2-1
+tableMarge	2	1	3	1	text	data3-2
