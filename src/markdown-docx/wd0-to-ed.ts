@@ -1,4 +1,3 @@
-import { toInteger } from "lodash";
 import { MessageType, ShowMessage } from "./common";
 
 let showMessage: ShowMessage | undefined;
@@ -283,7 +282,7 @@ function getBlockInfoTypeLast() {
 //   convert functions
 
 function addNewLine(info: string) {
-  const r = ["", "", `<!-- ${info} -->`].join(_sp);
+  const r = [wd0Command.newLine, info, "tm"].join(_sp);
   outputWd(r);
 }
 
@@ -310,9 +309,7 @@ function convertHeading(params: DocxParam, isCommandEnd?: boolean) {
   if (isCommandEnd) {
     return;
   }
-
-  //const r = ["section", params.index, params.title, params.idTitle].join(_sp);
-  const r = ["#".repeat(toInteger(params.index)), "", params.title].join(_sp);
+  const r = ["section", params.index, params.title, params.idTitle].join(_sp);
   outputWd(r);
   addNewLine("convertHeading");
 }
@@ -486,8 +483,7 @@ function convertText(params: DocxParam | string, isCommandEnd?: boolean) {
   } else if (typeof params === "object") {
     plainText = (params as DocxParam).text;
   }
-  //const wordDownText = ["text", plainText].join(_sp);
-  const wordDownText = ["", "", plainText].join(_sp);
+  const wordDownText = ["text", plainText].join(_sp);
   outputWd(wordDownText);
 }
 
@@ -520,7 +516,6 @@ function convertLink(params: DocxParam, isCommandEnd?: boolean) {
   if (isCommandEnd) {
     return;
   }
-  //const r = ["link", params.href, params.title, params.text, "tm"].join(_sp);
   const r = ["link", params.href, params.title, params.text, "tm"].join(_sp);
   outputWd(r);
 }
@@ -669,7 +664,7 @@ function isAddWordSeparator(wdLines: string[], wdLine: string) {
   return r;
 }
 
-export function wd0ToExcelMd(wd0: string, sm?: ShowMessage): string {
+export function wd0ToDocx(wd0: string, sm?: ShowMessage): string {
   showMessage = sm;
   wordDownLines = [];
   blockInfos = [new Base(wd0Command.non)];
@@ -687,6 +682,7 @@ export function wd0ToExcelMd(wd0: string, sm?: ShowMessage): string {
   for (let i = 0; i < lines.length; i++) {
     const words = lines[i].split(_sp);
     const rawCommand = words.shift();
+    //const isCommandEnd = !!(rawCommand?.length && rawCommand?.[0] === "/");
     const isCommandEnd = rawCommand?.[0] === "/";
     const command = rawCommand?.slice(isCommandEnd ? 1 : 0);
 
