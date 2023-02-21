@@ -10,6 +10,7 @@ export async function wordDownToDocx(fileWd: string, option: DocxOption) {
   const thisEngine = docxEngineInsideBody
     ? docxEngineInsideBody
     : option.docxEngine;
+
   const thisTemplate = templateInsideBody
     ? templateInsideBody
     : option.docxTemplate;
@@ -17,13 +18,13 @@ export async function wordDownToDocx(fileWd: string, option: DocxOption) {
   //docxEngine options
   option.message?.(
     MessageType.info,
-    `docx docxEngine: ${thisEngine ?? "use inside"}`,
+    `docx docxEngine: ${thisEngine ? thisEngine : "use inside"}`,
     "main",
     false
   );
   option.message?.(
     MessageType.info,
-    `docx docxTemplate: ${thisTemplate ?? "use inside"}`,
+    `docx docxTemplate: ${thisTemplate ? thisTemplate : "use inside"}`,
     "main",
     false
   );
