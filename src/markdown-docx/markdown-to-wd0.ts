@@ -267,7 +267,7 @@ export function slugify(header: string, alowDuplicate = false) {
     .trim()
     .toLowerCase()
     .replace(
-      /[\]\[\!\"\#\$\%\&\'\(\)\*\+\,\.\/\:\;\<\=\>\?\@\\\^\_\{\|\}\~]/g,
+      /[\]\[\!\"\#\$\%\&\'\(\)\*\+\,\.\/\:\;\<\=\>\?\@\\\^\_\{\|\}\~＠＃＄％＾＆＊（）＿＋－＝｛｝”’＜＞［］「」・、。～]/g,
       ""
     )
     .replace(/\s+/g, "-") // Replace spaces with hyphens
