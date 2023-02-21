@@ -89,16 +89,26 @@ export function getWordDownCommand(wd: string) {
   const command = testMatch?.groups?.name ?? "";
   const commandList = command.trim().split(/\s(?=(?:[^"]*"[^"]*")*[^"]*$)/i);
   if (commandList[0] === "word" && commandList[1]) {
-    const params = (commandList.slice(2) ?? []).map(l => l.replace(/\"/g, ""));
+    const params = (commandList.slice(2) ?? []).map((l) =>
+      l.replace(/\"/g, "")
+    );
     return { command: commandList[1], params };
   }
   return undefined;
 }
 
-export async function createPath(dir: string, name: string, ext: string) {
+export async function createPath(
+  dir: string,
+  name: string,
+  ext: string,
+  isSame = false
+) {
   for (let index = 0; index < 1000; index++) {
     const filePath =
       path.resolve(dir, name + (index > 0 ? index.toString() : "")) + "." + ext;
+    if (isSame) {
+      return filePath;
+    }
     if (!(await fileExists(filePath)) && !(await dirExists(filePath))) {
       return filePath;
     }

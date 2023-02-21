@@ -52,6 +52,11 @@
       },
       {
         "enablement": "true",
+        "command": "explorer.mdToEd",
+        "title": "Convert me to ed"
+      },
+      {
+        "enablement": "true",
         "command": "editor.ExportDocx",
         "title": "Convert to Docx"
       },
@@ -86,6 +91,11 @@
         {
           "when": "resourceExtname =~ /\\.html$/i && !markdown-docx.isRunning",
           "command": "explorer.ExportHtmlDocx",
+          "group": "myGroup@1"
+        },
+        {
+          "when": "resourceExtname =~ /\\.md$/i && !markdown-docx.isRunning",
+          "command": "explorer.mdToEd",
           "group": "myGroup@1"
         }
       ],

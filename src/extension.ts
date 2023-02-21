@@ -10,6 +10,7 @@ import {
   DocxOption,
   MessageType,
 } from "./markdown-docx";
+import { markdownToEd } from "./markdown-docx/markdown-to-ed";
 
 export let isDebug = false;
 
@@ -43,6 +44,10 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand("explorer.ExportHtmlDocx", exportHtmlDocx)
   );
 
+  //
+  context.subscriptions.push(
+    vscode.commands.registerCommand("explorer.mdToEd", exportMarkdownEd)
+  );
   // split md for hugo
   context.subscriptions.push(
     vscode.commands.registerCommand(
@@ -86,6 +91,22 @@ function exportHtmlDocx(uriFile: vscode.Uri) {
     if (filePath.match(/\.html$/i)) {
       // wordDown
       const r = htmlToMarkdown(filePath);
+      vscodeCommon.showMessage(MessageType.info, r, "");
+    }
+  } catch (error) {
+    vscodeCommon.showMessage(MessageType.err, error, "main");
+  } finally {
+    vscodeCommon.updateStatusBar(false);
+  }
+}
+
+function exportMarkdownEd(uriFile: vscode.Uri) {
+  try {
+    vscodeCommon.updateStatusBar(true);
+    const filePath = uriFile.fsPath;
+    if (filePath.match(/\.md$/i)) {
+      // wordDown
+      const r = markdownToEd(filePath, "");
       vscodeCommon.showMessage(MessageType.info, r, "");
     }
   } catch (error) {
