@@ -8,6 +8,8 @@ const _sp = "\t";
 
 let wordDownLines: string[] = [""];
 
+let outBuffer = "";
+
 type ListInfo = {
   ordered: boolean;
   start: number;
@@ -41,6 +43,7 @@ const wd0Command = {
   html: "html",
 
   non: "non",
+  debug: "debug",
 
   // word down
   author: "author",
@@ -283,7 +286,7 @@ function getBlockInfoTypeLast() {
 //   convert functions
 
 function addNewLine(info: string) {
-  const r = ["", "", `<!-- ${info} -->`].join(_sp);
+  const r = ["nText", "", `<!-- ${info} -->`].join(_sp);
   outputWd(r);
 }
 
@@ -312,9 +315,9 @@ function convertHeading(params: DocxParam, isCommandEnd?: boolean) {
   }
 
   //const r = ["section", params.index, params.title, params.idTitle].join(_sp);
-  const r = ["#".repeat(toInteger(params.index)), "", params.title].join(_sp);
+  const r = ["#".repeat(toInteger(params.index)), params.title].join(_sp);
   outputWd(r);
-  addNewLine("convertHeading");
+  //addNewLine("convertHeading");
 }
 
 function convertParagraph(params: DocxParam, isCommandEnd?: boolean) {
@@ -397,12 +400,13 @@ function convertList(params: DocxParam, isCommandEnd?: boolean) {
     addNewLine("convertList In");
   }
 
-  //list ordered 0 orq start number body
+  //list ordered 0 or start number body
   const r: ListInfo = {
     start: parseInt(params.start),
     ordered: params.ordered === "1",
     indent: listInfos![listInfos!.length - 1].indent + 1,
   };
+
   outputWd(wd0Command.indentPlus);
   listInfos!.push(r);
   pushBlockInfo(new Base(wd0Command.list));
@@ -416,11 +420,7 @@ function convertListItem(params: DocxParam, isCommandEnd?: boolean) {
   }
 
   if (isCommandEnd) {
-    const r = popBlockInfo();
-    r!.blockList.map((i) => {
-      outputWd(i);
-    });
-    addNewLine("convertListItem End");
+    outputList();
     return;
   }
 
@@ -428,29 +428,38 @@ function convertListItem(params: DocxParam, isCommandEnd?: boolean) {
   if (getBlockInfoTypeLast() === wd0Command.listitem) {
     addNewLine("convertListItem In");
   }
-  params.checked = "";
+
+  //outputWd(r);
+  pushBlockInfo(new Base(wd0Command.listitem));
+}
+
+function outputList() {
   const listType = listInfos[listInfos.length - 1].ordered
     ? "OderList"
     : "NormalList";
+  const listString = listType === "OderList" ? "." : "*";
+  const listCommands = listString
+    .repeat(listInfos[listInfos.length - 1].indent)
+    .toString();
 
-  const r = [
-    listType,
-    listInfos[listInfos.length - 1].indent.toString(),
-    params.text,
-  ].join(_sp);
+  const r = popBlockInfo();
+  const listTitle = r!.blockList[0].split("\t")[1];
 
-  outputWd(r);
-  pushBlockInfo(new Base(wd0Command.listitem));
+  outputWd(`${listCommands}\t\t${listTitle}`, true);
+
+  addNewLine("convertListItem End");
 }
 
 function convertCode(params: DocxParam, isCommandEnd?: boolean) {
   if (isCommandEnd) {
     const code = popBlockInfo();
-    code!.blockList.forEach((i) => {
-      //const codeParam = i.split(_sp);
-      const r = ["", "", i].join(_sp);
-      outputWd(r);
-      addNewLine("convertCode");
+    const n = code!.blockList.length;
+    code!.blockList.forEach((i, index) => {
+      //const r = ["", "", i].join(_sp);
+      const r = i;
+      const exCommand = index === 0 || index === n - 1 ? "code" : "";
+      outputWd(exCommand + r);
+      //addNewLine("convertCode");
     });
     return;
   }
@@ -484,9 +493,11 @@ function convertText(params: DocxParam | string, isCommandEnd?: boolean) {
   if (typeof params === "string") {
     plainText = params;
   } else if (typeof params === "object") {
-    plainText = (params as DocxParam).text;
+    plainText = params.text;
   }
-  const wordDownText = ["", "", plainText].join(_sp);
+
+  const wordDownText = ["cText", plainText].join(_sp);
+
   outputWd(wordDownText);
 }
 
@@ -605,6 +616,7 @@ function convertCrossRef(params: DocxParam, isCommandEnd?: boolean) {
   const r = ["crossRef", params.crossRef, "", "", "", "tm"].join(_sp);
   outputWd(r);
 }
+
 function convertClearContent(params: DocxParam, isCommandEnd?: boolean) {
   if (isCommandEnd) {
     return;
@@ -612,6 +624,7 @@ function convertClearContent(params: DocxParam, isCommandEnd?: boolean) {
   const r = ["clearContent", params.isClearContent, "", "", "", "tm"].join(_sp);
   outputWd(r);
 }
+
 function convertDate(params: DocxParam, isCommandEnd?: boolean) {
   if (isCommandEnd) {
     return;
@@ -620,43 +633,45 @@ function convertDate(params: DocxParam, isCommandEnd?: boolean) {
   outputWd(r);
 }
 
-function outputWd(wdText: string) {
+function outputWd(wdText: string, isMainStream = false) {
   // if block exists, add all wdTexts to the block.
-  if (getBlockInfoTypeLast() !== wd0Command.non) {
+  if (getBlockInfoTypeLast() !== wd0Command.non && !isMainStream) {
     blockInfos.slice(-1)[0].blockList.push(wdText);
     return;
   }
+
   // do not duplicate new lines.
-  if (wdText.split(_sp)[0] === wd0Command.newLine) {
-    if (
-      wordDownLines.length > 0 &&
-      wordDownLines.slice(-1)[0].split(_sp)[0] === wd0Command.newLine
-    ) {
-      return;
-    }
+  // if (wdText.split(_sp)[0] === wd0Command.newLine) {
+  //   if (
+  //     wordDownLines.length > 0 &&
+  //     wordDownLines.slice(-1)[0].split(_sp)[0] === wd0Command.newLine
+  //   ) {
+  //     return;
+  //   }
 
-    let line = "\t";
-    for (let i = wordDownLines.length - 1; i > 0; i--) {
-      line = wordDownLines[i];
-      if (
-        ![
-          wd0Command.indentMinus as string,
-          wd0Command.indentPlus as string,
-        ].includes(line)
-      ) {
-        break;
-      }
-    }
+  //   let line = "\t";
+  //   for (let i = wordDownLines.length - 1; i > 0; i--) {
+  //     line = wordDownLines[i];
+  //     if (
+  //       ![
+  //         wd0Command.indentMinus as string,
+  //         wd0Command.indentPlus as string,
+  //       ].includes(line)
+  //     ) {
+  //       break;
+  //     }
+  //   }
 
-    if (line.split(_sp)[0] === wd0Command.newLine) {
-      return;
-    }
-  }
+  //   if (line.split(_sp)[0] === wd0Command.newLine) {
+  //     return;
+  //   }
+  // }
 
   if (isAddWordSeparator(wordDownLines, wdText)) {
     // add space between words. but is not needed for japanese.
-    wordDownLines.push(["text", " ", "", "", "", "tm"].join(_sp));
+    // wordDownLines.push(["text", "", " "].join(_sp));
   }
+  //wordDownLines.push(["sText", "", " "].join(_sp));
   wordDownLines.push(wdText);
 }
 
@@ -672,6 +687,7 @@ export function wd0ToExcelMd(wd0: string, sm?: ShowMessage): string {
   showMessage = sm;
   wordDownLines = [];
   blockInfos = [new Base(wd0Command.non)];
+  outBuffer = "";
 
   // now not user front matter
   // option from front matter.
@@ -699,6 +715,11 @@ export function wd0ToExcelMd(wd0: string, sm?: ShowMessage): string {
     const toCommand = command as Wd0Command;
     resolveCommand(toCommand, params, isCommandEnd);
   }
+
+  // return blockInfos
+  //   .slice(-1)[0]
+  //   .blockList.map((i) => i)
+  //   .join("\n");
 
   return wordDownLines.map((i) => i).join("\n");
 }

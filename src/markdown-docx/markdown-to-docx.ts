@@ -12,6 +12,7 @@ import {
   ShowMessage,
 } from "./common";
 import { wordDownToDocx } from "./wd-to-docx";
+import { wdToEd } from "./wd-to-ed";
 
 let showMessage: ShowMessage;
 
@@ -42,6 +43,7 @@ export async function markdownToDocx(
     const { wdPath, wdBody } = await markdownToWd(
       pathMarkdown,
       selection,
+      false,
       startLine,
       option.isDebug
     );
@@ -69,10 +71,48 @@ export async function markdownToDocx(
   }
 }
 
+export async function markdownToExcel(
+  pathMarkdown: string,
+  selection: string,
+  /** zero base number */
+  startLine = 0,
+  option: DocxOption
+) {
+  option.message && (showMessage = option.message);
+  const dirPath = Path.dirname(pathMarkdown);
+  const fileNameMd = Path.basename(pathMarkdown).replace(/\.md$/i, "");
+  const fileEd = await createPath(dirPath, fileNameMd, "ed", true);
+
+  // convert markdown to docx
+  try {
+    showMessage?.(
+      MessageType.info,
+      `markdown to docx:`,
+      "Markdown to docx: start !!!",
+      false
+    );
+
+    const { wdPath, wdBody } = await markdownToWd(
+      pathMarkdown,
+      selection,
+      true,
+      startLine,
+      option.isDebug
+    );
+
+    // wdToEd(wdBody, option);
+    const edBody = wdToEd(wdBody);
+    Fs.writeFileSync(fileEd, edBody);
+  } catch (ex) {
+    throw ex;
+  }
+}
+
 //creating wd file for test
 export async function markdownToWd(
   filePath: string,
   selection: string,
+  isExcel = false,
   /** zero base number */
   startLine = 0,
   isDebug?: boolean,
@@ -80,8 +120,8 @@ export async function markdownToWd(
 ) {
   const dirPath = Path.dirname(filePath);
   const fileNameMd = Path.basename(filePath).replace(/\.md$/i, "");
-  const fileWd0 = await createPath(dirPath, fileNameMd, "wd0");
-  const fileWd = await createPath(dirPath, fileNameMd, "wd");
+  const fileWd0 = await createPath(dirPath, fileNameMd, "wd0", true);
+  const fileWd = await createPath(dirPath, fileNameMd, "wd", true);
 
   // convert markdown to docx
   try {
@@ -108,6 +148,7 @@ export async function markdownToWd(
 
     const wd0 = markdownToWd0(
       markdownBodyX,
+      isExcel,
       { sanitize: false },
       showMessage
     ).replace(/(\r?\n)+/g, "\n");

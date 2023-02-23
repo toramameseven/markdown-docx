@@ -10,7 +10,7 @@ import {
   DocxOption,
   MessageType,
 } from "./markdown-docx";
-import { markdownToEd } from "./markdown-docx/markdown-to-ed";
+import { markdownToExcel } from "./markdown-docx/markdown-to-docx";
 
 export let isDebug = false;
 
@@ -44,7 +44,7 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand("explorer.ExportHtmlDocx", exportHtmlDocx)
   );
 
-  //
+  //exportMarkdownEd
   context.subscriptions.push(
     vscode.commands.registerCommand("explorer.mdToEd", exportMarkdownEd)
   );
@@ -101,12 +101,18 @@ function exportHtmlDocx(uriFile: vscode.Uri) {
 }
 
 function exportMarkdownEd(uriFile: vscode.Uri) {
+  const thisOption = createDocxOptionExtension({
+    ac,
+    message: vscodeCommon.showMessage,
+  });
+
   try {
     vscodeCommon.updateStatusBar(true);
     const filePath = uriFile.fsPath;
     if (filePath.match(/\.md$/i)) {
       // wordDown
-      const r = markdownToEd(filePath, "");
+      //const r = markdownToExDown(filePath, "");
+      const r = markdownToExcel(filePath, "", 0, thisOption);
       vscodeCommon.showMessage(MessageType.info, r, "");
     }
   } catch (error) {

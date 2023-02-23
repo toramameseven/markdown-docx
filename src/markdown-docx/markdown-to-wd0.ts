@@ -67,8 +67,16 @@ const inline = (inlineType: string) => (content: string) => {
   }
   return content;
 };
+
+const inlineEx = (inlineType: string) => (content: string) => {
+  if (inlineType) {
+    return `${inlineType}${content}${inlineType}`;
+  }
+  return content;
+};
 // hr
 const hr = () => "\nhr\n";
+
 // newline
 const newline = () => _newline;
 //empty
@@ -536,13 +544,59 @@ const docxRenderer: marked.Renderer = {
 
 export function markdownToWd0(
   markdown: string,
+  isExcel?: boolean,
   options?: marked.MarkedOptions,
   messageFunction?: ShowMessage
 ): string {
   idMap.clear();
   showMessage = messageFunction;
-  const unmarked = marked(markdown, { ...options, renderer: docxRenderer });
+
+  const render = isExcel ? excelRenderer : docxRenderer;
+
+  const unmarked = marked(markdown, { ...options, renderer: render });
   const unescaped = unescape(unmarked);
   const trimmed = unescaped.trim();
   return trimmed;
 }
+
+const excelRenderer: marked.Renderer = {
+  // Block elements
+  heading: blockHeading,
+
+  // normal paragraph
+  paragraph: blockParagraph(markedCommand.paragraph),
+
+  list: blockList,
+  listitem: blockListItem,
+
+  // ``` or tab
+  code: blockParagraph(markedCommand.code, true),
+
+  // >
+  blockquote: block(markedCommand.blockquote),
+
+  table: blockTable,
+  tablerow: block(markedCommand.tablerow),
+  tablecell: blockTableCell,
+
+  html: htmlBlock,
+  hr: hr,
+  checkbox: empty,
+
+  // Inline elements
+  image: blockImage(markedCommand.image),
+  link: blockLink,
+  text: inlineEx(""),
+  // `code`
+  codespan: inlineEx("`"),
+  // ** **
+  strong: inlineEx("**"),
+  // _ _
+  em: inlineEx("_"),
+  // <br>?
+  br: newline,
+  // ~~ ~~
+  del: inlineEx(markedCommand.del),
+  // etc.
+  options: {},
+};
