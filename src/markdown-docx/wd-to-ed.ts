@@ -1,5 +1,93 @@
 import { MessageType, ShowMessage } from "./common";
 
+class Cell {
+  blockList: string[] = [];
+  align: string;
+  constructor(align: string) {
+    this.align = align;
+  }
+}
+
+class Table {
+  rowCount: number;
+  columnCount: number;
+  cells: Cell[][];
+  row: number = 0;
+  column: number = 0;
+  columnWidth: number[] = [];
+
+  constructor(rows: number, columns: number) {
+    this.rowCount = rows;
+    this.columnCount = columns;
+
+    this.cells = [];
+    let row: Cell[] = [];
+
+    for (let c = 0; c < this.columnCount; c++) {
+      this.columnWidth.push(0);
+    }
+
+    for (let r = 0; r < this.rowCount; r++) {
+      for (let c = 0; c < this.columnCount; c++) {
+        row.push(new Cell("left"));
+      }
+      this.cells.push(row);
+      row = [];
+    }
+  }
+
+  addCell(i: number, j: number, text: string) {
+    this.row = i;
+    this.column = j;
+  }
+
+  appendTextToCell(text: string) {
+    this.cells[this.row][this.column].blockList.push(text);
+    const len = this.cells[this.row][this.column].blockList.join("").length;
+    this.columnWidth[this.column] =
+      this.columnWidth[this.column] < len ? len : this.columnWidth[this.column];
+  }
+
+  value(i: number, j: number) {
+    try {
+      return this.cells[i][j];
+    } catch {}
+    return undefined;
+  }
+
+  createWordDownTable() {
+    if (this.rowCount === 0){
+      return;
+    }
+
+    let row: string[] = [];
+    for (let r = 0; r < this.rowCount; r++) {
+      for (let c = 0; c < this.columnCount; c++) {
+        row.push (this.cells[r][c].blockList.join(""));
+      }
+      const tableRow = row.join("\t");
+      const tableCode = (r ===0 || r === this.rowCount -1) ? "table" : ""; 
+      excelLines.push(`${tableCode}\t\t${tableRow}`);
+      row = [];
+    }
+    createLineBlank();
+  }
+
+  initialize() {
+    this.rowCount = 0;
+    this.columnCount = 0;
+    this.cells = [];
+  }
+}
+
+function multibyteCharCount(str: string) {
+  let len = 0;
+  for (let i = 0; i < str.length; i++) {
+    str[i].match(/[ -~]/) ? (len += 1) : (len += 2);
+  }
+  return len;
+}
+
 const wdCommand = {
   text: "text",
   normalList: "NormalList",
@@ -81,6 +169,10 @@ function flushCommand() {
     }
     excelLines.push(`${lineCommand}\t\t${textBuffer}`);
   }
+
+  mdTable.createWordDownTable();
+
+  mdTable = new Table(0,0);
   lineCommand = "";
   textBuffer = "";
 }
@@ -90,6 +182,22 @@ function getPreviousCommand(n: number) {
   const r = line.split("\t")[0];
   return r;
 }
+
+function deleteCodeCommand() {
+  const line1 = excelLines[excelLines.length - 1] ?? "";
+  const words1 = line1.split("\t");
+  if (words1[0] === "code" ||  words1[0] === "codeX")
+  {
+    const line2 = excelLines[excelLines.length - 2] ?? "";
+    const words2 = line2.split("\t");
+    if (words2[0] === "code" || words2[0] === "codeX"){
+      words1[0] = "codeX";
+      excelLines[excelLines.length - 1] = words1.join("\t");  
+    }
+  }
+}
+
+
 
 function convertText(params: string[]) {
   textBuffer += params[0];
@@ -119,6 +227,7 @@ function convertSection(params: string[]) {
   flushCommand();
   const sections = parseInt(params[0], 10);
   const sectionTitle = params[1];
+  createLineBlank();
   createLine("#".repeat(sections), "", sectionTitle);
   createLineBlank();
 }
@@ -128,6 +237,7 @@ function convertCode(params: string[]) {
     createLineBlank();
   }
   flushCommand();
+  deleteCodeCommand();
   const content = params[0];
   createLine(wdCommand.code, "", content);
 }
@@ -157,8 +267,35 @@ function convertHr(params: string[]) {
   createLine("", "", "---");
 }
 
+function convertTableCreate(params: string[]) {
+  flushCommand();
+  createLineBlank();
+
+  const rows = parseInt(params[0]);
+  const columns = parseInt(params[1]);
+
+  mdTable = new Table(rows, columns);
+}
+
+function convertTableContents(params: string[]) {
+  const row = parseInt(params[0]);
+  const column = parseInt(params[1]);
+
+  mdTable.addCell(row, column, "left");
+}
+
+function convertTablecontentsList(params: string[]) {
+  const command = params[0];
+  const cellText = params[1];
+
+  if (command === "text") {
+    mdTable.appendTextToCell(cellText);
+  }
+}
+
 let lineCommand = "";
 let textBuffer = "";
+let mdTable = new Table(0, 0);
 
 export function wdToEd(wd: string, sm?: ShowMessage): string {
   showMessage = sm;
@@ -177,8 +314,9 @@ export function wdToEd(wd: string, sm?: ShowMessage): string {
     const toCommand = command as WdCommand;
     resolveCommand(toCommand, params);
   }
+  flushCommand();
 
-  return excelLines.map((i) => i).join("\n");
+  return excelLines.map((i) => i.replace(/^codeX/, "")).join("\n");
 }
 
 function resolveCommand(command: WdCommand, params: string[]) {
@@ -211,13 +349,13 @@ function resolveCommand(command: WdCommand, params: string[]) {
       convertHr(params);
       break;
     case wdCommand.tableCreate:
-      convertHr(params);
+      convertTableCreate(params);
       break;
     case wdCommand.tablecontents:
-      convertHr(params);
+      convertTableContents(params);
       break;
     case wdCommand.tablecontentslist:
-      convertHr(params);
+      convertTablecontentsList(params);
       break;
     default:
       const r = params[0];
@@ -333,71 +471,3 @@ function resolveCommand(command: WdCommand, params: string[]) {
 
 //   return res;
 // }
-
-class Cell {
-  blockList: string[] = [];
-  align: string;
-  constructor(align: string) {
-    this.align = align;
-  }
-}
-
-class Table {
-  rowCount: number;
-  columnCount: number;
-  cells: Cell[][];
-
-  constructor(rows: number, columns: number) {
-    this.rowCount = rows;
-    this.columnCount = columns;
-    this.cells = [];
-  }
-
-  addCell(i: number, j: number, text: string) {
-    this.cells[i][j] = new Cell(text);
-  }
-
-  appendTextToCell(i: number, j: number, text: string) {
-    this.cells[i][j].blockList.push(text);
-  }
-
-  value(i: number, j: number) {
-    try {
-      return this.cells[i][j];
-    } catch {}
-    return undefined;
-  }
-
-  createWordDownTable() {
-    const commands: string[] = [];
-    const commandContents: string[] = [];
-    commands.push(`tableCreate\t${this.rowCount}\t${this.columnCount}`);
-
-    // contents
-    // delete html comments
-    for (let i = 0; i < this.rowCount; i++) {
-      for (let j = 0; j < this.columnCount; j++) {
-        const blockList = this.cells[i][j].blockList;
-        //const cellValue = blockList.join("\n");
-        commandContents.push(
-          `tablecontents\t${i}\t${j}\tnext\t${this.cells[i][j].align}`
-        );
-        const tableCellCommands = blockList.map(
-          (i) => `tablecontentslist\t${i.trim().replace(/<!--.*?-->/g, "")}`
-        );
-        // detect end paragraph without newline
-        tableCellCommands.push(`tablecontentslist\tendParagraph\t\ttm`);
-        commandContents.push(...tableCellCommands);
-      }
-    }
-
-    const r = [...commands, ...commandContents];
-    return r;
-  }
-
-  initialize() {
-    this.rowCount = 0;
-    this.columnCount = 0;
-    this.cells = [];
-  }
-}
