@@ -97,6 +97,27 @@ export function getWordDownCommand(wd: string) {
   return undefined;
 }
 
+// wd: <!-- c m 1 3 xxx -->
+// c: command
+// m: merge
+// row: 1
+// column : 3
+// xxx: param
+export function getWordDownMergeCommand(wd: string) {
+  const testMatch = wd.match(/^<!--(?<name>.*)-->/i);
+  const command = testMatch?.groups?.name ?? "";
+  const commandList = command.trim().split(/\s(?=(?:[^"]*"[^"]*")*[^"]*$)/i);
+  if (commandList[0] === "c" && commandList[1]) {
+    const params = (commandList.slice(2) ?? []).map((l) =>
+      l.replace(/\"/g, "")
+    );
+    const isMergeRow = params.includes("^");
+    const isMergeColumn = params.includes("<");
+    return { isMergeRow, isMergeColumn };
+  }
+  return undefined;
+}
+
 export async function createPath(
   dir: string,
   name: string,

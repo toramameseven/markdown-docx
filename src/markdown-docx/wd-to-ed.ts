@@ -8,6 +8,39 @@ class Cell {
   }
 }
 
+class Code {
+  hasCode = false;
+  codes: string[];
+
+  constructor() {
+    this.codes = [];
+  }
+
+  addCode(command: string, params: string[]) {
+    this.hasCode = true;
+    this.codes.push(params.join(""));
+  }
+
+  initialize() {
+    this.codes = [];
+    this.hasCode = false;
+  }
+
+  createCode() {
+    createLineBlank("createCode in");
+    for (let r = 0; r < this.codes.length; r++) {
+      const element = this.codes[r];
+      const command = r === 0 || r === this.codes.length - 1 ? "code" : "";
+      excelLines.push(`${command}\t\t${element}`);
+    }
+    if (this.codes.length === 1) {
+      excelLines.push(`${wdCommand.code}\t\t`);
+    }
+    createLineBlank("createCode out");
+    this.initialize();
+  }
+}
+
 class Table {
   rowCount: number;
   columnCount: number;
@@ -56,21 +89,21 @@ class Table {
   }
 
   createWordDownTable() {
-    if (this.rowCount === 0){
+    if (this.rowCount === 0) {
       return;
     }
 
     let row: string[] = [];
     for (let r = 0; r < this.rowCount; r++) {
       for (let c = 0; c < this.columnCount; c++) {
-        row.push (this.cells[r][c].blockList.join(""));
+        row.push(this.cells[r][c].blockList.join(""));
       }
       const tableRow = row.join("\t");
-      const tableCode = (r ===0 || r === this.rowCount -1) ? "table" : ""; 
+      const tableCode = r === 0 || r === this.rowCount - 1 ? "table" : "";
       excelLines.push(`${tableCode}\t\t${tableRow}`);
       row = [];
     }
-    createLineBlank();
+    createLineBlank("createWordDownTable");
   }
 
   initialize() {
@@ -154,25 +187,41 @@ function createLine(command: string, picture: string, text: string) {
   excelLines.push(`${command}\t${picture}\t${text}`);
 }
 
-function createLineBlank() {
-  excelLines.push(`\t\t`);
+function createLineBlank(info: string, isForce = false) {
+  //console.log(`${createLineBlank.name}==> ${info}`);
+  if (
+    (excelLines.length && excelLines[excelLines.length - 1].trim() !== "") ||
+    isForce
+  ) {
+    excelLines.push(`\t\t`);
+  }
 }
 
 function createBlock() {
   //
 }
 
-function flushCommand() {
+function flushCommand(command: WdCommand = wdCommand.non, params = [""]) {
+  if (
+    mdCode?.hasCode &&
+    !(
+      command === "code" ||
+      (command === "newLine" && params[0] === "convertCode")
+    )
+  ) {
+    mdCode.createCode();
+  }
+
   if (lineCommand !== "" || textBuffer !== "") {
     if (!!getPreviousCommand(1) && lineCommand === "") {
-      createLineBlank();
+      createLineBlank("flushCommand exist previous, no line command");
     }
     excelLines.push(`${lineCommand}\t\t${textBuffer}`);
   }
 
   mdTable.createWordDownTable();
 
-  mdTable = new Table(0,0);
+  mdTable = new Table(0, 0);
   lineCommand = "";
   textBuffer = "";
 }
@@ -182,22 +231,6 @@ function getPreviousCommand(n: number) {
   const r = line.split("\t")[0];
   return r;
 }
-
-function deleteCodeCommand() {
-  const line1 = excelLines[excelLines.length - 1] ?? "";
-  const words1 = line1.split("\t");
-  if (words1[0] === "code" ||  words1[0] === "codeX")
-  {
-    const line2 = excelLines[excelLines.length - 2] ?? "";
-    const words2 = line2.split("\t");
-    if (words2[0] === "code" || words2[0] === "codeX"){
-      words1[0] = "codeX";
-      excelLines[excelLines.length - 1] = words1.join("\t");  
-    }
-  }
-}
-
-
 
 function convertText(params: string[]) {
   textBuffer += params[0];
@@ -216,10 +249,10 @@ function convertOderList(params: string[]) {
 }
 
 function convertNewline(params: string[]) {
-  flushCommand();
+  flushCommand(wdCommand.newLine, params);
   const newLineInfo = params[0];
   if (newLineInfo === "convertParagraph") {
-    createLineBlank();
+    createLineBlank("convertNewline convertParagraph");
   }
 }
 
@@ -227,25 +260,20 @@ function convertSection(params: string[]) {
   flushCommand();
   const sections = parseInt(params[0], 10);
   const sectionTitle = params[1];
-  createLineBlank();
+  createLineBlank("convertSection in");
   createLine("#".repeat(sections), "", sectionTitle);
-  createLineBlank();
+  createLineBlank("convertSection out");
 }
 
 function convertCode(params: string[]) {
-  if (getPreviousCommand(1) !== wdCommand.code) {
-    createLineBlank();
-  }
-  flushCommand();
-  deleteCodeCommand();
-  const content = params[0];
-  createLine(wdCommand.code, "", content);
+  flushCommand(wdCommand.code, params);
+  mdCode.addCode(wdCommand.code, params);
 }
 
 function convertImage(params: string[]) {
   flushCommand();
 
-  createLineBlank();
+  createLineBlank("convertImage");
   const imagePath = params[0];
   const imageTitle = params[1];
   const hover = params[2];
@@ -253,7 +281,7 @@ function convertImage(params: string[]) {
 }
 
 function convertLink(params: string[]) {
-  createLineBlank();
+  createLineBlank("convertLink");
   const linkPath = params[0];
   const hover = params[1];
   const linkTitle = params[2];
@@ -263,13 +291,13 @@ function convertLink(params: string[]) {
 
 function convertHr(params: string[]) {
   flushCommand();
-  createLineBlank();
+  createLineBlank("convertHr");
   createLine("", "", "---");
 }
 
 function convertTableCreate(params: string[]) {
   flushCommand();
-  createLineBlank();
+  createLineBlank("convertTableCreate");
 
   const rows = parseInt(params[0]);
   const columns = parseInt(params[1]);
@@ -296,6 +324,7 @@ function convertTablecontentsList(params: string[]) {
 let lineCommand = "";
 let textBuffer = "";
 let mdTable = new Table(0, 0);
+let mdCode: Code = new Code();
 
 export function wdToEd(wd: string, sm?: ShowMessage): string {
   showMessage = sm;

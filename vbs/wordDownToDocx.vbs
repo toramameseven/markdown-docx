@@ -1015,6 +1015,7 @@ Class XWord
                         oTable.Cell(x, y).Merge oTable.Cell(MergeEnd(0)+1, MergeEnd(1)+1)
                     Else
                         ''log "no merge", String_Empty, String_Empty
+                        oTable.Cell(x, y).Merge oTable.Cell(MergeEnd(0)+1, MergeEnd(1)+1)
                     End If
                 End If
             Next
@@ -1094,9 +1095,13 @@ Class XWord
                         If ubound(strSplit) > 4 Then
                             If (strSplit(5)) <> String_Empty or True Then
                                 If strSplit(1) = strSplit(3) Then
-                                    '
+                                    mergeInfo(CLng(strSplit(1)), CLng(strSplit(2))) = _
+                                         strSplit(3) & "," &  strSplit(4)
+                                    LogDebug "merge", "A"
                                 Else
-                                    mergeInfo(CLng(strSplit(1)), CLng(strSplit(2))) = strSplit(3) & "," &  strSplit(4)
+                                    mergeInfo(CLng(strSplit(1)), CLng(strSplit(2))) = _
+                                         strSplit(3) & "," &  strSplit(4)
+                                     LogDebug "merge", "B"
                                 End If
                             End If
                         End If

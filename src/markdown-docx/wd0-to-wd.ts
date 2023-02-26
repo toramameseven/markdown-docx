@@ -1,4 +1,5 @@
-import { MessageType, ShowMessage } from "./common";
+import { isInteger } from "lodash";
+import { MessageType, ShowMessage, getWordDownMergeCommand } from "./common";
 
 let showMessage: ShowMessage | undefined;
 
@@ -52,7 +53,7 @@ const wd0Command = {
 
   crossRef: "crossRef",
   property: "property",
-  clearContent:"clearContent",
+  clearContent: "clearContent",
   docNumber: "docNumber",
   indentPlus: "indentPlus",
   indentMinus: "indentMinus",
@@ -89,6 +90,7 @@ class Cell implements BaseBlock {
   x: number = 0;
   y: number = 0;
   align: string;
+  mergeTo: number[] = [];
   constructor(align: string) {
     this.align = align;
   }
@@ -169,13 +171,50 @@ class Table implements BaseBlock {
     const rowMergeList = this.rowMerge.split(",");
     let rowCellMerge0 = 0;
 
+    // get merge info in the cells.
+    for (let r = 0; r < this.rowCount; r++) {
+      let lastEmptyColumn = -1;
+      for (let c = 0; c < this.columnCount; c++) {
+        let mergeColumnTo = -1;
+        const mergeData =
+          this.rows[r][c].blockList.length > 0
+            ? this.rows[r][c].blockList[0]
+            : "";
+        lastEmptyColumn = mergeData ? -1 : c;
+        const mergeCommand = getWordDownMergeCommand(mergeData);
+
+        if (mergeCommand?.isMergeColumn) {
+          mergeColumnTo = lastEmptyColumn - 1;
+        }
+
+        let mergeRowTo = -1;
+        if (mergeCommand?.isMergeRow) {
+          for (let r2 = r - 1; r2 > -1; r2--) {
+            const mergeData =
+              this.rows[r2][c].blockList.length > 0
+                ? this.rows[r2][c].blockList[0]
+                : "";
+            if (!!mergeData) {
+              mergeRowTo = r2;
+            }
+          }
+        }
+        this.rows[r][c].mergeTo = [mergeRowTo, mergeColumnTo];
+        console.log(`${r},${c} - ${mergeRowTo},${mergeColumnTo}`);
+      }
+    }
+
     // merge main
     for (let k = 0; k < rowMergeList.length; k++) {
+      // rows[0]: start row, rows[1]:end row
       const rows = rowMergeList[k].split("-");
       // merge empty cell
-      // if not cell merge, no columns loop
+      // if not emptyMerge, no columns loop
+      // do merge in the range outside rowMerge.
       const columnLoopNum = this.emptyMerge ? this.columnCount : -1;
       for (let j = 0; j < columnLoopNum; j++) {
+        // do emptyMerge(row direction)
+        // ~~0 means zero base array.
         const beforeEnd0 = parseInt(rows[0]) - 1;
         let cellStartRow0 = rowCellMerge0;
         let cellEndRow0 = beforeEnd0;
@@ -210,6 +249,7 @@ class Table implements BaseBlock {
           );
         }
       } // for loop column
+
       // merge rows
       for (let j = 0; j < this.columnCount; j++) {
         const start = parseInt(rows[0]) - 1;
@@ -244,8 +284,8 @@ class Table implements BaseBlock {
       }
     }
 
-    const r = [...commands, ...commandContents, ...commandMergeInfos];
-    return r;
+    const ret = [...commands, ...commandContents, ...commandMergeInfos];
+    return ret;
   }
 
   initialize() {
@@ -605,14 +645,7 @@ function convertClearContent(params: DocxParam, isCommandEnd?: boolean) {
   if (isCommandEnd) {
     return;
   }
-  const r = [
-    "clearContent",
-    params.isClearContent,
-    "",
-    "",
-    "",
-    "tm",
-  ].join(_sp);
+  const r = ["clearContent", params.isClearContent, "", "", "", "tm"].join(_sp);
   outputWd(r);
 }
 function convertDate(params: DocxParam, isCommandEnd?: boolean) {
@@ -825,11 +858,11 @@ function resolveCommand(
       convertCrossRef(params, isCommandEnd);
       break;
     case wd0Command.clearContent:
-        if (isCommandEnd) {
-          return;
-        }
-        convertClearContent(params, isCommandEnd);
-        break;
+      if (isCommandEnd) {
+        return;
+      }
+      convertClearContent(params, isCommandEnd);
+      break;
     case wd0Command.date:
       if (isCommandEnd) {
         return;
