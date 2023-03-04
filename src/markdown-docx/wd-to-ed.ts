@@ -93,6 +93,7 @@ class Table {
       return;
     }
 
+    createLineBlank("createWordDownTable In");
     let row: string[] = [];
     for (let r = 0; r < this.rowCount; r++) {
       for (let c = 0; c < this.columnCount; c++) {
@@ -103,7 +104,7 @@ class Table {
       excelLines.push(`${tableCode}\t\t${tableRow}`);
       row = [];
     }
-    createLineBlank("createWordDownTable");
+    createLineBlank("createWordDownTable Out");
   }
 
   initialize() {
