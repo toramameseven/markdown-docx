@@ -1,4 +1,3 @@
-import { isInteger } from "lodash";
 import { MessageType, ShowMessage, getWordDownMergeCommand } from "./common";
 
 let showMessage: ShowMessage | undefined;
@@ -87,12 +86,17 @@ let blockInfos: BaseBlock[] = [new Base(wd0Command.non)];
 class Cell implements BaseBlock {
   blockType: Wd0Command = wd0Command.tablecell;
   blockList: string[] = [];
+  // row 1-
   x: number = 0;
+  // column 1-
   y: number = 0;
   align: string;
   mergeTo: number[] = [];
   constructor(align: string) {
     this.align = align;
+  }
+  isMerge() {
+    return this.x - 1 !== this.mergeTo[0] || this.y - 1 !== this.mergeTo[1];
   }
 }
 
@@ -160,6 +164,33 @@ class Table implements BaseBlock {
     // tableWidthInfo = 1,4
     commands.push(`tableWidthInfo\t${this.tableWidthInfo}`);
 
+    // get merge info in the cells(include column merge). <^
+    for (let r = 0; r < this.rowCount; r++) {
+      for (let c = 0; c < this.columnCount; c++) {
+        const mergeData =
+          this.rows[r][c].blockList.length > 0
+            ? this.rows[r][c].blockList[0]
+            : "";
+
+        // isMerge
+        const mergeCommand = getWordDownMergeCommand(mergeData);
+        let rowFrom = r - (mergeCommand.intMergeRows - 1);
+        rowFrom = rowFrom > -1 ? rowFrom : r;
+        let columnFrom = c - (mergeCommand.intMergeColumns - 1);
+        columnFrom = columnFrom > -1 ? columnFrom : c;
+
+        this.rows[r][c].mergeTo = [r, c];
+        this.rows[rowFrom][columnFrom].mergeTo = [r, c];
+
+        console.log(
+          // prettier-ignore
+          `${mergeCommand.intMergeRows},${mergeCommand.intMergeColumns}: ${rowFrom},${columnFrom} - ${r},${c} :: ${this.rows[r][c].isMerge()}`
+        );
+      }
+    }
+    // get merge info in the cells. r3 c2
+
+    // row merge
     // merge info rows
     // <!-- word rowMerge 3-4,5-6,7-9 -->
     // rowMerge = 3-4,5-6,7-9
@@ -171,43 +202,11 @@ class Table implements BaseBlock {
     const rowMergeList = this.rowMerge.split(",");
     let rowCellMerge0 = 0;
 
-    // get merge info in the cells.
-    for (let r = 0; r < this.rowCount; r++) {
-      let lastEmptyColumn = -1;
-      for (let c = 0; c < this.columnCount; c++) {
-        let mergeColumnTo = -1;
-        const mergeData =
-          this.rows[r][c].blockList.length > 0
-            ? this.rows[r][c].blockList[0]
-            : "";
-        lastEmptyColumn = mergeData ? -1 : c;
-        const mergeCommand = getWordDownMergeCommand(mergeData);
-
-        if (mergeCommand?.isMergeColumn) {
-          mergeColumnTo = lastEmptyColumn - 1;
-        }
-
-        let mergeRowTo = -1;
-        if (mergeCommand?.isMergeRow) {
-          for (let r2 = r - 1; r2 > -1; r2--) {
-            const mergeData =
-              this.rows[r2][c].blockList.length > 0
-                ? this.rows[r2][c].blockList[0]
-                : "";
-            if (!!mergeData) {
-              mergeRowTo = r2;
-            }
-          }
-        }
-        this.rows[r][c].mergeTo = [mergeRowTo, mergeColumnTo];
-        console.log(`${r},${c} - ${mergeRowTo},${mergeColumnTo}`);
-      }
-    }
-
-    // merge main
+    // merge main, rows merge{empty merge}
     for (let k = 0; k < rowMergeList.length; k++) {
       // rows[0]: start row, rows[1]:end row
-      const rows = rowMergeList[k].split("-");
+      // todo error  1-,-4
+      const [rows0, rows1] = rowMergeList[k].split("-");
       // merge empty cell
       // if not emptyMerge, no columns loop
       // do merge in the range outside rowMerge.
@@ -215,10 +214,11 @@ class Table implements BaseBlock {
       for (let j = 0; j < columnLoopNum; j++) {
         // do emptyMerge(row direction)
         // ~~0 means zero base array.
-        const beforeEnd0 = parseInt(rows[0]) - 1;
+        const beforeEnd0 = parseInt(rows0) - 1;
         let cellStartRow0 = rowCellMerge0;
         let cellEndRow0 = beforeEnd0;
-        // rows
+
+        // rows for empty merge
         for (let i = rowCellMerge0 + 1; i <= beforeEnd0; i++) {
           if (this.rows[i][j].blockList.length === 0) {
             // empty value so continue
@@ -230,42 +230,54 @@ class Table implements BaseBlock {
                 this.rows[cellStartRow0][j].blockList.length > 0
                   ? this.rows[cellStartRow0][j].blockList[0]
                   : "empty";
-              commandMergeInfos.push(
-                //`tableMarge\t${cellStartRow0}\t${j}\t${cellEndRow0}\t${j}\t${this.rows[cellStartRow0][j].blockList[0]}`
-                `tableMarge\t${cellStartRow0}\t${j}\t${cellEndRow0}\t${j}\t${mergeData}`
-              );
+              // commandMergeInfos.push(
+              //   `tableMarge\t${cellStartRow0}\t${j}\t${cellEndRow0}\t${j}\t${mergeData}`
+              // );
+              if (!this.rows[cellStartRow0][j].isMerge()) {
+                this.rows[cellStartRow0][j].mergeTo = [cellEndRow0, j];
+              }
             }
             cellStartRow0 = i;
             cellEndRow0 = beforeEnd0;
           }
         }
+
+        //
         if (cellStartRow0 < cellEndRow0) {
           const mergeData =
             this.rows[cellStartRow0][j].blockList.length > 0
               ? this.rows[cellStartRow0][j].blockList[0]
               : "empty";
-          commandMergeInfos.push(
-            `tableMarge\t${cellStartRow0}\t${j}\t${cellEndRow0}\t${j}\t${mergeData}`
-          );
+          // commandMergeInfos.push(
+          //   `tableMarge\t${cellStartRow0}\t${j}\t${cellEndRow0}\t${j}\t${mergeData}`
+          // );
+          if (!this.rows[cellStartRow0][j].isMerge()) {
+            this.rows[cellStartRow0][j].mergeTo = [cellEndRow0, j];
+          }
         }
       } // for loop column
 
       // merge rows
       for (let j = 0; j < this.columnCount; j++) {
-        const start = parseInt(rows[0]) - 1;
-        const end = parseInt(rows[1]) - 1;
+        const start = parseInt(rows0) - 1;
+        const end = parseInt(rows1) - 1;
         if (start < end) {
-          commandMergeInfos.push(
-            `tableMarge\t${start}\t${j}\t${end}\t${j}\t${this.rows[start][
-              j
-            ].blockList.join("")}`
-          );
+          // commandMergeInfos.push(
+          //   // prettier-ignore
+          //   `tableMarge\t${start}\t${j}\t${end}\t${j}\t${this.rows[start][j].blockList.join("")}`
+          // );
+          if (!this.rows[start][j].isMerge()) {
+            this.rows[start][j].mergeTo = [end, j];
+          }
         }
       }
-      rowCellMerge0 = parseInt(rows[1]);
-    }
 
-    // contents
+      // next row merge
+      rowCellMerge0 = parseInt(rows1);
+    } // end for rowMergeList
+    // merge main, rows merge{empty merge}
+
+    // create cell contents
     // delete html comments
     for (let i = 0; i < this.rowCount; i++) {
       for (let j = 0; j < this.columnCount; j++) {
@@ -276,11 +288,22 @@ class Table implements BaseBlock {
         );
         const tableCellCommands = blockList.map(
           (i) => `tablecontentslist\t${i.trim().replace(/<!--.*?-->/g, "")}`
-          //(i) => `tablecontentslist\t${i}`
         );
         // detect end paragraph without newline
         tableCellCommands.push(`tablecontentslist\tendParagraph\t\ttm`);
         commandContents.push(...tableCellCommands);
+      }
+    }
+
+    //create merge info
+    for (let i = 0; i < this.rowCount; i++) {
+      for (let j = 0; j < this.columnCount; j++) {
+        if (this.rows[i][j].isMerge()) {
+          commandMergeInfos.push(
+            // prettier-ignore
+            `tableMarge\t${i}\t${j}\t${this.rows[i][j].mergeTo[0]}\t${this.rows[i][j].mergeTo[1]}\tdummy`
+          );
+        }
       }
     }
 

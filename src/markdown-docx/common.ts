@@ -84,8 +84,8 @@ export function getFileContents(filePath: string) {
   return outLines.join("\n");
 }
 
-export function getWordDownCommand(wd: string) {
-  const testMatch = wd.match(/^<!--(?<name>.*)-->/i);
+export function getWordDownCommand(html: string) {
+  const testMatch = html.match(/^<!--(?<name>.*)-->/i);
   const command = testMatch?.groups?.name ?? "";
   const commandList = command.trim().split(/\s(?=(?:[^"]*"[^"]*")*[^"]*$)/i);
   if (commandList[0] === "word" && commandList[1]) {
@@ -97,25 +97,39 @@ export function getWordDownCommand(wd: string) {
   return undefined;
 }
 
-// wd: <!-- c m 1 3 xxx -->
-// c: command
-// m: merge
-// row: 1
-// column : 3
-// xxx: param
+// wd: <!-- c\d+ r\d+ -->
+// c: columns 1-
+// r: rows 1-
 export function getWordDownMergeCommand(wd: string) {
-  const testMatch = wd.match(/^<!--(?<name>.*)-->/i);
+  const testMatch = wd.match(/<!--(?<name>.*)-->/i);
   const command = testMatch?.groups?.name ?? "";
-  const commandList = command.trim().split(/\s(?=(?:[^"]*"[^"]*")*[^"]*$)/i);
-  if (commandList[0] === "c" && commandList[1]) {
-    const params = (commandList.slice(2) ?? []).map((l) =>
-      l.replace(/\"/g, "")
-    );
-    const isMergeRow = params.includes("^");
-    const isMergeColumn = params.includes("<");
-    return { isMergeRow, isMergeColumn };
+  const commandList = command
+    .trim()
+    .split(/\s(?=(?:[^"]*"[^"]*")*[^"]*$)/i)
+    .map((l) => l.replace(/\"/g, ""));
+  let mergeRows = "1";
+  let mergeColumns = "1";
+  if (commandList.length) {
+    for (let index = 0; index < commandList.length; index++) {
+      const element = commandList[index];
+      const rowMatch = element.match(/^r(?<rows>\d+)/);
+      if (rowMatch?.groups?.rows) {
+        mergeRows = rowMatch?.groups?.rows;
+        break;
+      }
+    }
+    for (let index = 0; index < commandList.length; index++) {
+      const element = commandList[index];
+      const rowMatch = element.match(/^c(?<columns>\d+)/);
+      if (rowMatch?.groups?.columns) {
+        mergeColumns = rowMatch?.groups?.columns;
+        break;
+      }
+    }
   }
-  return undefined;
+  const intMergeRows = parseInt(mergeRows);
+  const intMergeColumns = parseInt(mergeColumns);
+  return { intMergeRows, intMergeColumns };
 }
 
 export async function createPath(
