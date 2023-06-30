@@ -10,7 +10,7 @@ import { wd0ToDocx as wd0ToWd } from "../../markdown-docx/wd0-to-wd";
 function mdToWd(marked: string) {
   const markdownBodyX = marked.replace(/@/g, "\\@");
 
-  const wd0 = markdownToWd0(markdownBodyX, { sanitize: false }).replace(
+  const wd0 = markdownToWd0(markdownBodyX, "docx", { sanitize: false }).replace(
     /(\r?\n)+/g,
     "\n"
   );
