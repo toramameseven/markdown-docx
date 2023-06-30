@@ -21,8 +21,7 @@ export function htmlToMarkdown(filePath: string) {
   const s = getFileContents(filePath);
   // Single file
   const r = NodeHtmlMarkdown.translate(
-    s /* html */,
-    ///* html */ `<b>hello</b>`,
+    /* html `<b>hello</b>`*/ s,
     /* options (optional) */ {},
     /* customTranslators (optional) */ undefined,
     /* customCodeBlockTranslators (optional) */ undefined
