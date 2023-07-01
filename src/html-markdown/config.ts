@@ -158,6 +158,18 @@ export const defaultTranslators: TranslatorConfigObject = {
     prefix: "#".repeat(+node.tagName.charAt(1)) + " ",
   }),
 
+  /* code span etc */
+  "sub,sup,codespan": {
+    spaceIfRepeatingChar: true,
+    postprocess: ({ node, content, options: {} }) => {
+      const smallTag = node.tagName.toLowerCase();
+      const r = isWhiteSpaceOnly(content)
+        ? PostProcessResult.RemoveNode
+        : `\n<${smallTag}>${content}\n</${smallTag}>\n`;
+      return r;
+    },
+  },
+
   /* Bold / Strong */
   "strong,b": {
     spaceIfRepeatingChar: true,
@@ -366,7 +378,7 @@ export const defaultTranslators: TranslatorConfigObject = {
             colWidth
               .map((w) => {
                 let ww = w;
-                if (ww === 0){
+                if (ww === 0) {
                   ww = 1;
                 }
                 const r = " " + "-".repeat(ww) + " |";
