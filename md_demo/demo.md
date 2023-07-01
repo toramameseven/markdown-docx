@@ -130,7 +130,7 @@ upper line is `<!-- word newPage -->`
 <!-- word export demo-Typographic.md-->
 # Typographic replacements
 
-NOTE: All @ are replaced to "\\@" in **markdown to docx**. 
+NOTE: All @ are replaced to "\\@" in **markdown to docx**.
 
 anonymous@com.com
 
