@@ -1,10 +1,15 @@
 import { spawn } from "child_process";
 
-export function runCommand(exe: string, param: string) {
-  const child = spawn(exe, [param], {
-    stdio: "ignore", // piping all stdio to /dev/null
-    detached: true, // メインプロセスから切り離す設定
-    env: process.env, // NODE_ENV を tick.js へ与えるため
+/**
+ * run windows process
+ * @param exe full path of the exe file.
+ * @param params parameters for exe
+ */
+export function runCommand(exe: string, params: string) {
+  const child = spawn(exe, [params], {
+    stdio: "ignore",
+    detached: true,
+    env: process.env,
   });
-  child.unref(); // メインプロセスから切り離す
+  child.unref();
 }
