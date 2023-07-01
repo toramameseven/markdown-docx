@@ -1,8 +1,8 @@
-import { DocxOption, MessageType, ShowMessage } from "./common";
+import { DocxOption, MessageProp, MessageType, ShowMessage, fileExists } from "./common";
 import * as fs from "fs";
 import * as Path from "path";
 import * as imageSize from "image-size";
-const TeXToSVG = require("tex-to-svg");
+const texToSvg = require("tex-to-svg");
 
 import {
   Bookmark,
@@ -29,8 +29,10 @@ import {
   //convertInchesToTwip,
   //PageReference,
   SimpleField,
+  TableLayoutType,
 } from "docx";
 import { svg2imagePng } from "./svg-png-image";
+
 
 const _sp = "\t";
 //
@@ -135,7 +137,7 @@ class TableJs {
     this.tableWidthArray = [];
   }
 
-  doTableCommand(line: string) {
+  async doTableCommand(line: string) {
     const words = line.split(_sp);
     switch (words[0]) {
       case "tableWidthInfo":
@@ -161,7 +163,7 @@ class TableJs {
         } else if (words[1] === "image") {
           this.cells[this.row][this.column].push(
             new Paragraph({
-              children: [createImageChild(this.mdSourcePath, words[2])],
+              children: [ await createImageChild(this.mdSourcePath, words[2])],
             })
           );
         } else {
@@ -239,6 +241,7 @@ class TableJs {
     });
 
     const tableJs = new Table({
+      layout: TableLayoutType.FIXED,
       rows: tableRaws,
       style: "styleN",
       indent: {
@@ -393,7 +396,8 @@ export async function wdToDocxJs(
     currentParagraph = await resolveWordDownCommandEx(
       lines[i],
       currentParagraph,
-      mdSourcePath
+      mdSourcePath,
+      option
     );
 
     // when paragraph end, flush paragraph
@@ -454,14 +458,14 @@ function resolveWordCommentsCommands(
     documentInfo[wdCommandList[0]] = wdCommandList[1];
     return true;
   }
-
   return false;
 }
 
 async function resolveWordDownCommandEx(
   line: string,
   nodes: DocParagraph,
-  mdSourcePath: string
+  mdSourcePath: string,
+  option?: DocxOption
 ) {
   const words = line.split(_sp);
   let current: DocParagraph;
@@ -524,7 +528,7 @@ async function resolveWordDownCommandEx(
       return nodes;
       break;
     case NodeType.image:
-      child = createImageChild(mdSourcePath, words[1]);
+      child = await createImageChild(mdSourcePath, words[1], option);
       nodes.addChild(child, true);
       return nodes;
       break;
@@ -540,7 +544,7 @@ async function resolveWordDownCommandEx(
       }
 
       const mathBlock = s.match(/^\$(.*)\$$/);
-      if (mathBlock?.length) {
+      if (mathBlock?.length && option?.mathExtension) {
         const child = await createMathImage(mathBlock[1]);
         nodes.addChild(child, true);
       } else {
@@ -593,7 +597,7 @@ async function createMathImage(mathEq: string) {
     em: 16,
   };
 
-  const svgStr = TeXToSVG(mathEq, options);
+  const svgStr: string = texToSvg(mathEq, options);
 
   // create png
   const pngArray = await svg2imagePng(svgStr);
@@ -610,8 +614,19 @@ async function createMathImage(mathEq: string) {
   return child;
 }
 
-function createImageChild(mdSourcePath: string, imagePathR: string) {
+async function createImageChild(mdSourcePath: string, imagePathR: string, option?: DocxOption) {
   const imagePath = Path.resolve(mdSourcePath, imagePathR);
+
+  if (!(await fileExists(imagePath))){
+    option?.message?.(
+      MessageType.err,
+      `No image ${imagePath}`,
+      "docxjs",
+      false
+    );
+    const errorChild = new TextRun(`[No Image: ${imagePath}]`);
+    return errorChild;
+  }
 
   const sizeImage = imageSize.imageSize(imagePath);
 
