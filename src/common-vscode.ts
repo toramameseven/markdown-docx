@@ -10,6 +10,15 @@ export const codeStatusBar = vscode.window.createStatusBarItem(
   100
 );
 
+/**
+ * get vscode current folder
+ * @returns 
+ */
+export function getWorkingDirectory(){
+  let wf = vscode.workspace.workspaceFolders?.[0];
+  return wf;
+}
+
 function createMessage(message: string | unknown, source: string) {
   if (message instanceof Error) {
     return source + " : " + message.message;
