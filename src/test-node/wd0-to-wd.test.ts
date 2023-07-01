@@ -15,7 +15,7 @@ import { getFileContents } from "../markdown-docx/common";
 function mdToWd(marked: string) {
   const markdownBodyX = marked.replace(/@/g, "\\@");
 
-  const wd0 = markdownToWd0(markdownBodyX, { sanitize: false }).replace(
+  const wd0 = markdownToWd0(markdownBodyX, "docx", { sanitize: false }).replace(
     /(\r?\n)+/g,
     "\n"
   );
@@ -25,7 +25,7 @@ function mdToWd(marked: string) {
 }
 
 async function mdFileToWd(file: string) {
-  const r = await markdownToWd(file, "", 0, false, true);
+  const r = await markdownToWd(file, "", "docx", 0, false, true);
   return r.wdBody;
 }
 
