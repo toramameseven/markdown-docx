@@ -17,7 +17,7 @@ newLine	convertCode	tm
 text	result
 newLine	convertParagraph	tm
 tableCreate	4	2
-tableWidthInfo	1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+tableWidthInfo	6.5,6.5
 tablecontents	0	0	next	left
 tablecontentslist	text	data1-1
 tablecontentslist	endParagraph		tm

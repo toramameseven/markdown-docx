@@ -126,7 +126,7 @@ text	upper line is <codespan><!-- word newPage --></codespan>
 newLine	convertParagraph	tm
 section	1	Typographic replacements	typographic-replacements
 newLine	convertHeading	tm
-text	NOTE: All @ are replaced to "\@" in <b>markdown to docx</b>. 
+text	NOTE: All @ are replaced to "\@" in <b>markdown to docx</b>.
 newLine	convertParagraph	tm
 text	anonymous@com.com
 newLine	convertParagraph	tm
@@ -444,7 +444,7 @@ newLine	convertCode	tm
 text	result
 newLine	convertParagraph	tm
 tableCreate	4	2
-tableWidthInfo	1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+tableWidthInfo	6.5,6.5
 tablecontents	0	0	next	left
 tablecontentslist	text	data1-1
 tablecontentslist	endParagraph		tm
@@ -495,7 +495,7 @@ newLine	convertCode	tm
 text	result
 newLine	convertParagraph	tm
 tableCreate	4	2
-tableWidthInfo	1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+tableWidthInfo	6.5,6.5
 tablecontents	0	0	next	left
 tablecontentslist	text	data1-1
 tablecontentslist	endParagraph		tm
@@ -547,7 +547,7 @@ newLine	convertParagraph	tm
 text	cell(4,2) is not merged. (comment cell)
 newLine	convertParagraph	tm
 tableCreate	4	2
-tableWidthInfo	1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+tableWidthInfo	6.5,5.625
 tablecontents	0	0	next	left
 tablecontentslist	text	data1-1
 tablecontentslist	endParagraph		tm
@@ -589,7 +589,7 @@ newLine	convertCode	tm
 text	result
 newLine	convertParagraph	tm
 tableCreate	4	2
-tableWidthInfo	1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+tableWidthInfo	6.5,13.25
 tablecontents	0	0	next	left
 tablecontentslist	text	data1-1
 tablecontentslist	endParagraph		tm
@@ -726,7 +726,7 @@ newLine	convertCode	tm
 text	result
 newLine	convertParagraph	tm
 tableCreate	4	2
-tableWidthInfo	1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+tableWidthInfo	6.5,7.5
 tablecontents	0	0	next	left
 tablecontentslist	text	data1-1
 tablecontentslist	endParagraph		tm

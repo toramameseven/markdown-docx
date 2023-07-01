@@ -1,6 +1,6 @@
 section	1	Typographic replacements	typographic-replacements
 newLine	convertHeading	tm
-text	NOTE: All @ are replaced to "\@" in <b>markdown to docx</b>. 
+text	NOTE: All @ are replaced to "\@" in <b>markdown to docx</b>.
 newLine	convertParagraph	tm
 text	anonymous@com.com
 newLine	convertParagraph	tm
