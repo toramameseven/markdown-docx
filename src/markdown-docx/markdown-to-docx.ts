@@ -12,7 +12,11 @@ import {
   ShowMessage,
 } from "./common";
 import { wordDownToDocx } from "./wd-to-docx";
+import { wdToEd } from "./wd-to-ed";
+import { wordDownToPptx } from "./wd-to-pptx";
+import { wdToTextile } from "./wd-to-textile";
 
+/**message function */
 let showMessage: ShowMessage;
 
 // front matter is not used
@@ -29,7 +33,9 @@ export async function markdownToDocx(
   option: DocxOption
 ) {
   option.message && (showMessage = option.message);
+  /** *.wd file path */
   let fileWd = "";
+
   // convert markdown to docx
   try {
     showMessage?.(
@@ -39,18 +45,21 @@ export async function markdownToDocx(
       false
     );
 
+    // wdPath: path wd file, wdBody: wd strings
     const { wdPath, wdBody } = await markdownToWd(
       pathMarkdown,
       selection,
+      "docx",
       startLine,
       option.isDebug
     );
 
+    // get template and engine from the body text. engine is only for vba(vbs).
     const docxEngineInsideWdBody = getDocxEngine(wdBody);
     const templateInsideWdBody = getDocxTemplate(wdBody);
     fileWd = wdPath;
 
-    // get docx docxEngine and docxTemplate in a wd file.
+    // get docx docxEngine and docxTemplate in a wd file or options.
     option.docxEngine = docxEngineInsideWdBody
       ? docxEngineInsideWdBody
       : option.docxEngine;
@@ -58,7 +67,7 @@ export async function markdownToDocx(
       ? templateInsideWdBody
       : option.docxTemplate;
 
-    //create docx by vbs
+    //create docx (docxJs or vbs)
     await wordDownToDocx(fileWd, option);
   } catch (ex) {
     throw ex;
@@ -69,10 +78,159 @@ export async function markdownToDocx(
   }
 }
 
+export async function markdownToExcel(
+  pathMarkdown: string,
+  selection: string,
+  /** zero base number */
+  startLine = 0,
+  option: DocxOption
+) {
+  option.message && (showMessage = option.message);
+  const dirPath = Path.dirname(pathMarkdown);
+  const fileNameMd = Path.basename(pathMarkdown).replace(/\.md$/i, "");
+  const fileEd = await createPath(dirPath, fileNameMd, "ed", true);
+
+  // convert markdown to docx
+  try {
+    showMessage?.(
+      MessageType.info,
+      `markdown to docx:`,
+      "Markdown to docx: start !!!",
+      false
+    );
+
+    const r = await markdownToWd(
+      pathMarkdown,
+      selection,
+      "excel",
+      startLine,
+      option.isDebug
+    );
+
+    // wdToEd(wdBody, option);
+    const edBody = wdToEd(r.wdBody);
+    Fs.writeFileSync(fileEd, edBody);
+  } catch (ex) {
+    throw ex;
+  }
+}
+
+export async function markdownToTextile(
+  pathMarkdown: string,
+  selection: string,
+  /** zero base number */
+  startLine = 0,
+  option: DocxOption
+) {
+  option.message && (showMessage = option.message);
+  const dirPath = Path.dirname(pathMarkdown);
+  const fileNameMd = Path.basename(pathMarkdown).replace(/\.md$/i, "");
+  const fileEd = await createPath(dirPath, fileNameMd, "textile", true);
+
+  // convert markdown to docx
+  try {
+    showMessage?.(
+      MessageType.info,
+      `markdown to textile:`,
+      "Markdown to textile: start !!!",
+      false
+    );
+
+    const r = await markdownToWd(
+      pathMarkdown,
+      selection,
+      "textile",
+      startLine,
+      option.isDebug
+    );
+
+    // wdToEd(wdBody, option);
+    const edBody = wdToTextile(r.wdBody);
+    Fs.writeFileSync(fileEd, edBody);
+  } catch (ex) {
+    throw ex;
+  }
+}
+
+export async function markdownToPptx(
+  pathMarkdown: string,
+  selection: string,
+  /** zero base number */
+  startLine = 0,
+  option: DocxOption
+) {
+  option.message && (showMessage = option.message);
+  let fileWd = "";
+  // convert markdown to docx
+  try {
+    showMessage?.(
+      MessageType.info,
+      `markdown to pptx:`,
+      "Markdown to pptx: start !!!",
+      false
+    );
+
+    const r = await markdownToWd(
+      pathMarkdown,
+      selection,
+      "docx",
+      startLine,
+      option.isDebug
+    );
+
+    fileWd = r.wdPath;
+
+    //create docx (docxJs or vbs)
+    await wordDownToPptx(fileWd, option);
+  } catch (ex) {
+    throw ex;
+  } finally {
+    if (!option.isDebug) {
+      await rmFileIfExist(fileWd, { force: true });
+    }
+  }
+}
+
+export async function markdownToHtml(
+  pathMarkdown: string,
+  selection: string,
+  /** zero base number */
+  startLine = 0,
+  option: DocxOption
+) {
+  option.message && (showMessage = option.message);
+  const dirPath = Path.dirname(pathMarkdown);
+  const fileNameMd = Path.basename(pathMarkdown).replace(/\.md$/i, "");
+  const fileHtml = await createPath(dirPath, fileNameMd, "html", true);
+
+  // convert markdown to docx
+  try {
+    showMessage?.(
+      MessageType.info,
+      `markdown to docx:`,
+      "Markdown to docx: start !!!",
+      false
+    );
+
+    const r = await markdownToWd(
+      pathMarkdown,
+      selection,
+      "html",
+      startLine,
+      option.isDebug
+    );
+
+    Fs.writeFileSync(fileHtml, r.wdBody);
+  } catch (ex) {
+    throw ex;
+  }
+}
+
 //creating wd file for test
 export async function markdownToWd(
   filePath: string,
   selection: string,
+  convertType: "docx" | "excel" | "html" | "textile" = "docx",
   /** zero base number */
   startLine = 0,
   isDebug?: boolean,
@@ -80,8 +238,8 @@ export async function markdownToWd(
 ) {
   const dirPath = Path.dirname(filePath);
   const fileNameMd = Path.basename(filePath).replace(/\.md$/i, "");
-  const fileWd0 = await createPath(dirPath, fileNameMd, "wd0");
-  const fileWd = await createPath(dirPath, fileNameMd, "wd");
+  const fileWd0 = await createPath(dirPath, fileNameMd, "wd0", true);
+  const fileWd = await createPath(dirPath, fileNameMd, "wd", true);
 
   // convert markdown to docx
   try {
@@ -96,7 +254,8 @@ export async function markdownToWd(
     let fileContents = getFileContents(filePath);
 
     // get front matter and body
-    const { frontMatter, markdownBody } = getFrontMatterAndBody(
+    // const { frontMatter, markdownBody } = getFrontMatterAndBody(
+    const r = getFrontMatterAndBody(
       filePath,
       fileContents,
       selection,
@@ -104,13 +263,21 @@ export async function markdownToWd(
     );
 
     // for @ mark escape
-    const markdownBodyX = markdownBody.replace(/@/g, "\\@");
+    const markdownBodyX = r.markdownBody.replace(/@/g, "\\@");
+    // if \s\s\n is, convert newline.
+    const markdownBodyXX = markdownBodyX.replace(/\s{2,}\n/g, "\n\n");
 
+    // create wd0
     const wd0 = markdownToWd0(
-      markdownBodyX,
+      markdownBodyXX,
+      convertType,
       { sanitize: false },
       showMessage
     ).replace(/(\r?\n)+/g, "\n");
+
+    if (convertType === "html") {
+      return { wdPath: fileWd, wdBody: wd0 };
+    }
 
     // wd must vbLF
     const wd = wd0ToWd(wd0, showMessage);
