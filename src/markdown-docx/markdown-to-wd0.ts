@@ -503,6 +503,38 @@ function joinObjectToString(params: DocxParam) {
   return r.join(_sp);
 }
 
+
+
+export function markdownToWd0(
+  markdown: string,
+  convertType: "docx"|"excel"|"html"|"textile",
+  options?: marked.MarkedOptions,
+  messageFunction?: ShowMessage
+): string {
+  idMap.clear();
+  showMessage = messageFunction;
+
+  const typeOfConvert ={
+    docx: docxRenderer,
+    excel: excelRenderer,
+    html: null,
+    textile: textileRenderer
+  };
+
+  const render = typeOfConvert[convertType];
+
+  let markedOptions = { ...options };
+  if (render){
+    markedOptions = {...markedOptions, renderer:render};
+  }
+  
+  const unmarked = marked(markdown, markedOptions);
+
+  const unescaped = unescape(unmarked);
+  const trimmed = unescaped.trim();
+  return trimmed;
+}
+
 //main render
 const docxRenderer: marked.Renderer = {
   // Block elements
@@ -545,36 +577,6 @@ const docxRenderer: marked.Renderer = {
   // etc.
   options: {},
 };
-
-export function markdownToWd0(
-  markdown: string,
-  convertType: "docx"|"excel"|"html"|"textile",
-  options?: marked.MarkedOptions,
-  messageFunction?: ShowMessage
-): string {
-  idMap.clear();
-  showMessage = messageFunction;
-
-  const typeOfConvert ={
-    docx: docxRenderer,
-    excel: excelRenderer,
-    html: null,
-    textile: textileRenderer
-  };
-
-  const render = typeOfConvert[convertType];
-
-  let markedOptions = { ...options };
-  if (render){
-    markedOptions = {...markedOptions, renderer:render};
-  }
-  
-  const unmarked = marked(markdown, markedOptions);
-
-  const unescaped = unescape(unmarked);
-  const trimmed = unescaped.trim();
-  return trimmed;
-}
 
 const excelRenderer: marked.Renderer = {
   // Block elements

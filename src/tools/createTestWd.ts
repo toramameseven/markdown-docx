@@ -1,4 +1,4 @@
-import { markdownToWd } from "../../src/markdown-docx/markdown-to-docx";
+import { markdownToWd } from "../../src/markdown-docx/markdown-to-xxxx";
 import path = require("path");
 import * as Fs from "fs";
 

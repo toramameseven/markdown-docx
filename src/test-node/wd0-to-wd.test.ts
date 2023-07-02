@@ -2,7 +2,7 @@ import * as assert from "assert";
 import { markdownToWd0 } from "../markdown-docx/markdown-to-wd0";
 import { wd0ToDocx as wd0ToWd } from "../markdown-docx/wd0-to-wd";
 import { suite, test } from "mocha";
-import { markdownToWd } from "../../src/markdown-docx/markdown-to-docx";
+import { markdownToWd } from "../../src/markdown-docx/markdown-to-xxxx";
 import path = require("path");
 import * as Fs from "fs";
 import { getFileContents } from "../markdown-docx/common";

@@ -131,5 +131,5 @@ async function splitByExport(marked: string, pathToSave: string = "") {
 }
 
 // splitMarkdownExportCmd(
-//   "C:\\home\\tora-hub\\markdown-to-docx\\md_demo\\demo.md"
+//   "C:\\home\\tora-hub\\markdown-to-xxxx\\md_demo\\demo.md"
 // );

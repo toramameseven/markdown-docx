@@ -1,4 +1,4 @@
-export { markdownToDocx } from "./markdown-to-docx";
+export { markdownToDocx } from "./markdown-to-xxxx";
 export { wordDownToDocx } from "./wd-to-docx";
 export { createDocxOption, DocxOption, MessageType } from "./common";
 
