@@ -42,6 +42,11 @@
     "commands": [
       {
         "enablement": "true",
+        "command": "main.createDocxTemplate",
+        "title": "Create a docx template."
+      },
+      {
+        "enablement": "true",
         "command": "explorer.ExportDocx",
         "title": "Convert to Docx"
       },
@@ -49,6 +54,26 @@
         "enablement": "true",
         "command": "explorer.ExportHtmlDocx",
         "title": "Convert html to md"
+      },
+      {
+        "enablement": "true",
+        "command": "explorer.mdToEd",
+        "title": "Convert me to ed"
+      },
+      {
+        "enablement": "true",
+        "command": "explorer.mdToTextile",
+        "title": "Convert me to textile"
+      },
+      {
+        "enablement": "true",
+        "command": "explorer.mdToPptx",
+        "title": "Convert me to pptx"
+      },
+      {
+        "enablement": "true",
+        "command": "explorer.mdToHtml",
+        "title": "Convert me to Html"
       },
       {
         "enablement": "true",
@@ -79,6 +104,11 @@
           "group": "myGroup@1"
         },
         {
+          "when": "resourceExtname =~ /\\.wd$|\\.md$/i && !markdown-docx.isRunning",
+          "command": "explorer.mdToPptx",
+          "group": "myGroup@1"
+        },
+        {
           "when": "resourceExtname =~ /\\.md$|\\.mds$/i && !markdown-docx.isRunning && false",
           "command": "explorer.SplitForHugo",
           "group": "myGroup@1"
@@ -86,6 +116,21 @@
         {
           "when": "resourceExtname =~ /\\.html$/i && !markdown-docx.isRunning",
           "command": "explorer.ExportHtmlDocx",
+          "group": "myGroup@1"
+        },
+        {
+          "when": "resourceExtname =~ /\\.md$/i && !markdown-docx.isRunning",
+          "command": "explorer.mdToEd",
+          "group": "myGroup@1"
+        },
+        {
+          "when": "resourceExtname =~ /\\.md$/i && !markdown-docx.isRunning",
+          "command": "explorer.mdToTextile",
+          "group": "myGroup@1"
+        },
+        {
+          "when": "resourceExtname =~ /\\.md$/i && !markdown-docx.isRunning",
+          "command": "explorer.mdToHtml",
           "group": "myGroup@1"
         }
       ],
@@ -146,12 +191,37 @@
           "description": "more than 1. 1: many, 10 few.",
           "order": 6,
           "minProperties": "1"
+        },
+        "markdown-docx.docxEngine.doxJs": {
+          "type": "boolean",
+          "default": true,
+          "description": "If on, DOCXJS is used for rendering.",
+          "order": 7
+        },
+        "markdown-docx.docx.isOverWrite": {
+          "type": "boolean",
+          "default": false,
+          "description": "If true, overwrite a docx file.",
+          "order": 8
+        },
+        "markdown-docx.docx.wordPath": {
+          "type": "string",
+          "default": "",
+          "description": "word exe path.",
+          "order": 9
+        },
+        "markdown-docx.docx.isWordOpen": {
+          "type": "boolean",
+          "default": false,
+          "description": "If true, open the word file.",
+          "order": 10
         }
       }
     }
   },
   "scripts": {
     "vscode:prepublish": "npm run esbuild-base -- --minify",
+    "copy-wasm": "cpx ./node_modules/svg2png-wasm/svg2png_wasm_bg.wasm ./wasm",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
@@ -160,7 +230,7 @@
     "prepackage": "npm run pretest",
     "package": "vsce package --target win32-x64",
     "clean": "rimraf out",
-    "preesbuild-base": "npm run clean",
+    "preesbuild-base": "npm run clean && npm run copy-wasm",
     "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
     "esbuild": "npm run esbuild-base -- --sourcemap",
     "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
@@ -179,6 +249,7 @@
     "@typescript-eslint/eslint-plugin": "^5.42.0",
     "@typescript-eslint/parser": "^5.42.0",
     "@vscode/test-electron": "^2.2.0",
+    "cpx": "^1.5.0",
     "esbuild": "^0.16.13",
     "eslint": "^8.26.0",
     "glob": "^8.0.3",
@@ -188,12 +259,18 @@
     "typescript": "^4.8.4"
   },
   "dependencies": {
+    "docx": "^8.0.4",
     "encoding-japanese": "^2.0.0",
     "front-matter": "^4.0.2",
     "iconv-lite": "^0.6.3",
+    "image-size": "^1.0.2",
     "lodash": "^4.17.21",
     "marked": "^4.2.4",
+    "mathjax-full": "^3.2.2",
     "node-html-markdown": "^1.3.0",
-    "node-html-parser": "^6.1.4"
+    "node-html-parser": "^6.1.4",
+    "pptxgenjs": "^3.12.0",
+    "svg2png-wasm": "^1.4.0",
+    "tex-to-svg": "^0.2.0"
   }
 }
