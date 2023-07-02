@@ -11,7 +11,7 @@ async function createTestWd() {
       .forEach(async (file) => {
         const baseName = path.basename(file).replace(/\.md$/i, "");
         const mdPath = path.resolve(__dirname, pathDemoMd, baseName + ".md");
-        const r = await markdownToWd(mdPath, "", 0, false, false);
+        const r = await markdownToWd(mdPath, "", "docx", 0, false, false);
         Fs.copyFileSync(
           r.wdPath,
           path.resolve(__dirname, pathDemoMd, "wd", baseName + ".wd")

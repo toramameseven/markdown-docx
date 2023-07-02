@@ -1,22 +1,6 @@
-import { fileExists, selectExistsPath, vbsSpawn } from "./common";
 import { DocxOption, getFileContents, MessageType } from "./common";
-import { wdToDocxJs } from "./wd-to-docxjs";
-import * as child_process from "child_process";
-import * as util from "util";
 import * as Path from "path";
 import { wdToPptxJs } from "./wd-to-pptxJs";
-
-async function runChildProc(exe: string, param: string) {
-  const execFile = util.promisify(child_process.execFile);
-  execFile(exe, [param])
-    .then(() => {
-      console.log("Successfully executed.");
-    })
-    .catch((err: any) => {
-      console.log("Error!");
-      console.log(err);
-    });
-}
 
 export async function wordDownToPptx(fileWd: string, option: DocxOption) {
   const wdBody = getFileContents(fileWd);
