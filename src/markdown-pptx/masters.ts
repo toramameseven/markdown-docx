@@ -8,12 +8,14 @@
  */
 const pptxgenx = require("pptxgenjs");
 import PptxGenJS from "pptxgenjs";
-import { IMAGE_PATHS } from "./enums";
+//import { IMAGE_PATHS } from "./enums";
 
 export function createMasterSlides(pptx: PptxGenJS) {
-  let objBkg = { path: IMAGE_PATHS.starlabsBkgd.path };
+  let objBkg = { 
+    //path: IMAGE_PATHS.starlabsBkgd.path 
+  };
   let objImg = {
-    path: IMAGE_PATHS.starlabsLogo.path,
+    //path: IMAGE_PATHS.starlabsLogo.path,
     x: 4.6,
     y: 3.5,
     w: 4,
@@ -418,9 +420,11 @@ export function testSlideBackgrounds(pptx: PptxGenJS) {
 }
 
 export function createMasterSlidesOriginal(pptx: PptxGenJS) {
-  let objBkg = { path: IMAGE_PATHS.starlabsBkgd.path };
+  let objBkg = { 
+    // path: IMAGE_PATHS.starlabsBkgd.path 
+  };
   let objImg = {
-    path: IMAGE_PATHS.starlabsLogo.path,
+    // path: IMAGE_PATHS.starlabsLogo.path,
     x: 4.6,
     y: 3.5,
     w: 4,
