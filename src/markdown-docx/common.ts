@@ -19,7 +19,11 @@ export type DocxOption = {
   mathExtension?: boolean;
   isDebug?: boolean;
   logInterval?: number;
+  isUseDocxJs?: boolean;
   ac?: AbortController;
+  isOverWrite?: boolean;
+  wordPath?: string;
+  isWordOpen?: boolean;
   message?: ShowMessage;
 };
 
@@ -31,6 +35,10 @@ export function createDocxOption(option: DocxOption = {}) {
     mathExtension: option.mathExtension ?? true,
     isDebug: option.isDebug ?? false,
     logInterval: option.logInterval ?? 10,
+    isUseDocxJs: option.isUseDocxJs ?? true,
+    isOverWrite: option.isOverWrite ?? false,
+    wordPath: option.wordPath ?? "",
+    isWordOpen: option.isWordOpen ?? false,
     ac: option.ac,
     message: option.message,
   };
@@ -44,7 +52,15 @@ export const MessageType = {
   err: "err",
 } as const;
 
-export type MessageType = typeof MessageType[keyof typeof MessageType];
+export type MessageType = (typeof MessageType)[keyof typeof MessageType];
+
+export type MessageProp = {
+  msgType: MessageType,
+  message: unknown,
+  source: string,
+  showNotification?: boolean
+};
+
 
 export type ShowMessage = (
   msgType: MessageType,
@@ -54,6 +70,22 @@ export type ShowMessage = (
 ) => void;
 
 export type UpdateStatusBar = (isRunning: boolean) => void;
+
+export async function createDocxTemplateFile(wfFsPath:string) {
+  const folderOut =wfFsPath;
+  const fileOut = path.resolve(folderOut, "sample-heder-js.docx");
+  if (
+    (await dirExists(folderOut)) &&
+    !(await fileExists(fileOut))
+  ) {
+    fs.copyFileSync(
+      path.resolve(__dirname, "../vbs/sample-heder-js.docx"),
+      fileOut
+    );
+  } else {
+    throw new Error(`can not create a docx template!!.`);
+  }
+}
 
 export function getFileContents(filePath: string) {
   const outLines: string[] = [];
@@ -89,16 +121,47 @@ export function getWordDownCommand(wd: string) {
   const command = testMatch?.groups?.name ?? "";
   const commandList = command.trim().split(/\s(?=(?:[^"]*"[^"]*")*[^"]*$)/i);
   if (commandList[0] === "word" && commandList[1]) {
-    const params = (commandList.slice(2) ?? []).map(l => l.replace(/\"/g, ""));
+    const params = (commandList.slice(2) ?? []).map((l) =>
+      l.replace(/\"/g, "")
+    );
     return { command: commandList[1], params };
   }
   return undefined;
 }
 
-export async function createPath(dir: string, name: string, ext: string) {
+// wd: <!-- c m 1 3 xxx -->
+// c: command
+// m: merge
+// row: 1
+// column : 3
+// xxx: param
+export function getWordDownMergeCommand(wd: string) {
+  const testMatch = wd.match(/<!--(?<name>.*)-->/i);
+  const command = testMatch?.groups?.name ?? "";
+  const commandList = command.trim().split(/\s(?=(?:[^"]*"[^"]*")*[^"]*$)/gi);
+  if (commandList[0] === "c" && commandList[1]) {
+    const params = (commandList.slice(2) ?? []).map((l) =>
+      l.replace(/\"/g, "")
+    );
+    const isMergeRow = params.includes("^");
+    const isMergeColumn = params.includes("<");
+    return { isMergeRow, isMergeColumn };
+  }
+  return undefined;
+}
+
+export async function createPath(
+  dir: string,
+  name: string,
+  ext: string,
+  isSame = false
+) {
   for (let index = 0; index < 1000; index++) {
     const filePath =
       path.resolve(dir, name + (index > 0 ? index.toString() : "")) + "." + ext;
+    if (isSame) {
+      return filePath;
+    }
     if (!(await fileExists(filePath)) && !(await dirExists(filePath))) {
       return filePath;
     }
@@ -239,4 +302,18 @@ export function vbsSpawn(
     p.on("SIGTERM", cleanup);
     p.on("SIGQUIT", cleanup);
   });
+}
+
+export async function selectExistsPath(children: string[], pathAbsolute: string) {
+  for (let i = 0; i < children.length; i++) {
+    let filePath = children[i];
+    if (await fileExists(filePath)) {
+      return filePath;
+    }
+    filePath = path.resolve(pathAbsolute, filePath);
+    if (await fileExists(filePath)) {
+      return filePath;
+    }
+  }
+  return "";
 }
