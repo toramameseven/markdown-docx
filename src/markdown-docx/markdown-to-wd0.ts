@@ -1,7 +1,6 @@
 import { marked } from "marked";
 import { unescape } from "lodash";
 import { getWordDownCommand, MessageType, ShowMessage } from "./common";
-import { info } from "console";
 
 const source = "markdown-to-wd";
 let showMessage: ShowMessage | undefined;
@@ -67,12 +66,24 @@ const inline = (inlineType: string) => (content: string) => {
   }
   return content;
 };
+
+// inline for *emphasis* 
+const inlineEx = (inlineType: string) => (content: string) => {
+  if (inlineType) {
+    return `${inlineType}${content}${inlineType}`;
+  }
+  return content;
+};
+
 // hr
 const hr = () => "\nhr\n";
+
 // newline
 const newline = () => _newline;
+
 //empty
 const empty = () => "";
+
 // block
 const block = (blokType: string) => (content: string) => {
   const params = {
@@ -80,6 +91,7 @@ const block = (blokType: string) => (content: string) => {
   };
   return createBlockCommand(blokType, params);
 };
+
 // block quote
 const blockQuote = (blokType: string) => (content: string) => {
   const params = {
@@ -267,7 +279,7 @@ export function slugify(header: string, alowDuplicate = false) {
     .trim()
     .toLowerCase()
     .replace(
-      /[\]\[\!\"\#\$\%\&\'\(\)\*\+\,\.\/\:\;\<\=\>\?\@\\\^\_\{\|\}\~]/g,
+      /[\]\[\!\"\#\$\%\&\'\(\)\*\+\,\.\/\:\;\<\=\>\?\@\\\^\_\{\|\}\~＠＃＄％＾＆＊（）＿＋－＝｛｝”’＜＞［］「」・、。～]/g,
       ""
     )
     .replace(/\s+/g, "-") // Replace spaces with hyphens
@@ -536,13 +548,114 @@ const docxRenderer: marked.Renderer = {
 
 export function markdownToWd0(
   markdown: string,
+  convertType: "docx"|"excel"|"html"|"textile",
   options?: marked.MarkedOptions,
   messageFunction?: ShowMessage
 ): string {
   idMap.clear();
   showMessage = messageFunction;
-  const unmarked = marked(markdown, { ...options, renderer: docxRenderer });
+
+  const typeOfConvert ={
+    docx: docxRenderer,
+    excel: excelRenderer,
+    html: null,
+    textile: textileRenderer
+  };
+
+  const render = typeOfConvert[convertType];
+
+  let markedOptions = { ...options };
+  if (render){
+    markedOptions = {...markedOptions, renderer:render};
+  }
+  
+  const unmarked = marked(markdown, markedOptions);
+
   const unescaped = unescape(unmarked);
   const trimmed = unescaped.trim();
   return trimmed;
 }
+
+const excelRenderer: marked.Renderer = {
+  // Block elements
+  heading: blockHeading,
+
+  // normal paragraph
+  paragraph: blockParagraph(markedCommand.paragraph),
+
+  list: blockList,
+  listitem: blockListItem,
+
+  // ``` or tab
+  code: blockParagraph(markedCommand.code, true),
+
+  // >
+  blockquote: block(markedCommand.blockquote),
+
+  table: blockTable,
+  tablerow: block(markedCommand.tablerow),
+  tablecell: blockTableCell,
+
+  html: htmlBlock,
+  hr: hr,
+  checkbox: empty,
+
+  // Inline elements
+  image: blockImage(markedCommand.image),
+  link: blockLink,
+  text: inlineEx(""),
+  // `code`
+  codespan: inlineEx("`"),
+  // ** **
+  strong: inlineEx("**"),
+  // _ _
+  em: inlineEx("_"),
+  // <br>?
+  br: newline,
+  // ~~ ~~
+  del: inlineEx(markedCommand.del),
+  // etc.
+  options: {},
+};
+
+const textileRenderer: marked.Renderer = {
+  // Block elements
+  heading: blockHeading,
+
+  // normal paragraph
+  paragraph: blockParagraph(markedCommand.paragraph),
+
+  list: blockList,
+  listitem: blockListItem,
+
+  // ``` or tab
+  code: blockParagraph(markedCommand.code, true),
+
+  // >
+  blockquote: block(markedCommand.blockquote),
+
+  table: blockTable,
+  tablerow: block(markedCommand.tablerow),
+  tablecell: blockTableCell,
+
+  html: htmlBlock,
+  hr: hr,
+  checkbox: empty,
+
+  // Inline elements
+  image: blockImage(markedCommand.image),
+  link: blockLink,
+  text: inlineEx(""),
+  // `code`
+  codespan: inlineEx("`"),
+  // ** **
+  strong: inlineEx("**"),
+  // _ _
+  em: inlineEx("_"),
+  // <br>?
+  br: newline,
+  // ~~ ~~
+  del: inlineEx(markedCommand.del),
+  // etc.
+  options: {},
+};
