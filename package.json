@@ -192,25 +192,25 @@
           "order": 6,
           "minProperties": "1"
         },
-        "markdown-docx.docxEngine.doxJs": {
+        "markdown-docx.docxEngine.docxJs": {
           "type": "boolean",
           "default": true,
           "description": "If on, DOCXJS is used for rendering.",
           "order": 7
         },
-        "markdown-docx.docx.isOverWrite": {
+        "markdown-docx.docxEngine.isOverWrite": {
           "type": "boolean",
           "default": false,
           "description": "If true, overwrite a docx file.",
           "order": 8
         },
-        "markdown-docx.docx.wordPath": {
+        "markdown-docx.docxEngine.wordExePath": {
           "type": "string",
           "default": "",
           "description": "word exe path.",
           "order": 9
         },
-        "markdown-docx.docx.isWordOpen": {
+        "markdown-docx.docxEngine.isWordOpen": {
           "type": "boolean",
           "default": false,
           "description": "If true, open the word file.",

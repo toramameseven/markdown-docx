@@ -233,8 +233,8 @@ export async function markdownToWd(
   convertType: "docx" | "excel" | "html" | "textile" = "docx",
   /** zero base number */
   startLine = 0,
-  isDebug?: boolean,
-  isDryRun?: boolean
+  isDebug: boolean = false,
+  isSaveWd: boolean = false
 ) {
   const dirPath = Path.dirname(filePath);
   const fileNameMd = Path.basename(filePath).replace(/\.md$/i, "");
@@ -264,7 +264,7 @@ export async function markdownToWd(
 
     // for @ mark escape
     const markdownBodyX = r.markdownBody.replace(/@/g, "\\@");
-    // if \s\s\n is, convert newline.
+    // if \s\s\n is, convert it newline.
     const markdownBodyXX = markdownBodyX.replace(/\s{2,}\n/g, "\n\n");
 
     // create wd0
@@ -280,17 +280,14 @@ export async function markdownToWd(
     }
 
     // wd must vbLF
+    // wd0: html docx pptx ed(excel) textile
     const wd = wd0ToWd(wd0, showMessage);
 
-    // if dry run, not save files
-    if (!isDryRun) {
-      // output wd0 file.
-      if (isDebug) {
-        Fs.writeFileSync(fileWd0, wd0);
-      }
-      // output wd file.
-      Fs.writeFileSync(fileWd, wd);
-    }
+    // output wd0 file.
+    isDebug && Fs.writeFileSync(fileWd0, wd0);
+    // output wd file.
+    (isDebug || isSaveWd)  &&   Fs.writeFileSync(fileWd, wd);
+
 
     return { wdPath: fileWd, wdBody: wd };
   } catch (ex) {

@@ -1,6 +1,5 @@
 import { svg2png, initialize } from "svg2png-wasm";
-import { MessageType, ShowMessage, selectExistsPath } from "./common";
-//const { svg2png, initialize } = require("svg2png-wasm");
+import {/* MessageType, ShowMessage, */ selectExistsPath } from "./common";
 import { readFileSync } from "fs";
 
 let initialized = false;

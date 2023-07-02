@@ -453,7 +453,7 @@ function createDocxOptionExtension(option: DocxOption) {
     const timeout =
       vscode.workspace
         .getConfiguration("markdown-docx")
-        .get<number>("logInterval") ?? 10;
+        .get<number>("docxEngine.logInterval") ?? 10;
     return timeout > 0 ? timeout : 10;
   }
 
@@ -461,7 +461,7 @@ function createDocxOptionExtension(option: DocxOption) {
     const useDocxJs =
       vscode.workspace
         .getConfiguration("markdown-docx")
-        .get<boolean>("docxEngine.doxJs") ?? true;
+        .get<boolean>("docxEngine.docxJs") ?? true;
     return useDocxJs;
   }
 
@@ -469,7 +469,7 @@ function createDocxOptionExtension(option: DocxOption) {
     const isOverWrite =
       vscode.workspace
         .getConfiguration("markdown-docx")
-        .get<boolean>("docx.isOverWrite") ?? true;
+        .get<boolean>("docxEngine.isOverWrite") ?? true;
     return isOverWrite;
   }
 
@@ -477,7 +477,7 @@ function createDocxOptionExtension(option: DocxOption) {
     const isWordOpen =
       vscode.workspace
         .getConfiguration("markdown-docx")
-        .get<boolean>("docx.isWordOpen") ?? true;
+        .get<boolean>("docxEngine.isWordOpen") ?? true;
     return isWordOpen;
   }
 
@@ -485,7 +485,7 @@ function createDocxOptionExtension(option: DocxOption) {
     const wordPath =
       vscode.workspace
         .getConfiguration("markdown-docx")
-        .get<string>("docx.wordPath") ?? "";
+        .get<string>("docxEngine.wordExePath") ?? "";
     return wordPath;
   }
 }

@@ -93,12 +93,14 @@ const block = (blokType: string) => (content: string) => {
 };
 
 // block quote
+/* does note use
 const blockQuote = (blokType: string) => (content: string) => {
   const params = {
     text: content,
   };
   return createBlockCommand(blokType, params);
 };
+*/
 
 //
 const htmlBlock = (content: string) => {

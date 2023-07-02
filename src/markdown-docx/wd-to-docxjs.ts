@@ -1,4 +1,4 @@
-import { DocxOption, MessageProp, MessageType, ShowMessage, fileExists } from "./common";
+import { DocxOption, MessageType, fileExists } from "./common";
 import * as fs from "fs";
 import * as Path from "path";
 import * as imageSize from "image-size";
