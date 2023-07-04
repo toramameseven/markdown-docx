@@ -199,10 +199,10 @@ NOTE: user properties works only on vbs mode.
 
 ## Known Issues
 
-* Inline Image does not work.
 * Inline math does not work.
 * HTML does not work.
 * Block quote does no work.
+* The indent of table of contents is not good.
 
 ## How to package
 
