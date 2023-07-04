@@ -122,7 +122,7 @@ Call main
 WScript.Quit(0)
 
 '' functions
-'arge(0) markdown file path
+'arge(0) word down file path
 'arge(1) docx(docxTemplate) path
 'arge(2) isMath 0 or 1(true)
 'arge(3) isDebug 0 or 1(true)
@@ -158,6 +158,7 @@ Sub main
     End If
 
     isDebug = False
+    logCycle = 10
     If objArgs.Count > 3 Then
         If objArgs(3) = "1" Then
             isDebug = True
@@ -188,6 +189,8 @@ Sub main
         for i = 1 to warnMessages.Count
             Call LogCore("WRN", warnMessages.ObjectItem(i).title, warnMessages.ObjectItem(i).value)
         Next
+    Else
+        Call LogCore("INFO", "No warning messages!!", "completed!!") 
     end If
 End Sub
 
@@ -199,6 +202,7 @@ Class XWord
     Dim HeaderCollection '' As Dictionary
     Dim RefCollection '' As Dictionary
     Dim m_markdownDirPath '' markdown path now convert
+    Dim m_wdLine
 
     Dim m_rngCurrent ''As Range
 
@@ -230,15 +234,20 @@ Class XWord
         gLinesCount = wdLines.Count
         m_isToc = False
         m_indent = 1
+        '' ex. C:\doc\me\markdownPath only full path Folder
         m_markdownDirPath = markdownDirPath
         m_crossRef = "[[$n $t (p.$p)]]"
         
         Set HeaderCollection = New Dictionary
         Set RefCollection = New Dictionary
 
+        '' get info from first n lines.
         '' get docxTemplate inside wd file
-        Call doCommands(wdLines.Item(1), wdLines, 1, "docxTemplate") 
-        Call doCommands(wdLines.Item(2), wdLines, 2, "docxTemplate")
+        Dim iLine
+        For iLine = 0 to 20
+            Call doCommands(wdLines.Item(iLine), wdLines, iLine, "docxTemplate") 
+        Next
+
 
         With WordApp
             .DisplayAlerts = False
@@ -246,14 +255,25 @@ Class XWord
             .WindowState = wdWindowStateMinimize
             .Visible = True
             .WindowState = wdWindowStateMinimize
-            '' get file As docxTemplate 
+            '' get file As docxTemplate
+
             If m_templateInsideWd <> String_Empty Then
                 templateDocxPath = m_templateInsideWd
             End If
 
+            '' absolute or relative
+            If InStr(templateDocxPath, "\\") Or InStr(templateDocxPath, ":") Then
+                '' absolute, do nothing
+            Else
+                templateDocxPath = m_markdownDirPath & "\" & templateDocxPath
+            End If
+
+
             If fso.FileExists(templateDocxPath) Then
+                LogInfo "found", templateDocxPath
                 Set WordDoc = .Documents.Add(templateDocxPath)
             Else
+                LogWarn "not found", templateDocxPath
                 Set WordDoc = .Documents.Add()
             End If
 
@@ -320,7 +340,7 @@ Class XWord
         If fixCommand = String_Empty  Then
             '' continue
         else
-            If fixCommand = wdCommandLine  Then
+            If fixCommand = params(0)  Then
                 '' continue
             else
                 exit sub
@@ -995,6 +1015,7 @@ Class XWord
                         oTable.Cell(x, y).Merge oTable.Cell(MergeEnd(0)+1, MergeEnd(1)+1)
                     Else
                         ''log "no merge", String_Empty, String_Empty
+                        oTable.Cell(x, y).Merge oTable.Cell(MergeEnd(0)+1, MergeEnd(1)+1)
                     End If
                 End If
             Next
@@ -1074,9 +1095,13 @@ Class XWord
                         If ubound(strSplit) > 4 Then
                             If (strSplit(5)) <> String_Empty or True Then
                                 If strSplit(1) = strSplit(3) Then
-                                    '
+                                    mergeInfo(CLng(strSplit(1)), CLng(strSplit(2))) = _
+                                         strSplit(3) & "," &  strSplit(4)
+                                    LogDebug "merge", "A"
                                 Else
-                                    mergeInfo(CLng(strSplit(1)), CLng(strSplit(2))) = strSplit(3) & "," &  strSplit(4)
+                                    mergeInfo(CLng(strSplit(1)), CLng(strSplit(2))) = _
+                                         strSplit(3) & "," &  strSplit(4)
+                                     LogDebug "merge", "B"
                                 End If
                             End If
                         End If

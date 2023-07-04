@@ -10,7 +10,8 @@ If security check happens, you can download the template from this repo and set 
 ## Requirements
 
 * Windows 10
-* Microsoft Word
+
+We do not use Microsoft Word at version 0.0.2.
 
 ## Features
 
@@ -36,12 +37,15 @@ If security check happens, you can download the template from this repo and set 
 * `<!-- word author Author -->`
 
     add author
+
 * `<!-- word division Division -->`
 
     add division
+
 * `<!-- word date Date -->`
 
     add Date
+
 * `<!-- word toc 1 "table of contents" -->`
 
     * add toc
@@ -54,11 +58,13 @@ If security check happens, you can download the template from this repo and set 
 
 * `<!-- word pageSetup wdOrientationLandscape wdSizeA4 -->`
   
-    page setup sample. landscape and a4 size.
+    * page setup sample. landscape and a4 size.
+    * this option works only with vba mode.
 
 * `<!-- word pageSetup wdOrientationPortrait wdSizeA3 -->`
 
-    page setup sample. portrait and a3 size
+    * page setup sample. portrait and a3 size
+    * this option works only with vba mode.
 
 * `<!-- word newPage -->`
 
@@ -102,12 +108,28 @@ You can see the sample file in the [markdown-docx site](https://github.com/toram
 
     60000 ms is default. docx rendering is so slow, you can set bigger value.
 
-* markdown-docx.docxEngine.debug
-   
-    some debug option is enabled.
+* markdown-docx.docxEngine.debug  
+
+    some debug option is enabled.  
 
     * intermediate files *.wd0, *.wd are not deleted.
-  
+
+* markdown-docx.docxEngine.logInterval
+
+* markdown-docx.docxEngine.docxJs  
+
+    if true, use [DOCX](https://docx.js.org/#/).  
+    From now on, this feature will be the main feature.
+
+* markdown-docx.docxEngine.isOverWrite  
+    if true, markdown-docx overwrites the word file.  
+
+* markdown-docx.docxEngine.wordExePath  
+    set the full path of the word exe, if you want to open it.
+
+* markdown-docx.docxEngine.isOpenWord  
+    If true, open the word file. 
+
 ### markdown vscode settings
 
 like below
@@ -128,7 +150,19 @@ like below
 
 It is better, set your language font.
 
-##### styles
+### copy template file
+
+1. ctrl + shift + p  
+2. select **create a docx template**
+
+you get a template
+
+### place folder
+
+[DOCX](https://docx.js.org/#/) type place folder is used.
+
+
+### styles
 
 next styles are created.
 
@@ -156,6 +190,8 @@ next styles are created.
 
 ### user properties
 
+NOTE: user properties works only on vbs mode.
+
 * dNumber
   * number is displayed at header.
 * dDivision
@@ -164,8 +200,10 @@ next styles are created.
 
 ## Known Issues
 
-* Inline Images do not work.
+* Inline Image does not work.
+* Inline math does not work.
 * HTML does not work.
+* Block quote does no work.
 
 ## How to package
 
@@ -177,9 +215,10 @@ next styles are created.
 
 We thank for the wonderful npm packages.
 
+[Packages](usedModules.md)
+
 And we use some useful articles below. 
 
-* [Marked](https://www.npmjs.com/package/marked) is a very useful package for this extension.
 * [markdown-to-txt](https://www.npmjs.com/package/markdown-to-txt) tells us how to use **Marked**.
 * [koukimura's page](https://koukimra.com/) is used to resize pictures.
 * [minnano macro page](https://www.wordvbalab.com/) is used for emphasis styles.
@@ -188,6 +227,11 @@ And we use some useful articles below.
 
 
 ## Release Notes
+
+* 0.0.2
+  * use [DOCX](https://docx.js.org/#/) for creating word files.
+  * we do not support the vbs rendering.
+    
 
 * 0.0.1
   * first Release.

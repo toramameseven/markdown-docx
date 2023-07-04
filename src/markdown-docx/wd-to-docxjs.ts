@@ -433,6 +433,10 @@ function resolveWordCommentsCommands(
 ) {
   // table of contents
   if (wdCommandList[0] === "toc") {
+
+    const ptitle = new Paragraph(wdCommandList[2]);
+    patches.push(ptitle);
+
     const toc = new TableOfContents("Summary", {
       hyperlink: true,
       headingStyleRange: `1-${wdCommandList[1]}`,

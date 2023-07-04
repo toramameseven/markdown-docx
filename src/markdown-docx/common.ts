@@ -23,7 +23,7 @@ export type DocxOption = {
   ac?: AbortController;
   isOverWrite?: boolean;
   wordPath?: string;
-  isWordOpen?: boolean;
+  isOpenWord?: boolean;
   message?: ShowMessage;
 };
 
@@ -38,7 +38,7 @@ export function createDocxOption(option: DocxOption = {}) {
     isUseDocxJs: option.isUseDocxJs ?? true,
     isOverWrite: option.isOverWrite ?? false,
     wordPath: option.wordPath ?? "",
-    isWordOpen: option.isWordOpen ?? false,
+    isOpenWord: option.isOpenWord ?? false,
     ac: option.ac,
     message: option.message,
   };

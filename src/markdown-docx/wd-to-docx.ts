@@ -85,7 +85,7 @@ export async function wordDownToDocxBody(
       return;
     }
 
-    if (!option.isWordOpen) {
+    if (!option.isOpenWord) {
       return;
     }
 

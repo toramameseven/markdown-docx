@@ -399,7 +399,7 @@ function createDocxOptionExtension(option: DocxOption) {
     isUseDocxJs: getUseDocxJs(),
     isOverWrite: getIsOverWrite(),
     wordPath: getWordPath(),
-    isWordOpen: getIsWordOpen(),
+    isOpenWord: getIsWordOpen(),
   };
   return { ...r, ...option };
 
@@ -474,11 +474,11 @@ function createDocxOptionExtension(option: DocxOption) {
   }
 
   function getIsWordOpen() {
-    const isWordOpen =
+    const isOpenWord =
       vscode.workspace
         .getConfiguration("markdown-docx")
-        .get<boolean>("docxEngine.isWordOpen") ?? true;
-    return isWordOpen;
+        .get<boolean>("docxEngine.isOpenWord") ?? true;
+    return isOpenWord;
   }
 
   function getWordPath() {
