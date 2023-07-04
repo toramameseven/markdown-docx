@@ -30,6 +30,7 @@ import {
   //PageReference,
   SimpleField,
   TableLayoutType,
+  PageBreak,
 } from "docx";
 import { svg2imagePng } from "./svg-png-image";
 
@@ -467,7 +468,7 @@ function resolveWordCommentsCommands(
 
 async function resolveWordDownCommandEx(
   line: string,
-  nodes: DocParagraph,
+  currentParagraph: DocParagraph,
   mdSourcePath: string,
   option?: DocxOption
 ) {
@@ -486,7 +487,7 @@ async function resolveWordDownCommandEx(
       });
       current = new DocParagraph(
         nodeType,
-        nodes.indent,
+        currentParagraph.indent,
         words[1] as DocStyle,
         child
       );
@@ -498,17 +499,17 @@ async function resolveWordDownCommandEx(
       // text	Consectetur adipiscing elit
       // newLine	convertParagraph	tm
       style = createListType(nodeType, parseInt(words[1]));
-      current = new DocParagraph(NodeType.NormalList, nodes.indent, style);
+      current = new DocParagraph(NodeType.NormalList, currentParagraph.indent, style);
       return current;
       break;
     case NodeType.OderList:
       style = createListType(nodeType, parseInt(words[1]));
-      current = new DocParagraph(NodeType.OderList, nodes.indent, style);
+      current = new DocParagraph(NodeType.OderList, currentParagraph.indent, style);
       return current;
       break;
     case "code":
       child = new TextRun(words[1]);
-      current = new DocParagraph(nodeType, nodes.indent, "code", child);
+      current = new DocParagraph(nodeType, currentParagraph.indent, "code", child);
       return current;
       break;
     case NodeType.link:
@@ -517,7 +518,7 @@ async function resolveWordDownCommandEx(
         children.push(new SimpleField(` REF ${words[1]} \\w \\h `));
         children.push(new TextRun("---"));
         children.push(new SimpleField(` REF ${words[1]} \\h `));
-        nodes.addChildren(children);
+        currentParagraph.addChildren(children);
       } else {
         child = new ExternalHyperlink({
           children: [
@@ -527,14 +528,14 @@ async function resolveWordDownCommandEx(
           ],
           link: words[1],
         });
-        nodes.addChild(child);
+        currentParagraph.addChild(child);
       }
-      return nodes;
+      return currentParagraph;
       break;
     case NodeType.image:
       child = await createImageChild(mdSourcePath, words[1], option);
-      nodes.addChild(child, true);
-      return nodes;
+      currentParagraph.addChild(child, true);
+      return currentParagraph;
       break;
     case "text":
       const admonition = words[1].match(/^(note|warning)(:\s)(.*)/i);
@@ -543,36 +544,40 @@ async function resolveWordDownCommandEx(
       if (admonition && admonition[3]) {
         s = admonition[3];
         const admonitionType = admonition[1];
-        nodes.nodeType = admonitionType as NodeType;
-        nodes.docStyle = resolveAdmonition(admonitionType);
+        currentParagraph.nodeType = admonitionType as NodeType;
+        currentParagraph.docStyle = resolveAdmonition(admonitionType);
       }
 
       const mathBlock = s.match(/^\$(.*)\$$/);
       if (mathBlock?.length && option?.mathExtension) {
         const child = await createMathImage(mathBlock[1]);
-        nodes.addChild(child, true);
+        currentParagraph.addChild(child, true);
       } else {
-        resolveEmphasis(s).forEach((x) => nodes.addChild(x));
+        resolveEmphasis(s).forEach((x) => currentParagraph.addChild(x));
       }
 
-      return nodes;
+      return currentParagraph;
       break;
     case "indentPlus":
-      nodes.addIndent();
-      return nodes;
+      currentParagraph.addIndent();
+      return currentParagraph;
       break;
     case "indentMinus":
-      nodes.removeIndent();
-      return nodes;
+      currentParagraph.removeIndent();
+      return currentParagraph;
       break;
     case "newLine":
       if (!["convertTitle", "convertSubTitle"].includes(words[1])) {
         // output paragraph
-        nodes.isFlush = true;
+        currentParagraph.isFlush = true;
       }
-      return nodes;
+      return currentParagraph;
+    case "newPage":
+      currentParagraph.addChild(new PageBreak() );
+      currentParagraph.isFlush = true;
+      return currentParagraph;
     default:
-      return nodes;
+      return currentParagraph;
   }
 }
 

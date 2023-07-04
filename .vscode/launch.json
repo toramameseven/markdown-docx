@@ -17,6 +17,19 @@
 				"${workspaceFolder}/out/**/*.js"
 			],
 			"preLaunchTask": "${defaultBuildTask}"
+		},		
+		{
+			"name": "Run esbuild",
+			"type": "extensionHost",
+			"request": "launch",
+			"args": [
+				"--extensionDevelopmentPath=${workspaceFolder}",
+                "${workspaceFolder}/md_demo"
+			],
+			"outFiles": [
+				"${workspaceFolder}/out/**/*.js"
+			],
+			"preLaunchTask": "npm: esbuild-only"
 		},
 		{
 			"name": "Extension Tests",

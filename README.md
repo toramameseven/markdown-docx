@@ -1,7 +1,5 @@
 # Markdown Docx README
 
-for new feature!!
-
 This is the README **Markdown Docx**. 
 
 This extension uses a docx binary file for the template. 
@@ -34,6 +32,7 @@ We do not use Microsoft Word at version 0.0.2.
 * `<!-- word subTitle SubTitle -->`
   
     add sub title
+
 * `<!-- word author Author -->`
 
     add author
@@ -155,7 +154,7 @@ It is better, set your language font.
 1. ctrl + shift + p  
 2. select **create a docx template**
 
-you get a template
+you get a template.
 
 ### place folder
 
