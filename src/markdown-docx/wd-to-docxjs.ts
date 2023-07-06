@@ -34,7 +34,6 @@ import {
 } from "docx";
 import { svg2imagePng } from "./svg-png-image";
 
-
 const _sp = "\t";
 //
 const NodeType = {
@@ -107,7 +106,6 @@ const DocStyle = {
 } as const;
 type DocStyle = (typeof DocStyle)[keyof typeof DocStyle];
 
-
 /**
  *
  */
@@ -164,7 +162,7 @@ class TableJs {
         } else if (words[1] === "image") {
           this.cells[this.row][this.column].push(
             new Paragraph({
-              children: [ await createImageChild(this.mdSourcePath, words[2])],
+              children: [await createImageChild(this.mdSourcePath, words[2])],
             })
           );
         } else {
@@ -434,7 +432,6 @@ function resolveWordCommentsCommands(
 ) {
   // table of contents
   if (wdCommandList[0] === "toc") {
-
     const ptitle = new Paragraph(wdCommandList[2]);
     patches.push(ptitle);
 
@@ -488,10 +485,10 @@ async function resolveWordDownCommandEx(
       current = new DocParagraph(
         nodeType,
         currentParagraph.indent,
-        words[1] as DocStyle,
+        `hh${words[1]}` as DocStyle,
+        //`${words[1]}` as DocStyle, // we do not know how this works.
         child
       );
-      //nodes.push(current);
       return current;
       break;
     case "NormalList":
@@ -499,25 +496,43 @@ async function resolveWordDownCommandEx(
       // text	Consectetur adipiscing elit
       // newLine	convertParagraph	tm
       style = createListType(nodeType, parseInt(words[1]));
-      current = new DocParagraph(NodeType.NormalList, currentParagraph.indent, style);
+      current = new DocParagraph(
+        NodeType.NormalList,
+        currentParagraph.indent,
+        style
+      );
       return current;
       break;
     case NodeType.OderList:
       style = createListType(nodeType, parseInt(words[1]));
-      current = new DocParagraph(NodeType.OderList, currentParagraph.indent, style);
+      current = new DocParagraph(
+        NodeType.OderList,
+        currentParagraph.indent,
+        style
+      );
       return current;
       break;
     case "code":
       child = new TextRun(words[1]);
-      current = new DocParagraph(nodeType, currentParagraph.indent, "code", child);
+      current = new DocParagraph(
+        nodeType,
+        currentParagraph.indent,
+        "code",
+        child
+      );
       return current;
       break;
     case NodeType.link:
       if (!words[3]) {
+        // internal link
         let children = [];
+        //  \w : full contents
+        //  \h :
         children.push(new SimpleField(` REF ${words[1]} \\w \\h `));
         children.push(new TextRun("---"));
         children.push(new SimpleField(` REF ${words[1]} \\h `));
+        children.push(new TextRun("---"));
+        children.push(new SimpleField(` PAGEREF ${words[1]} \\h `));
         currentParagraph.addChildren(children);
       } else {
         child = new ExternalHyperlink({
@@ -573,7 +588,7 @@ async function resolveWordDownCommandEx(
       }
       return currentParagraph;
     case "newPage":
-      currentParagraph.addChild(new PageBreak() );
+      currentParagraph.addChild(new PageBreak());
       currentParagraph.isFlush = true;
       return currentParagraph;
     default:
@@ -581,14 +596,14 @@ async function resolveWordDownCommandEx(
   }
 }
 
-function resolveAdmonition(s: string){
-  let admonition:DocStyle = DocStyle.note1;
+function resolveAdmonition(s: string) {
+  let admonition: DocStyle = DocStyle.note1;
   switch (s.toLocaleLowerCase()) {
     case "note":
-      admonition =  DocStyle.note1;
+      admonition = DocStyle.note1;
       break;
     case "warning":
-      admonition =  DocStyle.warning1;
+      admonition = DocStyle.warning1;
       break;
     default:
       //
@@ -596,8 +611,6 @@ function resolveAdmonition(s: string){
   }
   return admonition as DocStyle;
 }
-
-
 
 async function createMathImage(mathEq: string) {
   const options = {
@@ -623,10 +636,14 @@ async function createMathImage(mathEq: string) {
   return child;
 }
 
-async function createImageChild(mdSourcePath: string, imagePathR: string, option?: DocxOption) {
+async function createImageChild(
+  mdSourcePath: string,
+  imagePathR: string,
+  option?: DocxOption
+) {
   const imagePath = Path.resolve(mdSourcePath, imagePathR);
 
-  if (!(await fileExists(imagePath))){
+  if (!(await fileExists(imagePath))) {
     option?.message?.(
       MessageType.err,
       `No image ${imagePath}`,
