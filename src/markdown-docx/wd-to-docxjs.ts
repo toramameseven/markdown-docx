@@ -337,7 +337,7 @@ export async function wdToDocxJs(
   docxTemplatePath: string,
   docxOutPath: string,
   mdSourcePath: string,
-  option?: DocxOption
+  option: DocxOption
 ): Promise<void> {
   let patches: (Paragraph | Table | TableOfContents)[] = [];
 
@@ -353,6 +353,7 @@ export async function wdToDocxJs(
     date: "",
     author: "",
     docNumber: "",
+    crossRef:"[[$n $t (p.$p)]]"
   };
 
   for (let i = 0; i < lines.length; i++) {
@@ -396,7 +397,8 @@ export async function wdToDocxJs(
       lines[i],
       currentParagraph,
       mdSourcePath,
-      option
+      option,
+      documentInfo
     );
 
     // when paragraph end, flush paragraph
@@ -467,7 +469,8 @@ async function resolveWordDownCommandEx(
   line: string,
   currentParagraph: DocParagraph,
   mdSourcePath: string,
-  option?: DocxOption
+  option: DocxOption,
+  documentInfo: { [v: string]: string }
 ) {
   const words = line.split(_sp);
   let current: DocParagraph;
@@ -525,14 +528,7 @@ async function resolveWordDownCommandEx(
     case NodeType.link:
       if (!words[3]) {
         // internal link
-        let children = [];
-        //  \w : full contents
-        //  \h :
-        children.push(new SimpleField(` REF ${words[1]} \\w \\h `));
-        children.push(new TextRun("---"));
-        children.push(new SimpleField(` REF ${words[1]} \\h `));
-        children.push(new TextRun("---"));
-        children.push(new SimpleField(` PAGEREF ${words[1]} \\h `));
+        let children = resolveXref(words[1], documentInfo.crossRef);
         currentParagraph.addChildren(children);
       } else {
         child = new ExternalHyperlink({
@@ -594,6 +590,42 @@ async function resolveWordDownCommandEx(
     default:
       return currentParagraph;
   }
+}
+
+function resolveXref(linkRef: string, refFormat: string ="[[$n $t p.$p]]") {
+  const refItems = [];
+  for (let i = 0; i < refFormat.length; i++) {
+    let t = refFormat.slice(i, i + 2);
+    console.log(t);
+    if (t.match(/\$n|\$p|\$t/)) {
+      refItems.push(t);
+      i++;
+    } else {
+      refItems.push(refFormat.slice(i, i + 1));
+    }
+  }
+
+  const children = [];
+  //  \w : full contents
+  //  \h :
+  for (let i = 0; i < refItems.length; i++) {
+
+    switch (refItems[i]) {
+      case '$n':
+        children.push(new SimpleField(` REF ${linkRef} \\w \\h `));
+        break;
+      case '$t':
+        children.push(new SimpleField(` REF ${linkRef} \\h `));
+        break;
+      case '$p':
+        children.push(new SimpleField(` PAGEREF ${linkRef} \\h `));
+        // Expected output: "Mangoes and papayas are $2.79 a pound."
+        break;
+      default:
+        children.push(new TextRun(refItems[i]));
+    }
+  }
+  return children;
 }
 
 function resolveAdmonition(s: string) {
