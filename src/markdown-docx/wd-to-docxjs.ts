@@ -356,6 +356,9 @@ export async function wdToDocxJs(
     crossRef:"[[$n $t (p.$p)]]"
   };
 
+  // patch parameter
+  const params ={};
+
   for (let i = 0; i < lines.length; i++) {
     const wdCommandList = lines[i].split(_sp);
 
@@ -385,7 +388,8 @@ export async function wdToDocxJs(
     const isResolveCommand = resolveWordCommentsCommands(
       wdCommandList,
       patches,
-      documentInfo
+      documentInfo,
+      params
     );
 
     if (isResolveCommand) {
@@ -412,7 +416,7 @@ export async function wdToDocxJs(
       );
     }
   }
-  await createDocxPatch(patches, docxTemplatePath, docxOutPath, documentInfo);
+  await createDocxPatch(patches, docxTemplatePath, docxOutPath, documentInfo, params);
 }
 
 // ############################################################
@@ -430,7 +434,8 @@ function createListType(listType: NodeType, listOrder: number) {
 function resolveWordCommentsCommands(
   wdCommandList: string[],
   patches: (Paragraph | Table | TableOfContents)[],
-  documentInfo: { [v: string]: string }
+  documentInfo: { [v: string]: string },
+  params: { [v: string]: Params }
 ) {
   // table of contents
   if (wdCommandList[0] === "toc") {
@@ -457,6 +462,18 @@ function resolveWordCommentsCommands(
     return true;
   }
 
+  // patch words
+  if (wdCommandList[0] === "param") {
+    params[wdCommandList[1]] ={
+      type: PatchType.PARAGRAPH,
+      children: [new TextRun(wdCommandList[2])],
+    },
+    
+    wdCommandList[2];
+    return true;
+  }
+
+  // option
   const documentInfoKeys = Object.keys(documentInfo);
   if (documentInfoKeys.includes(wdCommandList[0])) {
     documentInfo[wdCommandList[0]] = wdCommandList[1];
@@ -708,6 +725,11 @@ async function createImageChild(
   return child;
 }
 
+type Params  = {
+  type: PatchType.PARAGRAPH;
+  children: TextRun[];
+};
+
 /**
  *
  * @param children array of paragraph or table
@@ -718,38 +740,41 @@ export async function createDocxPatch(
   children: (Paragraph | Table | TableOfContents)[],
   docxTemplatePath: string,
   docxOutPath: string,
-  docInfo: { [v: string]: string }
+  docInfo: { [v: string]: string },
+  params: { [v: string]: Params }
 ) {
+
   const patchDoc = await patchDocument(fs.readFileSync(docxTemplatePath), {
     patches: {
       paragraphReplace: {
         type: PatchType.DOCUMENT,
         children: children,
       },
-      title: {
-        type: PatchType.PARAGRAPH,
-        children: [new TextRun(docInfo.title)],
-      },
-      subTitle: {
-        type: PatchType.PARAGRAPH,
-        children: [new TextRun(docInfo.subTitle)],
-      },
-      docNumber: {
-        type: PatchType.PARAGRAPH,
-        children: [new TextRun(docInfo.docNumber)],
-      },
-      author: {
-        type: PatchType.PARAGRAPH,
-        children: [new TextRun(docInfo.author)],
-      },
-      division: {
-        type: PatchType.PARAGRAPH,
-        children: [new TextRun(docInfo.division)],
-      },
-      date: {
-        type: PatchType.PARAGRAPH,
-        children: [new TextRun(docInfo.date)],
-      },
+      ...params
+      // title: {
+      //   type: PatchType.PARAGRAPH,
+      //   children: [new TextRun(docInfo.title)],
+      // },
+      // subTitle: {
+      //   type: PatchType.PARAGRAPH,
+      //   children: [new TextRun(docInfo.subTitle)],
+      // },
+      // docNumber: {
+      //   type: PatchType.PARAGRAPH,
+      //   children: [new TextRun(docInfo.docNumber)],
+      // },
+      // author: {
+      //   type: PatchType.PARAGRAPH,
+      //   children: [new TextRun(docInfo.author)],
+      // },
+      // division: {
+      //   type: PatchType.PARAGRAPH,
+      //   children: [new TextRun(docInfo.division)],
+      // },
+      // date: {
+      //   type: PatchType.PARAGRAPH,
+      //   children: [new TextRun(docInfo.date)],
+      // },
     },
   });
   fs.writeFileSync(docxOutPath, patchDoc);
