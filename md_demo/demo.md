@@ -1,9 +1,9 @@
-<!-- word title "sample document" -->
-<!-- word subTitle "sample document subTitle" -->
-<!-- word division divisionXXX -->
-<!-- word date dateXXX -->
-<!-- word author authorXXX -->
-<!-- word docNumber XXXX-0004 -->
+<!-- word param title "sample document" -->
+<!-- word param subTitle "sample document subTitle" -->
+<!-- word param division divisionXXX -->
+<!-- word param date dateXXX -->
+<!-- word param author authorXXX -->
+<!-- word param docNumber XXXX-0004 -->
 <!-- word newLine -->
 <!-- word toc 3 "toc caption" -->
 

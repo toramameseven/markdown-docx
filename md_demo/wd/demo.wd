@@ -1,11 +1,9 @@
-title	sample document
-newLine	convertTitle	tm
-subTitle	sample document subTitle
-newLine	convertSubTitle	tm
-division	divisionXXX				tm
-date	dateXXX				tm
-author	authorXXX				tm
-docNumber	XXXX-0004				tm
+param	title	sample document			tm
+param	subTitle	sample document subTitle			tm
+param	division	divisionXXX			tm
+param	date	dateXXX			tm
+param	author	authorXXX			tm
+param	docNumber	XXXX-0004			tm
 newLine	wd0NewLine	tm
 toc	3	toc caption	tm
 newLine	convertToc	tm
