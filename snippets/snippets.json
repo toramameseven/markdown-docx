@@ -57,7 +57,7 @@
   },
   "cross reference": {
     "prefix": "word crossRef",
-    "body": ["<!-- word crossRef [[\\$n \\$t (p.\\$p)]] -->"]
+    "body": ["<!-- word crossRef \"[[\\$n \\$t (p.\\$p)]]\" -->"]
   },
   "docx engine": {
     "prefix": "word docxEngine",
