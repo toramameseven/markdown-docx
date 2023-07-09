@@ -54,6 +54,7 @@ const wordCommand = {
   property: "property",
   clearContent: "clearContent",
   crossRef: "crossRef",
+  param: "param"
 } as const;
 
 const _sp = "\t";
@@ -198,6 +199,11 @@ function getWordCommand(content: string) {
         const crossRef = params[0];
         return createBlockCommand(wordCommand.crossRef, {
           crossRef,
+        });
+      case wordCommand.param:
+        return createBlockCommand(wordCommand.param, {
+          key: params[0],
+          value: params[1],
         });
       case wordCommand.clearContent:
         const isClearContent = params[0] ?? false;
@@ -495,6 +501,7 @@ const createBlockCommandTable = (command: string, params: DocxParam) => {
   return `\n${r}\n/${command}${_sp}${_sp}\n`;
 };
 
+
 // {kye: value} > kye\tvalue.....
 function joinObjectToString(params: DocxParam) {
   const r: string[] = [];
@@ -504,7 +511,6 @@ function joinObjectToString(params: DocxParam) {
   }
   return r.join(_sp);
 }
-
 
 
 export function markdownToWd0(
@@ -537,7 +543,9 @@ export function markdownToWd0(
   return trimmed;
 }
 
-//main render
+/**
+ * docx renderer
+ */
 const docxRenderer: marked.Renderer = {
   // Block elements
   heading: blockHeading,
@@ -580,6 +588,10 @@ const docxRenderer: marked.Renderer = {
   options: {},
 };
 
+
+/**
+ * excel Renderer
+ */
 const excelRenderer: marked.Renderer = {
   // Block elements
   heading: blockHeading,
@@ -622,6 +634,10 @@ const excelRenderer: marked.Renderer = {
   options: {},
 };
 
+
+/**
+ * textile Renderer
+ */
 const textileRenderer: marked.Renderer = {
   // Block elements
   heading: blockHeading,
