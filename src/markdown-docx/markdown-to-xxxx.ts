@@ -51,7 +51,8 @@ export async function markdownToDocx(
       selection,
       "docx",
       startLine,
-      option.isDebug
+      option.isDebug,
+      !option.isUseDocxJs
     );
 
     // get template and engine from the body text. engine is only for vba(vbs).
@@ -68,7 +69,7 @@ export async function markdownToDocx(
       : option.docxTemplate;
 
     //create docx (docxJs or vbs)
-    await wordDownToDocx(fileWd, option);
+    await wordDownToDocx(fileWd, wdBody, option);
   } catch (ex) {
     throw ex;
   } finally {
@@ -287,7 +288,6 @@ export async function markdownToWd(
     isDebug && Fs.writeFileSync(fileWd0, wd0);
     // output wd file.
     (isDebug || isSaveWd)  &&   Fs.writeFileSync(fileWd, wd);
-
 
     return { wdPath: fileWd, wdBody: wd };
   } catch (ex) {

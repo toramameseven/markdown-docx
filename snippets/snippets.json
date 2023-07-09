@@ -2,12 +2,12 @@
   "word front all": {
     "prefix": "word properties",
     "body": [
-      "<!-- word title ${1:title} -->",
-      "<!-- word subTitle ${2:subTitle} -->",
-      "<!-- word author ${3:author} -->",
-      "<!-- word division ${4:division} -->",
-      "<!-- word date ${5:date} -->",
-      "<!-- word docNumber ${6:XXXX-XXXX} -->",
+      "<!-- word param title ${1:title} -->",
+      "<!-- word param subTitle ${2:subTitle} -->",
+      "<!-- word param author ${3:author} -->",
+      "<!-- word param division ${4:division} -->",
+      "<!-- word param date ${5:date} -->",
+      "<!-- word param docNumber ${6:XXXX-XXXX} -->",
       "<!-- word toc ${7|1,2,3|} TOC -->$0"
     ],
     "description": "word properties"
@@ -35,33 +35,14 @@
     "body": ["<!-- word newPage -->"],
     "description": "New Page"
   },
-  "export": {
-    "prefix": "word export",
-    "body": ["<!-- word export $1.md-->"],
-    "description": "word export"
-  },
   "import": {
     "prefix": "word import",
     "body": ["<!-- word import $1.md-->"],
     "description": "word import"
   },
-  "page setup": {
-    "prefix": "word page setup",
-    "body": [
-      "<!-- word pageSetup ${1|wdOrientationLandscape,wdOrientationPortrait|} ${2|wdSizeA4,wdSizeA3|} -->"
-    ]
-  },
-  "clear content": {
-    "prefix": "word clear content",
-    "body": ["<!-- word clearContent ${1|true,false|} -->$0"]
-  },
   "cross reference": {
     "prefix": "word crossRef",
     "body": ["<!-- word crossRef \"[[\\$n \\$t (p.\\$p)]]\" -->"]
-  },
-  "docx engine": {
-    "prefix": "word docxEngine",
-    "body": ["<!-- word docxEngine $1.vbs -->"]
   },
   "docx docxTemplate": {
     "prefix": "word docxTemplate",

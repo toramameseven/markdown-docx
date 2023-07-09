@@ -70,16 +70,17 @@ export type ShowMessage = (
 ) => void;
 
 export type UpdateStatusBar = (isRunning: boolean) => void;
+export const docxTemplate001 = "_template_001.docx";
 
 export async function createDocxTemplateFile(wfFsPath:string) {
   const folderOut =wfFsPath;
-  const fileOut = path.resolve(folderOut, "sample-heder-js.docx");
+  const fileOut = path.resolve(folderOut, docxTemplate001);
   if (
     (await dirExists(folderOut)) &&
     !(await fileExists(fileOut))
   ) {
     fs.copyFileSync(
-      path.resolve(__dirname, "../vbs/sample-heder-js.docx"),
+      path.resolve(__dirname, `../docxtemplate/${docxTemplate001}`),
       fileOut
     );
   } else {

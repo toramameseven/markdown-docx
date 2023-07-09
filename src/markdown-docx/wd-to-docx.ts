@@ -5,13 +5,20 @@ import {
   fileExists,
   selectExistsPath,
   vbsSpawn,
+  docxTemplate001,
 } from "./common";
 import { wdToDocxJs } from "./wd-to-docxjs";
 import * as Path from "path";
 import { runCommand } from "../tools/tools-common";
 
-export async function wordDownToDocx(fileWd: string, option: DocxOption) {
-  const wdBody = getFileContents(fileWd);
+export async function wordDownToDocx(
+  fileWd: string,
+  wdBody: string,
+  option: DocxOption
+) {
+  if (wdBody === "") {
+    wdBody = getFileContents(fileWd);
+  }
   wordDownToDocxBody(fileWd, wdBody, option);
 }
 
@@ -22,11 +29,11 @@ export async function wordDownToDocxBody(
 ) {
   const defaultTemplate = Path.resolve(
     __dirname,
-    "../vbs/sample-heder-js.docx"
+    `../docxtemplate/${docxTemplate001}`
   );
   const defaultTemplate2 = Path.resolve(
     __dirname,
-    "../../vbs/sample-heder-js.docx"
+    `../../docxtemplate/${docxTemplate001}`
   );
   const template = await selectExistsPath(
     [

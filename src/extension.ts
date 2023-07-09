@@ -275,7 +275,7 @@ async function exportDocxFromExplorerCore(uriFile: vscode.Uri) {
 
   if (filePath.match(/\.wd$/i)) {
     // wordDown
-    await wordDownToDocx(filePath, thisOption);
+    await wordDownToDocx(filePath, "", thisOption);
     return;
   }
 
@@ -369,7 +369,7 @@ async function exportDocxFromEditorCore(
 
   if (filePath.match(/\.wd$/i)) {
     // wordDown
-    await wordDownToDocx(filePath, thisOption);
+    await wordDownToDocx(filePath, "", thisOption);
     return;
   }
 
