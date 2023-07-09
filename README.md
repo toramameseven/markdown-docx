@@ -235,10 +235,10 @@ We thank for the wonderful npm packages.
 
 [Packages](usedModules.md)
 
-
 And we use some useful articles below. 
 * [markdown-to-txt](https://www.npmjs.com/package/markdown-to-txt) tells us how to use **Marked**.
 * To Slugify, we use Mr. Sato 's code (https://qiita.com/satokaz/items/64582da4640898c4bf42)
+* [node-html-markdown](https://github.com/crosstype/node-html-markdown)'s code is used, for converting html to markdown.
 * [koukimura's page](https://koukimra.com/) is used to resize pictures.
 * [minnano macro page](https://www.wordvbalab.com/) is used for emphasis styles.
 
