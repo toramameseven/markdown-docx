@@ -43,6 +43,7 @@ const wd0Command = {
   non: "non",
 
   // word down
+  param: "param",
   author: "author",
   date: "date",
   division: "division",
@@ -653,6 +654,15 @@ function convertPageSetup(params: DocxParam, isCommandEnd?: boolean) {
   ].join(_sp);
   outputWd(r);
 }
+
+function convertPatchParameter(params: DocxParam, isCommandEnd?: boolean) {
+  if (isCommandEnd) {
+    return;
+  }
+  const r = ["param", params.key, params.value, "", "", "tm"].join(_sp);
+  outputWd(r);
+}
+
 function convertEngine(params: DocxParam, isCommandEnd?: boolean) {
   if (isCommandEnd) {
     return;
@@ -898,6 +908,12 @@ function resolveCommand(
         return;
       }
       convertEngine(params, isCommandEnd);
+      break;
+    case wd0Command.param:
+      if (isCommandEnd) {
+        return;
+      }
+      convertPatchParameter(params, isCommandEnd);
       break;
     case wd0Command.author:
       if (isCommandEnd) {
