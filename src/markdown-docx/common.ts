@@ -150,6 +150,14 @@ export function getWordDownMergeCommand(wd: string) {
   return undefined;
 }
 
+/**
+ * create uniq path
+ * @param dir 
+ * @param name 
+ * @param ext 
+ * @param isSame 
+ * @returns 
+ */
 export async function createPath(
   dir: string,
   name: string,
@@ -187,6 +195,12 @@ export async function dirExists(filepath: string) {
   }
 }
 
+/**
+ * remove pathFolder
+ * @param pathFolder 
+ * @param option  option: { force: true }
+ * @returns 
+ */
 export async function rmDirIfExist(pathFolder: string, option: {}) {
   try {
     const isExist = await dirExists(pathFolder);
@@ -200,6 +214,12 @@ export async function rmDirIfExist(pathFolder: string, option: {}) {
   }
 }
 
+/**
+ * remove pathFile
+ * @param pathFile 
+ * @param option option: { force: true }
+ * @returns void
+ */
 export async function rmFileIfExist(pathFile: string, option: { force: true }) {
   try {
     const isExist = await fileExists(pathFile);
