@@ -56,22 +56,22 @@
         "title": "Convert html to md"
       },
       {
-        "enablement": "true",
+        "enablement": "false",
         "command": "explorer.mdToEd",
         "title": "Convert me to ed"
       },
       {
-        "enablement": "true",
+        "enablement": "false",
         "command": "explorer.mdToTextile",
         "title": "Convert me to textile"
       },
       {
-        "enablement": "true",
+        "enablement": "false",
         "command": "explorer.mdToPptx",
         "title": "Convert me to pptx"
       },
       {
-        "enablement": "true",
+        "enablement": "false",
         "command": "explorer.mdToHtml",
         "title": "Convert me to Html"
       },
@@ -104,7 +104,7 @@
           "group": "myGroup@1"
         },
         {
-          "when": "resourceExtname =~ /\\.wd$|\\.md$/i && !markdown-docx.isRunning",
+          "when": "resourceExtname =~ /\\.wd$|\\.md$/i && !markdown-docx.isRunning && false",
           "command": "explorer.mdToPptx",
           "group": "myGroup@1"
         },
@@ -114,22 +114,22 @@
           "group": "myGroup@1"
         },
         {
-          "when": "resourceExtname =~ /\\.html$/i && !markdown-docx.isRunning",
+          "when": "resourceExtname =~ /\\.html$/i && !markdown-docx.isRunning && false",
           "command": "explorer.ExportHtmlDocx",
           "group": "myGroup@1"
         },
         {
-          "when": "resourceExtname =~ /\\.md$/i && !markdown-docx.isRunning",
+          "when": "resourceExtname =~ /\\.md$/i && !markdown-docx.isRunning && false",
           "command": "explorer.mdToEd",
           "group": "myGroup@1"
         },
         {
-          "when": "resourceExtname =~ /\\.md$/i && !markdown-docx.isRunning",
+          "when": "resourceExtname =~ /\\.md$/i && !markdown-docx.isRunning && false",
           "command": "explorer.mdToTextile",
           "group": "myGroup@1"
         },
         {
-          "when": "resourceExtname =~ /\\.md$/i && !markdown-docx.isRunning",
+          "when": "resourceExtname =~ /\\.md$/i && !markdown-docx.isRunning && false",
           "command": "explorer.mdToHtml",
           "group": "myGroup@1"
         }
