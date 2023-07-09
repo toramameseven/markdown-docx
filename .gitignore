@@ -5,3 +5,4 @@ node_modules
 *.vsix
 *.xxtxt
 *.wd0
+wasm
