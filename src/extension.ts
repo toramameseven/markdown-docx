@@ -2,7 +2,6 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
 import * as vscodeCommon from "./common-vscode";
-import { splitMarkdownToHugo } from "./tools/split-markdown";
 import { htmlToMarkdown } from "./html-markdown/html-to-markdown";
 import {
   markdownToDocx,
@@ -36,7 +35,7 @@ export function activate(context: vscode.ExtensionContext) {
   // activate event
   vscodeCommon.showMessage(
     MessageType.info,
-    '"markdown-docx" is now active!',
+    '"markdown-docx" is initializing.',
     "main"
   );
 
@@ -54,7 +53,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   // explorer html to docx
   context.subscriptions.push(
-    vscode.commands.registerCommand("explorer.ExportHtmlDocx", exportHtmlDocx)
+    vscode.commands.registerCommand("explorer.ExportHtmlMarkdown", exportHtmlMarkdown)
   );
 
   //exportMarkdownEd
@@ -70,14 +69,6 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     vscode.commands.registerCommand("explorer.mdToHtml", exportMarkdownHtml)
-  );
-
-  // split md for hugo
-  context.subscriptions.push(
-    vscode.commands.registerCommand(
-      "explorer.SplitForHugo",
-      splitToHugoMarkdown
-    )
   );
 
   //  main.createDocxTemplate
@@ -97,12 +88,12 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   // editor html to docx
-  // context.subscriptions.push(
-  //   vscode.commands.registerTextEditorCommand(
-  //     "editor.ExportHtmlDocx",
-  //     exportDocxFromEditor
-  //   )
-  // );
+  context.subscriptions.push(
+    vscode.commands.registerTextEditorCommand(
+      "editor.ExportHtmlDocx",
+      exportDocxFromEditor
+    )
+  );
 
   // cancel convert
   context.subscriptions.push(
@@ -110,17 +101,25 @@ export function activate(context: vscode.ExtensionContext) {
       ac.abort();
     })
   );
+
+  enableExperienceFeature();
+
+  vscodeCommon.showMessage(
+    MessageType.info,
+    '"markdown-docx" is initialized.',
+    "main"
+  );
 }
 
 /**
  * convert html to markdown
  * @param uriFile
  */
-function exportHtmlDocx(uriFile: vscode.Uri) {
+function exportHtmlMarkdown(uriFile: vscode.Uri) {
   try {
     vscodeCommon.updateStatusBar(true);
     const filePath = uriFile.fsPath;
-    if (filePath.match(/\.html$/i)) {
+    if (filePath.match(/\.html$|\.htm$/i)) {
       // wordDown
       const r = htmlToMarkdown(filePath);
       vscodeCommon.showMessage(MessageType.info, r, "");
@@ -197,24 +196,6 @@ function exportMarkdownHtml(uriFile: vscode.Uri) {
   }
 }
 
-/**
- * convert a markdown to hugo markdowns
- * @param uriFile
- */
-async function splitToHugoMarkdown(uriFile: vscode.Uri) {
-  try {
-    vscodeCommon.updateStatusBar(true);
-    const filePath = uriFile.fsPath;
-    if (filePath.match(/\.md$|\.mds$/i)) {
-      // wordDown
-      await splitMarkdownToHugo(filePath);
-    }
-  } catch (error) {
-    vscodeCommon.showMessage(MessageType.err, error, "main");
-  } finally {
-    vscodeCommon.updateStatusBar(false);
-  }
-}
 
 async function createDocxTemplate() {
   try {
@@ -386,6 +367,19 @@ async function exportDocxFromEditorCore(
 
 // This method is called when your extension is deactivated
 export function deactivate() {}
+
+
+function enableExperienceFeature(){
+  vscode.commands.executeCommand(
+    "setContext",
+    "markdown-docx.isExperienceFeature",
+    true
+  );
+}
+
+
+
+
 
 // options
 function createDocxOptionExtension(option: DocxOption) {
