@@ -79,6 +79,13 @@ export async function wordDownToDocxBody(
       return;
     }
 
+    option.message?.(
+      MessageType.info,
+      `create docx: ${outPath}.`,
+      "main",
+      false
+    );
+
     // render by vba(vbs)
     try {
       await wdToDocxJs(wdBody, template, outPath, Path.dirname(fileWd), option);
@@ -96,6 +103,13 @@ export async function wordDownToDocxBody(
       return;
     }
 
+    option.message?.(
+      MessageType.info,
+      `open docx: ${outPath}.`,
+      "main",
+      false
+    );
+
     const wordExe = await selectExistsPath(
       [
         option.wordPath ?? "",
@@ -104,7 +118,6 @@ export async function wordDownToDocxBody(
       ],
       ""
     );
-
     runCommand(wordExe, outPath);
     return;
   }
