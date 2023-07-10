@@ -243,13 +243,13 @@ class TableJs {
       layout: TableLayoutType.FIXED,
       rows: tableRaws,
       style: "styleN",
-      indent: {
-        size: "20mm",
-        type: WidthType.AUTO,
-      },
+      // indent: {
+      //   size: "20mm",
+      //   type: WidthType.AUTO,
+      // },
       width: {
-        size: "150mm",
-        type: WidthType.AUTO,
+        size: 95,
+        type: WidthType.PERCENTAGE,
       },
     });
     return tableJs;
@@ -751,30 +751,6 @@ export async function createDocxPatch(
         children: children,
       },
       ...params
-      // title: {
-      //   type: PatchType.PARAGRAPH,
-      //   children: [new TextRun(docInfo.title)],
-      // },
-      // subTitle: {
-      //   type: PatchType.PARAGRAPH,
-      //   children: [new TextRun(docInfo.subTitle)],
-      // },
-      // docNumber: {
-      //   type: PatchType.PARAGRAPH,
-      //   children: [new TextRun(docInfo.docNumber)],
-      // },
-      // author: {
-      //   type: PatchType.PARAGRAPH,
-      //   children: [new TextRun(docInfo.author)],
-      // },
-      // division: {
-      //   type: PatchType.PARAGRAPH,
-      //   children: [new TextRun(docInfo.division)],
-      // },
-      // date: {
-      //   type: PatchType.PARAGRAPH,
-      //   children: [new TextRun(docInfo.date)],
-      // },
     },
   });
   fs.writeFileSync(docxOutPath, patchDoc);
