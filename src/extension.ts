@@ -19,7 +19,6 @@ import {
 import { createDocxTemplateFile } from "./markdown-docx/common";
 import { wordDownToPptx } from "./markdown-docx/wd-to-pptx";
 import { getWorkingDirectory } from "./common-vscode";
-import { createInlineHtml } from "./tools/createInlineHtml";
 
 export let isDebug = false;
 
@@ -76,6 +75,9 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand("explorer.htmlToInlineHtml", exportMarkdownInlineHtml)
   );
 
+  context.subscriptions.push(
+    vscode.commands.registerCommand("explorer.textileToMarkdown", exportMarkdownInlineHtml)
+  );
   //  main.createDocxTemplate
   context.subscriptions.push(
     vscode.commands.registerCommand(
@@ -222,6 +224,26 @@ async function exportMarkdownInlineHtml(uriFile: vscode.Uri) {
   }
 }
 
+async function exportTextileToMarkdown(uriFile: vscode.Uri) {
+  const thisOption = createDocxOptionExtension({
+    ac,
+    message: vscodeCommon.showMessage,
+  });
+
+  try {
+    vscodeCommon.updateStatusBar(true);
+    const filePath = uriFile.fsPath;
+    if (filePath.match(/\.textile$/i)) {
+      const r = await markdownToHtml(filePath, "", 0, thisOption, true);
+
+      vscodeCommon.showMessage(MessageType.info, r, "extension");
+    }
+  } catch (error) {
+    vscodeCommon.showMessage(MessageType.err, error, "extension");
+  } finally {
+    vscodeCommon.updateStatusBar(false);
+  }
+}
 
 async function createDocxTemplate() {
   try {

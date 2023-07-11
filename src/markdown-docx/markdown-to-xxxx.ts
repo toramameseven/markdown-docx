@@ -237,6 +237,51 @@ export async function markdownToHtml(
   }
 }
 
+export async function textileToMarkdown(
+  pathMarkdown: string,
+  selection: string,
+  /** zero base number */
+  startLine = 0,
+  option: DocxOption,
+  isInclude: boolean = false
+) {
+  option.message && (showMessage = option.message);
+  const dirPath = Path.dirname(pathMarkdown);
+  const fileNameTextile = Path.basename(pathMarkdown).replace(/\.textile$/i, "");
+  const fileHtml = await createPath(dirPath, fileNameTextile, "html", true);
+
+  // convert markdown to docx
+  try {
+    showMessage?.(
+      MessageType.info,
+      `textile to html to markdown:`,
+      "markdown-to-xxxx",
+      false
+    );
+
+    let r = await markdownToWd(
+      pathMarkdown,
+      selection,
+      "html",
+      startLine,
+      option.isDebug
+    );
+    
+    let rr = '';
+    if (isInclude){
+      rr = await createInlineHtml(pathMarkdown, r.wdBody);
+    }
+
+    const outHtml = rr ? rr: r.wdBody;
+    Fs.writeFileSync(fileHtml, outHtml);
+
+    return fileHtml;
+  } catch (ex) {
+    throw ex;
+  }
+}
+
+
 //creating wd file for test
 export async function markdownToWd(
   filePath: string,

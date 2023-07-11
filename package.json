@@ -86,6 +86,11 @@
         "title": "Convert html to md"
       },
       {
+        "enablement": "markdown-docx.isExperienceFeature",
+        "command": "explorer.textileToMarkdown",
+        "title": "Convert textile to md"
+      },
+      {
         "enablement": "true",
         "command": "editor.ExportStop",
         "title": "stop signal"
@@ -131,6 +136,11 @@
         {
           "when": "resourceExtname =~ /\\.md$/i && !markdown-docx.isRunning && markdown-docx.isExperienceFeature",
           "command": "explorer.htmlToInlineHtml",
+          "group": "myGroup@1"
+        },
+        {
+          "when": "resourceExtname =~ /\\.textile$/i && !markdown-docx.isRunning && markdown-docx.isExperienceFeature",
+          "command": "explorer.textileToMarkdown",
           "group": "myGroup@1"
         }
       ],
@@ -272,6 +282,7 @@
     "node-html-parser": "^6.1.4",
     "pptxgenjs": "^3.12.0",
     "svg2png-wasm": "^1.4.0",
-    "tex-to-svg": "^0.2.0"
+    "tex-to-svg": "^0.2.0",
+    "textile-js": "^2.1.1"
   }
 }
