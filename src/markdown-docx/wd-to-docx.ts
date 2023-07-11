@@ -48,7 +48,7 @@ export async function wordDownToDocxBody(
   option.message?.(
     MessageType.info,
     `docx docxTemplate: ${template ? template : "use inside"}`,
-    "main",
+    "wd-to-docx",
     false
   );
 
@@ -58,7 +58,7 @@ export async function wordDownToDocxBody(
       option.message?.(
         MessageType.warn,
         `docx template: no docx template is set.`,
-        "main",
+        "wd-to-docx",
         false
       );
       return;
@@ -73,7 +73,7 @@ export async function wordDownToDocxBody(
       option.message?.(
         MessageType.warn,
         `docx exists: ${outPath}.`,
-        "main",
+        "wd-to-docx",
         false
       );
       return;
@@ -82,7 +82,7 @@ export async function wordDownToDocxBody(
     option.message?.(
       MessageType.info,
       `create docx: ${outPath}.`,
-      "main",
+      "wd-to-docx",
       false
     );
 
@@ -93,7 +93,7 @@ export async function wordDownToDocxBody(
       option.message?.(
         MessageType.warn,
         `wdToDocxJs err: ${e}.`,
-        "main",
+        "wd-to-docx",
         false
       );
       return;
@@ -106,7 +106,7 @@ export async function wordDownToDocxBody(
     option.message?.(
       MessageType.info,
       `open docx: ${outPath}.`,
-      "main",
+      "wd-to-docx",
       false
     );
 
@@ -131,7 +131,7 @@ export async function wordDownToDocxBody(
   option.message?.(
     MessageType.info,
     `docx docxEngine: ${thisEngine ? thisEngine : "use inside"}`,
-    "main",
+    "wd-to-docx",
     false
   );
 

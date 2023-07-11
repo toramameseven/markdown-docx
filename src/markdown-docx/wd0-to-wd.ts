@@ -984,7 +984,7 @@ function resolveCommand(
       showMessage?.(
         MessageType.warn,
         `NO COMMAND!! [${command}][${r}]`,
-        "wd0-to-wd.ts",
+        "wd0-to-wd",
         false
       );
   }

@@ -19,6 +19,7 @@ import {
 import { createDocxTemplateFile } from "./markdown-docx/common";
 import { wordDownToPptx } from "./markdown-docx/wd-to-pptx";
 import { getWorkingDirectory } from "./common-vscode";
+import { createInlineHtml } from "./tools/createInlineHtml";
 
 export let isDebug = false;
 
@@ -36,7 +37,7 @@ export function activate(context: vscode.ExtensionContext) {
   vscodeCommon.showMessage(
     MessageType.info,
     '"markdown-docx" is initializing.',
-    "main"
+    "extension"
   );
 
   // explorer md wd to docx
@@ -69,6 +70,10 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     vscode.commands.registerCommand("explorer.mdToHtml", exportMarkdownHtml)
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand("explorer.htmlToInlineHtml", exportMarkdownInlineHtml)
   );
 
   //  main.createDocxTemplate
@@ -107,7 +112,7 @@ export function activate(context: vscode.ExtensionContext) {
   vscodeCommon.showMessage(
     MessageType.info,
     '"markdown-docx" is initialized.',
-    "main"
+    "extension"
   );
 }
 
@@ -122,10 +127,10 @@ function exportHtmlMarkdown(uriFile: vscode.Uri) {
     if (filePath.match(/\.html$|\.htm$/i)) {
       // wordDown
       const r = htmlToMarkdown(filePath);
-      vscodeCommon.showMessage(MessageType.info, r, "");
+      vscodeCommon.showMessage(MessageType.info, r, "extension");
     }
   } catch (error) {
-    vscodeCommon.showMessage(MessageType.err, error, "main");
+    vscodeCommon.showMessage(MessageType.err, error, "extension");
   } finally {
     vscodeCommon.updateStatusBar(false);
   }
@@ -144,10 +149,10 @@ function exportMarkdownEd(uriFile: vscode.Uri) {
       // wordDown
       //const r = markdownToExDown(filePath, "");
       const r = markdownToExcel(filePath, "", 0, thisOption);
-      vscodeCommon.showMessage(MessageType.info, r, "");
+      vscodeCommon.showMessage(MessageType.info, r, "extension");
     }
   } catch (error) {
-    vscodeCommon.showMessage(MessageType.err, error, "main");
+    vscodeCommon.showMessage(MessageType.err, error, "extension");
   } finally {
     vscodeCommon.updateStatusBar(false);
   }
@@ -165,10 +170,10 @@ function exportMarkdownTextile(uriFile: vscode.Uri) {
     if (filePath.match(/\.md$/i)) {
       // wordDown
       const r = markdownToTextile(filePath, "", 0, thisOption);
-      vscodeCommon.showMessage(MessageType.info, r, "");
+      vscodeCommon.showMessage(MessageType.info, r, "extension");
     }
   } catch (error) {
-    vscodeCommon.showMessage(MessageType.err, error, "main");
+    vscodeCommon.showMessage(MessageType.err, error, "extension");
   } finally {
     vscodeCommon.updateStatusBar(false);
   }
@@ -187,10 +192,31 @@ function exportMarkdownHtml(uriFile: vscode.Uri) {
       // wordDown
       //const r = markdownToExDown(filePath, "");
       const r = markdownToHtml(filePath, "", 0, thisOption);
-      vscodeCommon.showMessage(MessageType.info, r, "");
+      vscodeCommon.showMessage(MessageType.info, r, "extension");
     }
   } catch (error) {
-    vscodeCommon.showMessage(MessageType.err, error, "main");
+    vscodeCommon.showMessage(MessageType.err, error, "extension");
+  } finally {
+    vscodeCommon.updateStatusBar(false);
+  }
+}
+
+async function exportMarkdownInlineHtml(uriFile: vscode.Uri) {
+  const thisOption = createDocxOptionExtension({
+    ac,
+    message: vscodeCommon.showMessage,
+  });
+
+  try {
+    vscodeCommon.updateStatusBar(true);
+    const filePath = uriFile.fsPath;
+    if (filePath.match(/\.md$/i)) {
+      const r = await markdownToHtml(filePath, "", 0, thisOption, true);
+
+      vscodeCommon.showMessage(MessageType.info, r, "extension");
+    }
+  } catch (error) {
+    vscodeCommon.showMessage(MessageType.err, error, "extension");
   } finally {
     vscodeCommon.updateStatusBar(false);
   }
@@ -200,9 +226,9 @@ function exportMarkdownHtml(uriFile: vscode.Uri) {
 async function createDocxTemplate() {
   try {
     const wf = getWorkingDirectory();
-    await createDocxTemplateFile(wf?.uri.fsPath ?? "");
+    await createDocxTemplateFile(wf?.uri.fsPath ?? "extension");
   } catch (error) {
-    vscodeCommon.showMessage(MessageType.err, error, "main");
+    vscodeCommon.showMessage(MessageType.err, error, "extension");
   } finally {
     vscodeCommon.updateStatusBar(false);
   }
@@ -217,7 +243,7 @@ async function exportDocxFromExplorer(uriFile: vscode.Uri) {
     vscodeCommon.updateStatusBar(true);
     await exportDocxFromExplorerCore(uriFile);
   } catch (error) {
-    vscodeCommon.showMessage(MessageType.err, error, "main");
+    vscodeCommon.showMessage(MessageType.err, error, "extension");
   } finally {
     vscodeCommon.updateStatusBar(false);
   }
@@ -228,7 +254,7 @@ async function exportPptxFromExplorer(uriFile: vscode.Uri) {
     vscodeCommon.updateStatusBar(true);
     await exportPptxFromExplorerCore(uriFile);
   } catch (error) {
-    vscodeCommon.showMessage(MessageType.err, error, "main");
+    vscodeCommon.showMessage(MessageType.err, error, "extension");
   } finally {
     vscodeCommon.updateStatusBar(false);
   }
@@ -245,7 +271,7 @@ async function exportDocxFromExplorerCore(uriFile: vscode.Uri) {
   vscodeCommon.showMessage(
     MessageType.info,
     `convert docx from ${filePath}`,
-    "main"
+    "extension"
   );
 
   resetAbortController();
@@ -264,7 +290,7 @@ async function exportDocxFromExplorerCore(uriFile: vscode.Uri) {
   try {
     await markdownToDocx(filePath, "", 0, thisOption);
   } catch (error) {
-    vscodeCommon.showMessage(MessageType.err, error, "");
+    vscodeCommon.showMessage(MessageType.err, error, "extension");
   }
 }
 
@@ -274,7 +300,7 @@ async function exportPptxFromExplorerCore(uriFile: vscode.Uri) {
   vscodeCommon.showMessage(
     MessageType.info,
     `convert docx from ${filePath}`,
-    "main"
+    "extension"
   );
 
   resetAbortController();
@@ -293,7 +319,7 @@ async function exportPptxFromExplorerCore(uriFile: vscode.Uri) {
   try {
     await markdownToPptx(filePath, "", 0, thisOption);
   } catch (error) {
-    vscodeCommon.showMessage(MessageType.err, error, "");
+    vscodeCommon.showMessage(MessageType.err, error, "extension");
   }
 }
 
@@ -314,7 +340,7 @@ async function exportDocxFromEditor(
     vscodeCommon.updateStatusBar(true);
     await exportDocxFromEditorCore(textEditor, edit);
   } catch (error) {
-    vscodeCommon.showMessage(MessageType.err, error, "main");
+    vscodeCommon.showMessage(MessageType.err, error, "extension");
   } finally {
     vscodeCommon.updateStatusBar(false);
   }
@@ -340,7 +366,7 @@ async function exportDocxFromEditorCore(
   vscodeCommon.showMessage(
     MessageType.info,
     `convert docx from ${filePath}`,
-    "main"
+    "extension"
   );
   resetAbortController();
   const thisOption = createDocxOptionExtension({
@@ -361,7 +387,7 @@ async function exportDocxFromEditorCore(
   try {
     await markdownToDocx(filePath, text, startLine, thisOption);
   } catch (error) {
-    vscodeCommon.showMessage(MessageType.err, error, "");
+    vscodeCommon.showMessage(MessageType.err, error, "extension");
   }
 }
 

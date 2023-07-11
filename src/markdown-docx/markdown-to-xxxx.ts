@@ -15,6 +15,7 @@ import { wordDownToDocx } from "./wd-to-docx";
 import { wdToEd } from "./wd-to-ed";
 import { wordDownToPptx } from "./wd-to-pptx";
 import { wdToTextile } from "./wd-to-textile";
+import { createInlineHtml } from "../tools/createInlineHtml";
 
 /**message function */
 let showMessage: ShowMessage;
@@ -40,8 +41,8 @@ export async function markdownToDocx(
   try {
     showMessage?.(
       MessageType.info,
-      `markdown to docx:`,
       "Markdown to docx: start !!!",
+      "markdown-to-xxxx",
       false
     );
 
@@ -95,8 +96,8 @@ export async function markdownToExcel(
   try {
     showMessage?.(
       MessageType.info,
-      `markdown to docx:`,
-      "Markdown to docx: start !!!",
+      "Markdown to ed: start !!!",
+      "markdown-to-xxxx",
       false
     );
 
@@ -132,8 +133,8 @@ export async function markdownToTextile(
   try {
     showMessage?.(
       MessageType.info,
-      `markdown to textile:`,
       "Markdown to textile: start !!!",
+      "markdown-to-xxxx",
       false
     );
 
@@ -166,8 +167,8 @@ export async function markdownToPptx(
   try {
     showMessage?.(
       MessageType.info,
-      `markdown to pptx:`,
       "Markdown to pptx: start !!!",
+      "markdown-to-xxxx",
       false
     );
 
@@ -197,7 +198,8 @@ export async function markdownToHtml(
   selection: string,
   /** zero base number */
   startLine = 0,
-  option: DocxOption
+  option: DocxOption,
+  isInclude: boolean = false
 ) {
   option.message && (showMessage = option.message);
   const dirPath = Path.dirname(pathMarkdown);
@@ -208,20 +210,28 @@ export async function markdownToHtml(
   try {
     showMessage?.(
       MessageType.info,
-      `markdown to docx:`,
-      "Markdown to docx: start !!!",
+      `markdown to inline html:`,
+      "markdown-to-xxxx",
       false
     );
 
-    const r = await markdownToWd(
+    let r = await markdownToWd(
       pathMarkdown,
       selection,
       "html",
       startLine,
       option.isDebug
     );
+    
+    let rr = '';
+    if (isInclude){
+      rr = await createInlineHtml(pathMarkdown, r.wdBody);
+    }
 
-    Fs.writeFileSync(fileHtml, r.wdBody);
+    const outHtml = rr ? rr: r.wdBody;
+    Fs.writeFileSync(fileHtml, outHtml);
+
+    return fileHtml;
   } catch (ex) {
     throw ex;
   }
@@ -247,7 +257,7 @@ export async function markdownToWd(
     showMessage?.(
       MessageType.info,
       `markdown to wd:`,
-      "Markdown to Wd start !!!",
+      "markdown-to-xxxx",
       false
     );
 

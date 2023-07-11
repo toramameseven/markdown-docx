@@ -89,6 +89,11 @@
         "enablement": "true",
         "command": "editor.ExportStop",
         "title": "stop signal"
+      },
+      {
+        "enablement": "markdown-docx.isExperienceFeature",
+        "command": "explorer.htmlToInlineHtml",
+        "title": "Convert html to inlineHtml"
       }
     ],
     "menus": {
@@ -121,6 +126,11 @@
         {
           "when": "resourceExtname =~ /\\.md$/i && !markdown-docx.isRunning && markdown-docx.isExperienceFeature",
           "command": "explorer.mdToHtml",
+          "group": "myGroup@1"
+        },
+        {
+          "when": "resourceExtname =~ /\\.md$/i && !markdown-docx.isRunning && markdown-docx.isExperienceFeature",
+          "command": "explorer.htmlToInlineHtml",
           "group": "myGroup@1"
         }
       ],
@@ -256,6 +266,7 @@
     "front-matter": "^4.0.2",
     "iconv-lite": "^0.6.3",
     "image-size": "^1.0.2",
+    "inline-source": "^8.0.2",
     "lodash": "^4.17.21",
     "marked": "^4.2.4",
     "node-html-parser": "^6.1.4",

@@ -30,7 +30,7 @@ export async function wordDownToPptxBody(
   try {
     await wdToPptxJs(wdBody, "", "outPath", Path.dirname(fileWd), option);
   } catch (e) {
-    option.message?.(MessageType.warn, `wdToPptxJs err: ${e}.`, "main", false);
+    option.message?.(MessageType.warn, `wdToPptxJs err: ${e}.`, "wd-to-pptx", false);
     return;
   }
   return;

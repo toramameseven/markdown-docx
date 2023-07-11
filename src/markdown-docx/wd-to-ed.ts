@@ -392,7 +392,7 @@ function resolveCommand(command: WdCommand, params: string[]) {
       showMessage?.(
         MessageType.warn,
         `NO COMMAND!! [${command}][${r}]`,
-        "wd-to-ed.ts",
+        "wd-to-ed",
         false
       );
   }

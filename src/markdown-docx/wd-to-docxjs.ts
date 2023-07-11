@@ -696,7 +696,7 @@ async function createImageChild(
     option?.message?.(
       MessageType.err,
       `No image ${imagePath}`,
-      "docxjs",
+      "wd-to-docxjs",
       false
     );
     const errorChild = new TextRun(`[No Image: ${imagePath}]`);
