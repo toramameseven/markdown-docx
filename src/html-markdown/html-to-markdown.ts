@@ -17,8 +17,11 @@ import { getFileContents } from "../markdown-docx/common";
  * If using it once, you can use the static method
  * https://github.com/crosstype/node-html-markdown
  * ********************************************************* */
-export function htmlToMarkdown(filePath: string) {
-  const s = getFileContents(filePath);
+export function htmlToMarkdown(filePath: string, body: string) {
+  let s = body;
+  if (s === "") {
+    s = getFileContents(filePath);
+  }
   // Single file
   const r = NodeHtmlMarkdown.translate(
     /* html `<b>hello</b>`*/ s,
@@ -26,6 +29,9 @@ export function htmlToMarkdown(filePath: string) {
     /* customTranslators (optional) */ undefined,
     /* customCodeBlockTranslators (optional) */ undefined
   );
-  Fs.writeFileSync(filePath + ".md", r);
+
+  if (filePath !== "") {
+    Fs.writeFileSync(filePath + ".md", r);
+  }
   return r;
 }

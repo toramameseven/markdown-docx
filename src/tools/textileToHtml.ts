@@ -1,3 +1,13 @@
+import { getFileContents } from "./tools-common";
+
 const textile = require('textile-js');
 
-console.log( textile( "I am using __textile__." ) );
+export function textileToHtml(file:string, body:string){
+  let s = body;
+  if (s === ""){
+    s = getFileContents(file);
+  }
+  const r = textile(s);
+  return r;
+}
+

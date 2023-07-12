@@ -186,6 +186,11 @@ function createLine(command: string, picture: string, text: string) {
   textileLines.push(`${command} ${text}`);
 }
 
+function createLineEx(command: string, picture: string, text: string) {
+  //textileLines.push(`${command} ${text}`);
+  textBuffer += `${command} ${text}`
+}
+
 function createLineBlank(info: string, isForce = false) {
   //console.log(`${createLineBlank.name}==> ${info}`);
   if (
@@ -276,13 +281,15 @@ function convertCode(params: string[]) {
 }
 
 function convertImage(params: string[]) {
-  flushCommand();
+  // for text
+  // textBuffer += params[0];
+  //flushCommand();
 
-  createLineBlank("convertImage");
+  //createLineBlank("convertImage");
   const imagePath = params[0];
   const imageTitle = params[1];
   const hover = params[2];
-  createLine(`!${imagePath}!`, imagePath, "");
+  createLineEx(`!${imagePath}!`, imagePath, "");
 }
 
 function convertLink(params: string[]) {

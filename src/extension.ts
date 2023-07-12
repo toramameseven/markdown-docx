@@ -19,6 +19,7 @@ import {
 import { createDocxTemplateFile } from "./markdown-docx/common";
 import { wordDownToPptx } from "./markdown-docx/wd-to-pptx";
 import { getWorkingDirectory } from "./common-vscode";
+import { textileToHtml } from "./tools/textileToHtml";
 
 export let isDebug = false;
 
@@ -76,7 +77,7 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand("explorer.textileToMarkdown", exportMarkdownInlineHtml)
+    vscode.commands.registerCommand("explorer.textileToMarkdown", exportTextileToMarkdown)
   );
   //  main.createDocxTemplate
   context.subscriptions.push(
@@ -128,7 +129,7 @@ function exportHtmlMarkdown(uriFile: vscode.Uri) {
     const filePath = uriFile.fsPath;
     if (filePath.match(/\.html$|\.htm$/i)) {
       // wordDown
-      const r = htmlToMarkdown(filePath);
+      const r = htmlToMarkdown(filePath, "");
       vscodeCommon.showMessage(MessageType.info, r, "extension");
     }
   } catch (error) {
@@ -234,7 +235,10 @@ async function exportTextileToMarkdown(uriFile: vscode.Uri) {
     vscodeCommon.updateStatusBar(true);
     const filePath = uriFile.fsPath;
     if (filePath.match(/\.textile$/i)) {
-      const r = await markdownToHtml(filePath, "", 0, thisOption, true);
+
+      const rHtml = textileToHtml(filePath, "");
+
+      const r = htmlToMarkdown(filePath, rHtml);
 
       vscodeCommon.showMessage(MessageType.info, r, "extension");
     }
