@@ -16,7 +16,7 @@ import { wdToEd } from "./wd-to-ed";
 import { wordDownToPptx } from "./wd-to-pptx";
 import { wdToTextile } from "./wd-to-textile";
 import { createInlineHtml } from "../tools/createInlineHtml";
-import { htmlToTextile } from "../tools/htmlToTextile";
+
 
 /**message function */
 let showMessage: ShowMessage;
@@ -142,13 +142,16 @@ export async function markdownToTextile(
     const r = await markdownToWd(
       pathMarkdown,
       selection,
-      "html",
+      "textile",
       startLine,
       option.isDebug
     );
 
     // wdToEd(wdBody, option);
-    const edBody = htmlToTextile("", r.wdBody);
+    //const edBody = htmlToTextile("", r.wdBody);
+
+    const edBody = wdToTextile(r.wdBody,showMessage);
+
     Fs.writeFileSync(fileEd, edBody);
   } catch (ex) {
     throw ex;

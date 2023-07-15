@@ -35,3 +35,17 @@ export function htmlToMarkdown(filePath: string, body: string) {
   }
   return r;
 }
+
+function testme() {
+  const source = `
+  <h1>Lists ordered</h1>
+<ol>
+	<li>Lorem ipsum dolor sit amet fffffa2<sup>x</sup><sub>y</sub>affff</li>
+	<li>Consectetur <b>adipiscing</b> elit</li>
+</ol>
+  `;
+
+  console.log(htmlToMarkdown("", source));
+}
+
+//testme();

@@ -241,8 +241,8 @@
     "package": "vsce package --target win32-x64",
     "clean": "rimraf out",
     "preesbuild-base": "npm run clean && npm run copy-wasm",
-    "esbuild-basex": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
-    "esbuild-base": "node buildme.js",
+    "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
+    "esbuild-basex": "node buildme.js",
     "esbuild": "npm run esbuild-base -- --sourcemap",
     "esbuild-only": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node -- --sourcemap",
     "test-compile": "tsc -p ./",
@@ -285,7 +285,6 @@
     "pptxgenjs": "^3.12.0",
     "svg2png-wasm": "^1.4.0",
     "tex-to-svg": "^0.2.0",
-    "textile-js": "^2.1.1",
-    "to-textile": "^0.1.1"
+    "textile-js": "^2.1.1"
   }
 }

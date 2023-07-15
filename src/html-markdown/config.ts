@@ -165,7 +165,8 @@ export const defaultTranslators: TranslatorConfigObject = {
       const smallTag = node.tagName.toLowerCase();
       const r = isWhiteSpaceOnly(content)
         ? PostProcessResult.RemoveNode
-        : `\n<${smallTag}>${content}\n</${smallTag}>\n`;
+        //: `\n<${smallTag}>${content}\n</${smallTag}>\n`;
+        : `<${smallTag}>${content}</${smallTag}>`;
       return r;
     },
   },

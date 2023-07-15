@@ -188,7 +188,7 @@ function createLine(command: string, picture: string, text: string) {
 
 function createLineEx(command: string, picture: string, text: string) {
   //textileLines.push(`${command} ${text}`);
-  textBuffer += `${command} ${text}`
+  textBuffer += `${command} ${text}`;
 }
 
 function createLineBlank(info: string, isForce = false) {
@@ -207,6 +207,7 @@ function createBlock() {
 }
 
 function flushCommand(command: WdCommand = wdCommand.non, params = [""]) {
+  
   // code
   if (
     mdCode?.hasCode &&
@@ -218,12 +219,13 @@ function flushCommand(command: WdCommand = wdCommand.non, params = [""]) {
     mdCode.createCode();
   }
 
-  if (lineCommand !== "" || textBuffer !== "") {
-    if (!!getPreviousCommand(1) && lineCommand === "") {
-      createLineBlank("flushCommand exist previous, no line command");
+  if (markupCommand || textBuffer) {
+    const previousCommand = getPreviousCommand(1);
+    if (previousCommand && markupCommand === "") {
+      createLineBlank(`flushCommand exist previous:${previousCommand}, no markup Command`);
     }
-    if (lineCommand) {
-      textileLines.push(`${lineCommand} ${textBuffer}`);
+    if (markupCommand) {
+      textileLines.push(`${markupCommand} ${textBuffer}`);
     } else {
       textileLines.push(textBuffer);
     }
@@ -232,12 +234,18 @@ function flushCommand(command: WdCommand = wdCommand.non, params = [""]) {
   // table
   mdTable.createWordDownTable();
   mdTable = new Table(0, 0);
-  lineCommand = "";
+  markupCommand = "";
   textBuffer = "";
 }
 
 function getPreviousCommand(n: number) {
   const line = textileLines[textileLines.length - n] ?? "";
+  const r = line.split("\t")[0];
+  return r;
+}
+
+function getNextCommand(n: number) {
+  const line = textileLines[textileLines.length + n] ?? "";
   const r = line.split("\t")[0];
   return r;
 }
@@ -249,20 +257,20 @@ function convertText(params: string[]) {
 function convertNormalList(params: string[]) {
   flushCommand();
   const listLevel = parseInt(params[0], 10);
-  lineCommand = "*".repeat(listLevel);
+  markupCommand = "*".repeat(listLevel);
 }
 
 function convertOderList(params: string[]) {
   flushCommand();
   const listLevel = parseInt(params[0], 10);
-  lineCommand = "#".repeat(listLevel);
+  markupCommand = "#".repeat(listLevel);
 }
 
 function convertNewline(params: string[]) {
   flushCommand(wdCommand.newLine, params);
   const newLineInfo = params[0];
   if (newLineInfo === "convertParagraph") {
-    createLineBlank("convertNewline convertParagraph");
+    //createLineBlank("convertNewline convertParagraph");
   }
 }
 
@@ -333,7 +341,7 @@ function convertTablecontentsList(params: string[]) {
   }
 }
 
-let lineCommand = "";
+let markupCommand = "";
 let textBuffer = "";
 let mdTable = new Table(0, 0);
 let mdCode: Code = new Code();
@@ -342,7 +350,7 @@ export function wdToTextile(wd: string, sm?: ShowMessage): string {
   showMessage = sm;
   textileLines = [];
   textBuffer = "";
-  lineCommand = "";
+  markupCommand = "";
 
   // convert main
   // wd0command p1 v1 p2 v2 ...
