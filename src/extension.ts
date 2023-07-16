@@ -16,7 +16,7 @@ import {
   markdownToTextile,
   
 } from "./markdown-docx/markdown-to-xxxx";
-import {wordDownToPptxBody} from "./markdown-docx/wd-to-pptxJs"
+import {wordDownToPptxBody} from "./markdown-docx/wd-to-pptxJs";
 import { createDocxTemplateFile } from "./markdown-docx/common";
 import { getWorkingDirectory } from "./common-vscode";
 import { textileToHtml } from "./tools/toolsTextile";
@@ -55,30 +55,30 @@ export function activate(context: vscode.ExtensionContext) {
 
   // explorer html to docx
   context.subscriptions.push(
-    vscode.commands.registerCommand("explorer.ExportHtmlMarkdown", exportHtmlMarkdown)
+    vscode.commands.registerCommand("explorer.ExportHtmlMarkdown", exportMarkdownFromHtml)
   );
 
   //exportMarkdownEd
   context.subscriptions.push(
-    vscode.commands.registerCommand("explorer.mdToEd", exportMarkdownEd)
+    vscode.commands.registerCommand("explorer.mdToEd", exportEdFromMarkdown)
   );
   context.subscriptions.push(
     vscode.commands.registerCommand(
       "explorer.mdToTextile",
-      exportMarkdownTextile
+      exportTextileFromMarkdown
     )
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand("explorer.mdToHtml", exportMarkdownHtml)
+    vscode.commands.registerCommand("explorer.mdToHtml", exportHtmlFromMarkdown)
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand("explorer.htmlToInlineHtml", exportMarkdownInlineHtml)
+    vscode.commands.registerCommand("explorer.htmlToInlineHtml", exportInlineHtmlFromMarkdown)
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand("explorer.textileToMarkdown", exportTextileToMarkdown)
+    vscode.commands.registerCommand("explorer.textileToMarkdown", exportMarkdownFromTextile)
   );
   //  main.createDocxTemplate
   context.subscriptions.push(
@@ -124,7 +124,7 @@ export function activate(context: vscode.ExtensionContext) {
  * convert html to markdown
  * @param uriFile
  */
-function exportHtmlMarkdown(uriFile: vscode.Uri) {
+function exportMarkdownFromHtml(uriFile: vscode.Uri) {
   try {
     vscodeCommon.updateStatusBar(true);
     const filePath = uriFile.fsPath;
@@ -140,7 +140,7 @@ function exportHtmlMarkdown(uriFile: vscode.Uri) {
   }
 }
 
-function exportMarkdownEd(uriFile: vscode.Uri) {
+function exportEdFromMarkdown(uriFile: vscode.Uri) {
   const thisOption = createDocxOptionExtension({
     ac,
     message: vscodeCommon.showMessage,
@@ -162,7 +162,7 @@ function exportMarkdownEd(uriFile: vscode.Uri) {
   }
 }
 
-function exportMarkdownTextile(uriFile: vscode.Uri) {
+function exportTextileFromMarkdown(uriFile: vscode.Uri) {
   const thisOption = createDocxOptionExtension({
     ac,
     message: vscodeCommon.showMessage,
@@ -183,7 +183,7 @@ function exportMarkdownTextile(uriFile: vscode.Uri) {
   }
 }
 
-function exportMarkdownHtml(uriFile: vscode.Uri) {
+function exportHtmlFromMarkdown(uriFile: vscode.Uri) {
   const thisOption = createDocxOptionExtension({
     ac,
     message: vscodeCommon.showMessage,
@@ -205,7 +205,7 @@ function exportMarkdownHtml(uriFile: vscode.Uri) {
   }
 }
 
-async function exportMarkdownInlineHtml(uriFile: vscode.Uri) {
+async function exportInlineHtmlFromMarkdown(uriFile: vscode.Uri) {
   const thisOption = createDocxOptionExtension({
     ac,
     message: vscodeCommon.showMessage,
@@ -226,7 +226,7 @@ async function exportMarkdownInlineHtml(uriFile: vscode.Uri) {
   }
 }
 
-async function exportTextileToMarkdown(uriFile: vscode.Uri) {
+async function exportMarkdownFromTextile(uriFile: vscode.Uri) {
   const thisOption = createDocxOptionExtension({
     ac,
     message: vscodeCommon.showMessage,
@@ -250,16 +250,7 @@ async function exportTextileToMarkdown(uriFile: vscode.Uri) {
   }
 }
 
-async function createDocxTemplate() {
-  try {
-    const wf = getWorkingDirectory();
-    await createDocxTemplateFile(wf?.uri.fsPath ?? "extension");
-  } catch (error) {
-    vscodeCommon.showMessage(MessageType.err, error, "extension");
-  } finally {
-    vscodeCommon.updateStatusBar(false);
-  }
-}
+
 
 /**
  * convert a md or a wd to a docx on a Explorer.
@@ -276,16 +267,6 @@ async function exportDocxFromExplorer(uriFile: vscode.Uri) {
   }
 }
 
-async function exportPptxFromExplorer(uriFile: vscode.Uri) {
-  try {
-    vscodeCommon.updateStatusBar(true);
-    await exportPptxFromExplorerCore(uriFile);
-  } catch (error) {
-    vscodeCommon.showMessage(MessageType.err, error, "extension");
-  } finally {
-    vscodeCommon.updateStatusBar(false);
-  }
-}
 
 /**
  * convert file(md, wd) to docx
@@ -318,6 +299,17 @@ async function exportDocxFromExplorerCore(uriFile: vscode.Uri) {
     await markdownToDocx(filePath, "", 0, thisOption);
   } catch (error) {
     vscodeCommon.showMessage(MessageType.err, error, "extension");
+  }
+}
+
+async function exportPptxFromExplorer(uriFile: vscode.Uri) {
+  try {
+    vscodeCommon.updateStatusBar(true);
+    await exportPptxFromExplorerCore(uriFile);
+  } catch (error) {
+    vscodeCommon.showMessage(MessageType.err, error, "extension");
+  } finally {
+    vscodeCommon.updateStatusBar(false);
   }
 }
 
@@ -432,7 +424,16 @@ function enableExperienceFeature(){
 
 
 
-
+async function createDocxTemplate() {
+  try {
+    const wf = getWorkingDirectory();
+    await createDocxTemplateFile(wf?.uri.fsPath ?? "extension");
+  } catch (error) {
+    vscodeCommon.showMessage(MessageType.err, error, "extension");
+  } finally {
+    vscodeCommon.updateStatusBar(false);
+  }
+}
 
 // options
 function createDocxOptionExtension(option: DocxOption) {
