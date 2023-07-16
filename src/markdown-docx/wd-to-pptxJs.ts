@@ -38,7 +38,7 @@ import {
   //PageReference,
   SimpleField,
 } from "docx";
-import { svg2imagePng } from "./svg-png-image";
+import { svg2imagePng } from "../tools/svg-png-image";
 import { runCommand } from "../tools/tools-common";
 
 

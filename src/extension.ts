@@ -227,10 +227,11 @@ async function exportInlineHtmlFromMarkdown(uriFile: vscode.Uri) {
 }
 
 async function exportMarkdownFromTextile(uriFile: vscode.Uri) {
-  const thisOption = createDocxOptionExtension({
-    ac,
-    message: vscodeCommon.showMessage,
-  });
+  // todo implement.
+  // const thisOption = createDocxOptionExtension({
+  //   ac,
+  //   message: vscodeCommon.showMessage,
+  // });
 
   try {
     vscodeCommon.updateStatusBar(true);
