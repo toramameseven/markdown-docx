@@ -1,4 +1,10 @@
-import { DocxOption, MessageType, ShowMessage, selectExistsPath } from "./common";
+import {
+  DocxOption,
+  MessageType,
+  ShowMessage,
+  selectExistsPath,
+  getFileContents
+} from "./common";
 const pptxgenx = require("pptxgenjs");
 import PptxGenJS from "pptxgenjs";
 import * as fs from "fs";
@@ -34,7 +40,181 @@ import {
 } from "docx";
 import { svg2imagePng } from "./svg-png-image";
 import { runCommand } from "../tools/tools-common";
-import { COMPRESS } from "../markdown-pptx/enums";
+
+
+export async function wordDownToPptxBody(
+  fileWd: string,
+  wdBody: string,
+  option: DocxOption
+) {
+  let body = wdBody;
+
+  if (body === ''){
+    body = getFileContents(fileWd);
+  }
+
+  try {
+    await wdToPptxJs(body, "", "outPath", Path.dirname(fileWd), option);
+  } catch (e) {
+    option.message?.(MessageType.warn, `wdToPptxJs err: ${e}.`, "wd-to-pptx", false);
+    return;
+  }
+  return;
+}
+
+/**
+ *
+ * @param wd
+ * @param docxTemplatePath
+ * @param docxOutPath
+ * @param mdSourcePath
+ */
+export async function wdToPptxJs(
+  wd: string,
+  docxTemplatePath: string,
+  docxOutPath: string,
+  mdSourcePath: string,
+  option?: DocxOption
+): Promise<void> {
+  // initialize pptx
+  let pptx: PptxGenJS = new pptxgenx();
+
+  pptx.title = "PptxGenJS Test Suite Presentation";
+  pptx.subject = "PptxGenJS Test Suite Export";
+  pptx.author = "Brent Ely";
+  pptx.revision = "15";
+
+  // FYI: use `headFontFace` and/or `bodyFontFace` to set the default font for the entire presentation (including slide Masters)
+  // pptx.theme = { bodyFontFace: "Arial" };
+  pptx.layout = "LAYOUT_WIDE";
+
+  // parse lines
+  const lines = (wd + "\nEndline").split(/\r?\n/);
+  let currentParagraph = new DocParagraph(NodeType.text);
+  let paragraphBlock: PptxGenJS.TextProps[] = [];
+  let currentSlide = pptx.addSlide();
+  let tableJs: TableJs | undefined = undefined;
+
+  const documentInfo = {
+    title: "",
+    subTitle: "",
+    division: "",
+    date: "",
+    author: "",
+    docNumber: "",
+  };
+
+  for (let i = 0; i < lines.length; i++) {
+    const wdCommandList = lines[i].split(_sp);
+
+    // when find create table
+    if (wdCommandList[0] === "tableCreate") {
+      // flush texts before.
+      const paragraph = currentParagraph.createPptxParagraph(currentSlide);
+      paragraphBlock.push(...paragraph);
+      addParagraphBlock(currentSlide, paragraphBlock);
+      paragraphBlock = [];
+
+      // initialize table.
+      tableJs = new TableJs(
+        parseInt(wdCommandList[1]),
+        parseInt(wdCommandList[2]),
+        mdSourcePath
+      );
+      continue;
+    }
+
+    // table command
+    if (wdCommandList[0].includes("table")) {
+      tableJs!.doTableCommand(lines[i]);
+    } else {
+      // in not table command, create table.
+      if (tableJs) {
+        tableJs!.createTable(currentSlide);
+        tableJs = undefined;
+      }
+    }
+
+    // image command
+    if (wdCommandList[0] === "image") {
+      // flush texts before.
+      const paragraph = currentParagraph.createPptxParagraph(currentSlide);
+      paragraphBlock.push(...paragraph);
+      addParagraphBlock(currentSlide, paragraphBlock);
+
+      paragraphBlock = [];
+
+      // initialize image
+      const image = createImageChild(mdSourcePath, wdCommandList[1]);
+      currentSlide.addImage(image);
+      continue;
+    }
+
+    // html comment command <!-- word xxxx -->
+    const isResolveCommand = resolveWordCommentsCommands(
+      wdCommandList,
+      documentInfo
+    );
+
+    if (isResolveCommand) {
+      continue;
+    }
+
+    // body commands
+    currentParagraph = await resolveWordDownCommandEx(
+      lines[i],
+      currentParagraph,
+      mdSourcePath
+    );
+
+    // when paragraph end, flush paragraph
+    if (currentParagraph.isFlush) {
+      const isNewSheet = currentParagraph.isNewSheet;
+      const paragraph = currentParagraph.createPptxParagraph(currentSlide);
+      paragraphBlock.push(...paragraph);
+
+      // reset paragraph. but keep the indent.
+      currentParagraph = new DocParagraph(
+        NodeType.text,
+        { fontSize: 10 },
+        currentParagraph.indent
+      );
+
+      if (isNewSheet) {
+        currentSlide = pptx.addSlide();
+        currentParagraph.isNewSheet = false;
+      }
+    }
+  }
+  // end loop lines
+
+  // cerate paragraph block
+  addParagraphBlock(currentSlide, paragraphBlock);
+
+  //Export Presentation
+  const ff = `PptxGenJS_Demo_${new Date()
+    .toISOString()
+    .replace(/\D/gi, "")}.pptx`;
+
+  const outPathPPtx = Path.resolve(Path.dirname(mdSourcePath), ff);
+
+  const r = await pptx.writeFile({
+    fileName: outPathPPtx,
+    compression: true,
+  });
+
+  // open ppt
+  const pptExe = await selectExistsPath(
+    [
+      "C:\\Program Files (x86)\\Microsoft Office\\root\\Office16\\POWERPNT.EXE",
+      "C:\\Program Files\\Microsoft Office\\root\\Office16\\POWERPNT.EXE",
+    ],
+    ""
+  );
+
+  runCommand(pptExe, r);
+}
+
 
 const _sp = "\t";
 //
@@ -260,6 +440,7 @@ class DocParagraph {
   docStyle: DocStyle;
   isImage: boolean;
   textPropsOptions: PptxGenJS.TextPropsOptions;
+  isNewSheet: boolean = false;
 
   constructor(
     nodeType: NodeType = NodeType.non,
@@ -327,141 +508,12 @@ class DocParagraph {
   }
 }
 
-/**
- *
- * @param wd
- * @param docxTemplatePath
- * @param docxOutPath
- * @param mdSourcePath
- */
-export async function wdToPptxJs(
-  wd: string,
-  docxTemplatePath: string,
-  docxOutPath: string,
-  mdSourcePath: string,
-  option?: DocxOption
-): Promise<void> {
-  // initialize pptx
-  let pptx: PptxGenJS = new pptxgenx();
-
-  pptx.title = "PptxGenJS Test Suite Presentation";
-  pptx.subject = "PptxGenJS Test Suite Export";
-  pptx.author = "Brent Ely";
-  pptx.revision = "15";
-
-  // FYI: use `headFontFace` and/or `bodyFontFace` to set the default font for the entire presentation (including slide Masters)
-  // pptx.theme = { bodyFontFace: "Arial" };
-  pptx.layout = "LAYOUT_WIDE";
-
-  // parse lines
-  const lines = (wd + "\nEndline").split(/\r?\n/);
-  let currentParagraph = new DocParagraph(NodeType.text);
-  let paragraphBlock: PptxGenJS.TextProps[] = [];
-  let currentSlide = pptx.addSlide();
-  let tableJs: TableJs;
-  let insideTable = false;
-
-  const documentInfo = {
-    title: "",
-    subTitle: "",
-    division: "",
-    date: "",
-    author: "",
-    docNumber: "",
-  };
-
-  for (let i = 0; i < lines.length; i++) {
-    const wdCommandList = lines[i].split(_sp);
-
-    // when find create table
-    if (wdCommandList[0] === "tableCreate") {
-      // flush texts before.
-      const paragraph = currentParagraph.createPptxParagraph(currentSlide);
-      paragraphBlock.push(...paragraph);
-      currentSlide.addText(paragraphBlock, {
-        x: 0.5,
-        y: 0.5,
-        w: 5.75,
-        h: 2.0,
-        //fill: { color: pptx.SchemeColor.background2 },
-        //color: pptx.SchemeColor.accent1,
-      });
-      paragraphBlock = [];
-
-      // initialize table.
-      tableJs = new TableJs(
-        parseInt(wdCommandList[1]),
-        parseInt(wdCommandList[2]),
-        mdSourcePath
-      );
-      insideTable = true;
-      continue;
-    }
-
-    // table command
-    if (wdCommandList[0].includes("table")) {
-      tableJs!.doTableCommand(lines[i]);
-    } else {
-      // in not table command, create table.
-      if (insideTable) {
-        tableJs!.createTable(currentSlide);
-        insideTable = false;
-      }
-    }
-
-    // image command
-    if (wdCommandList[0] === "image") {
-      // flush texts before.
-      const paragraph = currentParagraph.createPptxParagraph(currentSlide);
-      paragraphBlock.push(...paragraph);
-      currentSlide.addText(paragraphBlock, {
-        x: 0.5,
-        y: 0.5,
-        w: 5.75,
-        h: 2.0,
-        //fill: { color: pptx.SchemeColor.background2 },
-        //color: pptx.SchemeColor.accent1,
-      });
-      paragraphBlock = [];
-      
-      // initialize iamge
-      const image = createImageChild(mdSourcePath, wdCommandList[1]);
-      currentSlide.addImage(image);
-      continue;
-    }
 
 
-    // html comment command <!-- word xxxx -->
-    const isResolveCommand = resolveWordCommentsCommands(
-      wdCommandList,
-      documentInfo
-    );
-
-    if (isResolveCommand) {
-      continue;
-    }
-
-    // body commands
-    currentParagraph = await resolveWordDownCommandEx(
-      lines[i],
-      currentParagraph,
-      mdSourcePath
-    );
-
-    // when paragraph end, flush paragraph
-    if (currentParagraph.isFlush) {
-      const paragraph = currentParagraph.createPptxParagraph(currentSlide);
-      paragraphBlock.push(...paragraph);
-
-      // reset paragraph. but keep the indent.
-      currentParagraph = new DocParagraph(
-        NodeType.text,
-        { fontSize: 10 },
-        currentParagraph.indent
-      );
-    }
-  }
-
+function addParagraphBlock(
+  currentSlide: PptxGenJS.Slide,
+  paragraphBlock: PptxGenJS.TextProps[]
+) {
   // cerate paragraph block
   currentSlide.addText(paragraphBlock, {
     x: 0.5,
@@ -471,29 +523,6 @@ export async function wdToPptxJs(
     //fill: { color: pptx.SchemeColor.background2 },
     //color: pptx.SchemeColor.accent1,
   });
-
-  //Export Presentation
-  const ff = `PptxGenJS_Demo_${new Date()
-    .toISOString()
-    .replace(/\D/gi, "")}.pptx`;
-
-  const outPathPPtx = Path.resolve(Path.dirname(mdSourcePath), ff);
-
-  const r = await pptx.writeFile({
-    fileName: outPathPPtx,
-    compression: COMPRESS,
-  });
-
-  // open ppt
-  const pptExe = await selectExistsPath(
-    [
-      "C:\\Program Files (x86)\\Microsoft Office\\root\\Office16\\POWERPNT.EXE",
-      "C:\\Program Files\\Microsoft Office\\root\\Office16\\POWERPNT.EXE",
-    ],
-    ""
-  );
-
-  runCommand(pptExe, r);
 }
 
 // ############################################################
@@ -502,7 +531,6 @@ function resolveWordCommentsCommands(
   wdCommandList: string[],
   documentInfo: { [v: string]: string }
 ) {
-
   const documentInfoKeys = Object.keys(documentInfo);
   if (documentInfoKeys.includes(wdCommandList[0])) {
     documentInfo[wdCommandList[0]] = wdCommandList[1];
@@ -593,6 +621,10 @@ async function resolveWordDownCommandEx(
       // nodes.addChild(child, true);
       return docParagraph;
       break;
+    case NodeType.hr:
+      docParagraph.isFlush = true;
+      docParagraph.isNewSheet = true;
+      return docParagraph;
     case "text":
       const admonition = words[1].match(/^(note|warning)(:\s)(.*)/i);
 

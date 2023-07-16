@@ -14,10 +14,10 @@ import {
   markdownToHtml,
   markdownToPptx,
   markdownToTextile,
+  
 } from "./markdown-docx/markdown-to-xxxx";
-// import { markdownToPptx } from "./markdown-pptx/markdown-to-pptx";
+import {wordDownToPptxBody} from "./markdown-docx/wd-to-pptxJs"
 import { createDocxTemplateFile } from "./markdown-docx/common";
-import { wordDownToPptx } from "./markdown-docx/wd-to-pptx";
 import { getWorkingDirectory } from "./common-vscode";
 import { textileToHtml } from "./tools/toolsTextile";
 
@@ -338,7 +338,7 @@ async function exportPptxFromExplorerCore(uriFile: vscode.Uri) {
 
   if (filePath.match(/\.wd$/i)) {
     // wordDown
-    await wordDownToPptx(filePath, thisOption);
+    await wordDownToPptxBody(filePath, "", thisOption);
     return;
   }
 
