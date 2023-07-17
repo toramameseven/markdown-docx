@@ -2,6 +2,7 @@ import { spawn } from "child_process";
 import Encoding = require("encoding-japanese");
 import path = require("path");
 import * as Fs from "fs";
+import { fileExists } from "../markdown-docx/common";
 
 /**
  * run windows process
@@ -32,6 +33,20 @@ export function getFileContents(filePath: string) {
   const lines = fileContents.split(/\r?\n/g);
 
   return lines.join("\n");
+}
+
+export async function selectExistsPath(children: string[], pathAbsolute: string) {
+  for (let i = 0; i < children.length; i++) {
+    let filePath = children[i];
+    if (await fileExists(filePath)) {
+      return filePath;
+    }
+    filePath = path.resolve(pathAbsolute, filePath);
+    if (await fileExists(filePath)) {
+      return filePath;
+    }
+  }
+  return "";
 }
 
 

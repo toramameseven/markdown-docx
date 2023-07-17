@@ -325,16 +325,4 @@ export function vbsSpawn(
   });
 }
 
-export async function selectExistsPath(children: string[], pathAbsolute: string) {
-  for (let i = 0; i < children.length; i++) {
-    let filePath = children[i];
-    if (await fileExists(filePath)) {
-      return filePath;
-    }
-    filePath = path.resolve(pathAbsolute, filePath);
-    if (await fileExists(filePath)) {
-      return filePath;
-    }
-  }
-  return "";
-}
+

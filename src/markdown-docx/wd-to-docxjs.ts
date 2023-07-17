@@ -32,7 +32,7 @@ import {
   TableLayoutType,
   PageBreak,
 } from "docx";
-import { svg2imagePng } from "./svg-png-image";
+import { svg2imagePng } from "../tools/svg-png-image";
 
 const _sp = "\t";
 //

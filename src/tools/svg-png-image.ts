@@ -1,6 +1,6 @@
 import { svg2png, initialize } from "svg2png-wasm";
-import {/* MessageType, ShowMessage, */ selectExistsPath } from "./common";
 import { readFileSync } from "fs";
+import { selectExistsPath } from "./tools-common";
 
 let initialized = false;
 

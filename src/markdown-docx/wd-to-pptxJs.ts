@@ -1,13 +1,5 @@
-import {
-  DocxOption,
-  MessageType,
-  ShowMessage,
-  selectExistsPath,
-  getFileContents
-} from "./common";
-const pptxgenx = require("pptxgenjs");
+const pptxGen = require("pptxgenjs");
 import PptxGenJS from "pptxgenjs";
-import * as fs from "fs";
 import * as Path from "path";
 import * as imageSize from "image-size";
 const TeXToSVG = require("tex-to-svg");
@@ -39,8 +31,28 @@ import {
   SimpleField,
 } from "docx";
 import { svg2imagePng } from "../tools/svg-png-image";
-import { runCommand } from "../tools/tools-common";
+import { runCommand, selectExistsPath } from "../tools/tools-common";
+import {
+  DocxOption,
+  MessageType,
+  ShowMessage,
+  getFileContents,
+} from "./common";
 
+type PptStyle = {
+  title_slide: PptxGenJS.SlideMasterProps;
+  master_slide: PptxGenJS.SlideMasterProps;
+  thanks_slide: PptxGenJS.SlideMasterProps;
+  h1: PptxGenJS.TextPropsOptions;
+  h2: PptxGenJS.TextPropsOptions;
+  h3: PptxGenJS.TextPropsOptions;
+  h4: PptxGenJS.TextPropsOptions;
+  h5: PptxGenJS.TextPropsOptions;
+  h6: PptxGenJS.TextPropsOptions;
+  body: PptxGenJS.TextPropsOptions;
+};
+
+const pptStyle: PptStyle = require("C:\\Users\\maru\\Desktop\\github\\markdown-docx\\master-settings.js");
 
 export async function wordDownToPptxBody(
   fileWd: string,
@@ -49,14 +61,19 @@ export async function wordDownToPptxBody(
 ) {
   let body = wdBody;
 
-  if (body === ''){
+  if (body === "") {
     body = getFileContents(fileWd);
   }
 
   try {
     await wdToPptxJs(body, "", "outPath", Path.dirname(fileWd), option);
   } catch (e) {
-    option.message?.(MessageType.warn, `wdToPptxJs err: ${e}.`, "wd-to-pptx", false);
+    option.message?.(
+      MessageType.warn,
+      `wdToPptxJs err: ${e}.`,
+      "wd-to-pptx",
+      false
+    );
     return;
   }
   return;
@@ -77,22 +94,21 @@ export async function wdToPptxJs(
   option?: DocxOption
 ): Promise<void> {
   // initialize pptx
-  let pptx: PptxGenJS = new pptxgenx();
+  let pptx: PptxGenJS = new pptxGen();
 
-  pptx.title = "PptxGenJS Test Suite Presentation";
-  pptx.subject = "PptxGenJS Test Suite Export";
-  pptx.author = "Brent Ely";
-  pptx.revision = "15";
-
+  
   // FYI: use `headFontFace` and/or `bodyFontFace` to set the default font for the entire presentation (including slide Masters)
   // pptx.theme = { bodyFontFace: "Arial" };
   pptx.layout = "LAYOUT_WIDE";
+  
+  createMasterSlides(pptx);
+  //  let slide = pptx.addSlide({masterName: "MASTER_SLIDE", sectionTitle: "Text" });
+  //  slide.addText("genSlide01", { placeholder: "header" });
 
-  // parse lines
-  const lines = (wd + "\nEndline").split(/\r?\n/);
-  let currentParagraph = new DocParagraph(NodeType.text);
-  let paragraphBlock: PptxGenJS.TextProps[] = [];
-  let currentSlide = pptx.addSlide();
+  // temp objects
+  let currentSlide = pptx.addSlide({ masterName: "MASTER_SLIDE" });
+  let currentTextPropsArray: PptxGenJS.TextProps[] = [];
+  let currentParagraph = new DocParagraph(WdNodeType.text);
   let tableJs: TableJs | undefined = undefined;
 
   const documentInfo = {
@@ -104,17 +120,18 @@ export async function wdToPptxJs(
     docNumber: "",
   };
 
+  // main loop
+  const lines = (wd + "\nEndline").split(/\r?\n/);
   for (let i = 0; i < lines.length; i++) {
     const wdCommandList = lines[i].split(_sp);
 
     // when find create table
     if (wdCommandList[0] === "tableCreate") {
       // flush texts before.
-      const paragraph = currentParagraph.createPptxParagraph(currentSlide);
-      paragraphBlock.push(...paragraph);
-      addParagraphBlock(currentSlide, paragraphBlock);
-      paragraphBlock = [];
-
+      const paragraph = currentParagraph.createPptxParagraph();
+      currentTextPropsArray.push(...paragraph);
+      addTextPropsArrayToSlide(currentSlide, currentTextPropsArray);
+      currentTextPropsArray = [];
       // initialize table.
       tableJs = new TableJs(
         parseInt(wdCommandList[1]),
@@ -138,12 +155,10 @@ export async function wdToPptxJs(
     // image command
     if (wdCommandList[0] === "image") {
       // flush texts before.
-      const paragraph = currentParagraph.createPptxParagraph(currentSlide);
-      paragraphBlock.push(...paragraph);
-      addParagraphBlock(currentSlide, paragraphBlock);
-
-      paragraphBlock = [];
-
+      const paragraph = currentParagraph.createPptxParagraph();
+      currentTextPropsArray.push(...paragraph);
+      addTextPropsArrayToSlide(currentSlide, currentTextPropsArray);
+      currentTextPropsArray = [];
       // initialize image
       const image = createImageChild(mdSourcePath, wdCommandList[1]);
       currentSlide.addImage(image);
@@ -164,24 +179,27 @@ export async function wdToPptxJs(
     currentParagraph = await resolveWordDownCommandEx(
       lines[i],
       currentParagraph,
+      currentSlide,
       mdSourcePath
     );
 
     // when paragraph end, flush paragraph
-    if (currentParagraph.isFlush) {
-      const isNewSheet = currentParagraph.isNewSheet;
-      const paragraph = currentParagraph.createPptxParagraph(currentSlide);
-      paragraphBlock.push(...paragraph);
+    const isNewSheet = currentParagraph.isNewSheet;
+    if (currentParagraph.isFlush || isNewSheet) {
+      const textPropsArray = currentParagraph.createPptxParagraph();
+      currentTextPropsArray.push(...textPropsArray);
 
       // reset paragraph. but keep the indent.
       currentParagraph = new DocParagraph(
-        NodeType.text,
-        { fontSize: 10 },
+        WdNodeType.text,
+        pptStyle.body,
         currentParagraph.indent
       );
 
       if (isNewSheet) {
-        currentSlide = pptx.addSlide();
+        addTextPropsArrayToSlide(currentSlide, currentTextPropsArray);
+        currentTextPropsArray = [];
+        currentSlide = pptx.addSlide({ masterName: "MASTER_SLIDE" });
         currentParagraph.isNewSheet = false;
       }
     }
@@ -189,14 +207,20 @@ export async function wdToPptxJs(
   // end loop lines
 
   // cerate paragraph block
-  addParagraphBlock(currentSlide, paragraphBlock);
-
+  addTextPropsArrayToSlide(currentSlide, currentTextPropsArray);
+  currentTextPropsArray = [];
   //Export Presentation
   const ff = `PptxGenJS_Demo_${new Date()
     .toISOString()
     .replace(/\D/gi, "")}.pptx`;
 
   const outPathPPtx = Path.resolve(Path.dirname(mdSourcePath), ff);
+
+  pptx.title = documentInfo.title; // "PptxGenJS Test Suite Presentation";
+  pptx.subject = documentInfo.subTitle; // "PptxGenJS Test Suite Export";
+  pptx.author = documentInfo.author;
+  ("Brent Ely");
+  pptx.revision = "1";
 
   const r = await pptx.writeFile({
     fileName: outPathPPtx,
@@ -215,10 +239,20 @@ export async function wdToPptxJs(
   runCommand(pptExe, r);
 }
 
+function createMasterSlides(pptx: PptxGenJS) {
+  // TITLE_SLIDE
+  pptx.defineSlideMaster(pptStyle.title_slide);
+
+  // MASTER_SLIDE (MASTER_PLACEHOLDER)
+  pptx.defineSlideMaster(pptStyle.master_slide);
+
+  // THANKS_SLIDE (THANKS_PLACEHOLDER)
+  pptx.defineSlideMaster(pptStyle.thanks_slide);
+}
 
 const _sp = "\t";
 //
-const NodeType = {
+const WdNodeType = {
   non: "non",
   section: "section",
   heading: "heading",
@@ -269,9 +303,10 @@ const NodeType = {
   rowMerge: "rowMerge",
   emptyMerge: "emptyMerge",
 } as const;
-type NodeType = (typeof NodeType)[keyof typeof NodeType];
 
-const DocStyle = {
+type WdNodeType = (typeof WdNodeType)[keyof typeof WdNodeType];
+
+const DocxStyle = {
   "1": "1",
   Body: "body",
   Body1: "body1",
@@ -286,7 +321,7 @@ const DocStyle = {
   warning1: "warn1",
   Error: "Error",
 } as const;
-type DocStyle = (typeof DocStyle)[keyof typeof DocStyle];
+type DocxStyle = (typeof DocxStyle)[keyof typeof DocxStyle];
 
 /**
  *
@@ -433,20 +468,25 @@ class TableJs {
 }
 
 class DocParagraph {
-  nodeType: NodeType;
+  nodeType: WdNodeType;
   isFlush: boolean;
   indent: number;
+  // export interface TextProps {
+  // 	text?: string
+  // 	options?: TextPropsOptions
+  // }
   children: PptxGenJS.TextProps[] = [];
-  docStyle: DocStyle;
-  isImage: boolean;
   textPropsOptions: PptxGenJS.TextPropsOptions;
+  docxStyle: DocxStyle;
+  isImage: boolean;
   isNewSheet: boolean = false;
+  currentFontSize: number = 24;
 
   constructor(
-    nodeType: NodeType = NodeType.non,
-    textPropsOptions: PptxGenJS.TextPropsOptions = { fontSize: 10 },
+    nodeType: WdNodeType = WdNodeType.non,
+    textPropsOptions: PptxGenJS.TextPropsOptions = {},
     indent: number = 0,
-    docStyle: DocStyle = DocStyle.Body,
+    docStyle: DocxStyle = DocxStyle.Body,
     child?: PptxGenJS.TextProps
   ) {
     this.nodeType = nodeType;
@@ -454,16 +494,12 @@ class DocParagraph {
     this.textPropsOptions = textPropsOptions;
     this.indent = indent;
     this.children = child ? [child] : [];
-    this.docStyle = docStyle;
+    this.docxStyle = docStyle;
     this.isImage = false;
   }
 
-  // export interface TextProps {
-  // 	text?: string
-  // 	options?: TextPropsOptions
-  // }
-  createPptxParagraph(slide: PptxGenJS.Slide) {
-    let pStyle = this.isImage ? "picture1" : this.docStyle;
+  createPptxParagraph(): PptxGenJS.TextProps[] {
+    let pStyle = this.isImage ? "picture1" : this.docxStyle;
 
     if (pStyle === "body") {
       pStyle = `body${this.indent + 1}`;
@@ -475,7 +511,6 @@ class DocParagraph {
         options: { ...this.textPropsOptions, ...p.options },
       };
     });
-
     return r;
   }
 
@@ -508,18 +543,17 @@ class DocParagraph {
   }
 }
 
-
-
-function addParagraphBlock(
+function addTextPropsArrayToSlide(
   currentSlide: PptxGenJS.Slide,
-  paragraphBlock: PptxGenJS.TextProps[]
+  textPropsArray: PptxGenJS.TextProps[]
 ) {
   // cerate paragraph block
-  currentSlide.addText(paragraphBlock, {
+  currentSlide.addText(textPropsArray, {
     x: 0.5,
-    y: 0.5,
+    y: "15%",
     w: 5.75,
     h: 2.0,
+    valign: "top",
     //fill: { color: pptx.SchemeColor.background2 },
     //color: pptx.SchemeColor.accent1,
   });
@@ -540,21 +574,53 @@ function resolveWordCommentsCommands(
   return false;
 }
 
+function getHeaderStyle(header: string) {
+  switch (parseInt(header)) {
+    case 1:
+      return pptStyle.h1;
+    case 2:
+      return pptStyle.h2;
+    case 3:
+      return pptStyle.h3;
+    case 4:
+      return pptStyle.h4;
+    case 5:
+      return pptStyle.h5;
+    case 6:
+      return pptStyle.h6;
+    default:
+      return pptStyle.h6;
+  }
+}
+
 async function resolveWordDownCommandEx(
   line: string,
   docParagraph: DocParagraph,
+  slide: PptxGenJS.Slide,
   mdSourcePath: string
 ) {
   const words = line.split(_sp);
   let current: DocParagraph;
-  const nodeType = words[0] as NodeType;
-  let style: DocStyle;
+  const nodeType = words[0] as WdNodeType;
+  let style: DocxStyle;
   let child: PptxGenJS.TextProps;
+  let fontSize: number | undefined;
 
   switch (nodeType) {
     case "section":
-      current = new DocParagraph(NodeType.section, { fontSize: 48 });
+      // word
+      // section|1|タイトル|タイトル(slug)
+      const currentStyle = getHeaderStyle(words[1]);
+      if (words[1] === "1"){
+        current = new DocParagraph(WdNodeType.section);
+        resolveEmphasis(words[2]).forEach((x) => current.addChild(x));
+        slide.addText(current.createPptxParagraph(), { placeholder: "header", fontFace:currentStyle.fontFace });
+        return docParagraph;
+      }
+
+      current = new DocParagraph(WdNodeType.section, currentStyle);
       resolveEmphasis(words[2]).forEach((x) => current.addChild(x));
+      docParagraph.currentFontSize = currentStyle.fontSize ?? 32;
       return current;
       break;
     case "NormalList":
@@ -570,9 +636,15 @@ async function resolveWordDownCommandEx(
           indentLevel: parseInt(words[1]),
         },
       });
+      fontSize = getHeaderStyle("").fontSize;
+      if (fontSize) {
+        docParagraph.currentFontSize = fontSize;
+      } else {
+        //todo Error
+      }
       return docParagraph;
       break;
-    case NodeType.OderList:
+    case WdNodeType.OderList:
       docParagraph.addChild({
         text: " ",
         options: {
@@ -582,6 +654,12 @@ async function resolveWordDownCommandEx(
           indentLevel: parseInt(words[1]),
         },
       });
+      fontSize = getHeaderStyle("").fontSize;
+      if (fontSize) {
+        docParagraph.currentFontSize = fontSize;
+      } else {
+        //todo Error
+      }
       return docParagraph;
       break;
     case "code":
@@ -596,7 +674,7 @@ async function resolveWordDownCommandEx(
       });
       return docParagraph;
       break;
-    case NodeType.link:
+    case WdNodeType.link:
       // if (!words[3]) {
       //   let children = [];
       //   children.push(new SimpleField(` REF ${words[1]} \\w \\h `));
@@ -616,12 +694,12 @@ async function resolveWordDownCommandEx(
       // }
       return docParagraph;
       break;
-    case NodeType.image:
+    case WdNodeType.image:
       // child = createImageChild(mdSourcePath, words[1]);
       // nodes.addChild(child, true);
       return docParagraph;
       break;
-    case NodeType.hr:
+    case WdNodeType.hr:
       docParagraph.isFlush = true;
       docParagraph.isNewSheet = true;
       return docParagraph;
@@ -632,8 +710,8 @@ async function resolveWordDownCommandEx(
       if (admonition && admonition[3]) {
         s = admonition[3];
         const admonitionType = admonition[1];
-        docParagraph.nodeType = admonitionType as NodeType;
-        docParagraph.docStyle = resolveAdmonition(admonitionType);
+        docParagraph.nodeType = admonitionType as WdNodeType;
+        docParagraph.docxStyle = resolveAdmonition(admonitionType);
       }
 
       const mathBlock = s.match(/^\$(.*)\$$/);
@@ -644,7 +722,16 @@ async function resolveWordDownCommandEx(
       //   resolveEmphasis(s).forEach((x) => nodes.addChild(x));
       // }
 
-      resolveEmphasis(s).forEach((x) => docParagraph.addChild(x));
+      resolveEmphasis(s).forEach((x) =>
+        docParagraph.addChild({
+          text: x.text,
+          options: {
+            ...x.options,
+            fontSize: docParagraph.currentFontSize,
+            valign: "top",
+          },
+        })
+      );
 
       return docParagraph;
       break;
@@ -669,19 +756,19 @@ async function resolveWordDownCommandEx(
 }
 
 function resolveAdmonition(s: string) {
-  let admonition: DocStyle = DocStyle.note1;
+  let admonition: DocxStyle = DocxStyle.note1;
   switch (s.toLocaleLowerCase()) {
     case "note":
-      admonition = DocStyle.note1;
+      admonition = DocxStyle.note1;
       break;
     case "warning":
-      admonition = DocStyle.warning1;
+      admonition = DocxStyle.warning1;
       break;
     default:
       //
       break;
   }
-  return admonition as DocStyle;
+  return admonition as DocxStyle;
 }
 
 async function createMathImage(mathEq: string) {
@@ -740,6 +827,7 @@ function resolveEmphasis(source: string) {
     subscript: false,
     superscript: false,
     highlight: "",
+    //valign: "top",
   };
   let result: any;
   while ((result = rg.exec(source)) !== null) {

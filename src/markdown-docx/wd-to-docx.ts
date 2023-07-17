@@ -3,13 +3,12 @@ import {
   getFileContents,
   MessageType,
   fileExists,
-  selectExistsPath,
   vbsSpawn,
   docxTemplate001,
 } from "./common";
 import { wdToDocxJs } from "./wd-to-docxjs";
 import * as Path from "path";
-import { runCommand } from "../tools/tools-common";
+import { runCommand, selectExistsPath } from "../tools/tools-common";
 
 export async function wordDownToDocx(
   fileWd: string,
