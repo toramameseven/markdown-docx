@@ -40,9 +40,9 @@ import {
 } from "./common";
 
 type PptStyle = {
-  title_slide: PptxGenJS.SlideMasterProps;
-  master_slide: PptxGenJS.SlideMasterProps;
-  thanks_slide: PptxGenJS.SlideMasterProps;
+  titleSlide: PptxGenJS.SlideMasterProps;
+  masterSlide: PptxGenJS.SlideMasterProps;
+  thanksSlide: PptxGenJS.SlideMasterProps;
   h1: PptxGenJS.TextPropsOptions;
   h2: PptxGenJS.TextPropsOptions;
   h3: PptxGenJS.TextPropsOptions;
@@ -53,6 +53,16 @@ type PptStyle = {
 };
 
 const pptStyle: PptStyle = require("C:\\Users\\maru\\Desktop\\github\\markdown-docx\\master-settings.js");
+
+const defaultOutputPosition = {
+  x: "10%",
+  y: "15%",
+  w: "80%",
+  h: "75%",
+  valign: "top",
+  //fill: { color: pptx.SchemeColor.background2 },
+  //color: pptx.SchemeColor.accent1,
+};
 
 export async function wordDownToPptxBody(
   fileWd: string,
@@ -96,20 +106,20 @@ export async function wdToPptxJs(
   // initialize pptx
   let pptx: PptxGenJS = new pptxGen();
 
-  
   // FYI: use `headFontFace` and/or `bodyFontFace` to set the default font for the entire presentation (including slide Masters)
   // pptx.theme = { bodyFontFace: "Arial" };
   pptx.layout = "LAYOUT_WIDE";
-  
+
   createMasterSlides(pptx);
   //  let slide = pptx.addSlide({masterName: "MASTER_SLIDE", sectionTitle: "Text" });
   //  slide.addText("genSlide01", { placeholder: "header" });
 
   // temp objects
-  let currentSlide = pptx.addSlide({ masterName: "MASTER_SLIDE" });
+  let currentSlide : PptxGenJS.Slide;// = pptx.addSlide({ masterName: "MASTER_SLIDE" });
   let currentTextPropsArray: PptxGenJS.TextProps[] = [];
   let currentParagraph = new DocParagraph(WdNodeType.text);
   let tableJs: TableJs | undefined = undefined;
+  let nextPosition = defaultOutputPosition;
 
   const documentInfo = {
     title: "",
@@ -118,19 +128,46 @@ export async function wdToPptxJs(
     date: "",
     author: "",
     docNumber: "",
+    position: "",
   };
 
   // main loop
   const lines = (wd + "\nEndline").split(/\r?\n/);
+  
+  // get document information
+  const toInfoSearch = lines.length > 100 ? 100 : lines.length;
+  for (let i = 0; i < toInfoSearch; i++) {
+    const wdCommandList = lines[i].split(_sp);
+    // html comment command <!-- word xxxx -->
+    const isResolveCommand = resolveWordCommentsCommands(
+      wdCommandList,
+      documentInfo
+    );
+  }
+
+  // add title slide
+  if (documentInfo.title){
+    currentSlide = pptx.addSlide({ masterName: "TITLE_SLIDE" });
+    currentSlide.addText(documentInfo.title, {
+      placeholder: "title"
+    });
+  }
+
+  currentSlide = pptx.addSlide({ masterName: "MASTER_SLIDE" });
+
+  // main loop
   for (let i = 0; i < lines.length; i++) {
     const wdCommandList = lines[i].split(_sp);
-
     // when find create table
     if (wdCommandList[0] === "tableCreate") {
       // flush texts before.
       const paragraph = currentParagraph.createPptxParagraph();
       currentTextPropsArray.push(...paragraph);
-      addTextPropsArrayToSlide(currentSlide, currentTextPropsArray);
+      addTextPropsArrayToSlide(
+        currentSlide,
+        currentTextPropsArray,
+        nextPosition
+      );
       currentTextPropsArray = [];
       // initialize table.
       tableJs = new TableJs(
@@ -157,7 +194,11 @@ export async function wdToPptxJs(
       // flush texts before.
       const paragraph = currentParagraph.createPptxParagraph();
       currentTextPropsArray.push(...paragraph);
-      addTextPropsArrayToSlide(currentSlide, currentTextPropsArray);
+      addTextPropsArrayToSlide(
+        currentSlide,
+        currentTextPropsArray,
+        nextPosition
+      );
       currentTextPropsArray = [];
       // initialize image
       const image = createImageChild(mdSourcePath, wdCommandList[1]);
@@ -197,7 +238,11 @@ export async function wdToPptxJs(
       );
 
       if (isNewSheet) {
-        addTextPropsArrayToSlide(currentSlide, currentTextPropsArray);
+        addTextPropsArrayToSlide(
+          currentSlide,
+          currentTextPropsArray,
+          nextPosition
+        );
         currentTextPropsArray = [];
         currentSlide = pptx.addSlide({ masterName: "MASTER_SLIDE" });
         currentParagraph.isNewSheet = false;
@@ -207,7 +252,7 @@ export async function wdToPptxJs(
   // end loop lines
 
   // cerate paragraph block
-  addTextPropsArrayToSlide(currentSlide, currentTextPropsArray);
+  addTextPropsArrayToSlide(currentSlide, currentTextPropsArray, nextPosition);
   currentTextPropsArray = [];
   //Export Presentation
   const ff = `PptxGenJS_Demo_${new Date()
@@ -218,8 +263,7 @@ export async function wdToPptxJs(
 
   pptx.title = documentInfo.title; // "PptxGenJS Test Suite Presentation";
   pptx.subject = documentInfo.subTitle; // "PptxGenJS Test Suite Export";
-  pptx.author = documentInfo.author;
-  ("Brent Ely");
+  pptx.author = documentInfo.author; // ("Brent Ely");
   pptx.revision = "1";
 
   const r = await pptx.writeFile({
@@ -241,13 +285,13 @@ export async function wdToPptxJs(
 
 function createMasterSlides(pptx: PptxGenJS) {
   // TITLE_SLIDE
-  pptx.defineSlideMaster(pptStyle.title_slide);
+  pptx.defineSlideMaster(pptStyle.titleSlide);
 
   // MASTER_SLIDE (MASTER_PLACEHOLDER)
-  pptx.defineSlideMaster(pptStyle.master_slide);
+  pptx.defineSlideMaster(pptStyle.masterSlide);
 
   // THANKS_SLIDE (THANKS_PLACEHOLDER)
-  pptx.defineSlideMaster(pptStyle.thanks_slide);
+  pptx.defineSlideMaster(pptStyle.thanksSlide);
 }
 
 const _sp = "\t";
@@ -411,7 +455,7 @@ class TableJs {
   createTable(slide: PptxGenJS.Slide) {
     let rows = new Array(this.rows);
     for (let i = 0; i < this.rows; i++) {
-      rows[i] = new Array<PptxGenJS.TableCell | null>(this.columns);
+      rows[i] = new Array<PptxGenJS.TableCell | null>(0);
       for (let j = 0; j < this.columns; j++) {
         let thisWidth = {
           size: this.tableWidthArray[j],
@@ -426,12 +470,13 @@ class TableJs {
         }
 
         let pCell = this.cells[i][j];
-        const [rowSpan, columnSpan] = this.createRawColumnSpan(
+        const [rowspan, colspan] = this.createRawColumnSpan(
           i,
           j,
           this.mergedCells[i][j][0],
           this.mergedCells[i][j][1]
         );
+        console.log(`${i}-${j},${rowspan}-${colspan}`)
 
         let tCell = {
           text: pCell,
@@ -441,9 +486,11 @@ class TableJs {
           this.mergedCells[i][j][0] === -1 &&
           this.mergedCells[i][j][1] === -1
         ) {
-          rows[i][j] = null;
+          //rows[i][j] = null;
         } else {
-          rows[i][j] = tCell;
+          //rows[i][j] = {...tCell, options:{rowspan, colspan}};
+
+          rows[i].push({...tCell, options:{rowspan, colspan}});
         }
       }
     }
@@ -451,14 +498,14 @@ class TableJs {
     slide.addTable(rows, {
       x: 0,
       y: 2.1,
-      w: 7.0,
+      w: "100%",
       rowH: 0.75,
       fill: { color: "F7F7F7" },
       color: "000000",
       fontSize: 16,
       valign: "middle",
       align: "center",
-      //border: { pt: "1", color: "FFFFFF" },
+      border: { type:"solid", pt: 1, color: "000000" },
     });
   }
 
@@ -545,18 +592,11 @@ class DocParagraph {
 
 function addTextPropsArrayToSlide(
   currentSlide: PptxGenJS.Slide,
-  textPropsArray: PptxGenJS.TextProps[]
+  textPropsArray: PptxGenJS.TextProps[],
+  outputPosition: {}
 ) {
   // cerate paragraph block
-  currentSlide.addText(textPropsArray, {
-    x: 0.5,
-    y: "15%",
-    w: 5.75,
-    h: 2.0,
-    valign: "top",
-    //fill: { color: pptx.SchemeColor.background2 },
-    //color: pptx.SchemeColor.accent1,
-  });
+  currentSlide.addText(textPropsArray, outputPosition);
 }
 
 // ############################################################
@@ -566,8 +606,8 @@ function resolveWordCommentsCommands(
   documentInfo: { [v: string]: string }
 ) {
   const documentInfoKeys = Object.keys(documentInfo);
-  if (documentInfoKeys.includes(wdCommandList[0])) {
-    documentInfo[wdCommandList[0]] = wdCommandList[1];
+  if (wdCommandList[0] ==="param" && documentInfoKeys.includes(wdCommandList[1])) {
+    documentInfo[wdCommandList[1]] = wdCommandList[2];
     return true;
   }
 
@@ -611,10 +651,13 @@ async function resolveWordDownCommandEx(
       // word
       // section|1|タイトル|タイトル(slug)
       const currentStyle = getHeaderStyle(words[1]);
-      if (words[1] === "1"){
+      if (words[1] === "1") {
         current = new DocParagraph(WdNodeType.section);
         resolveEmphasis(words[2]).forEach((x) => current.addChild(x));
-        slide.addText(current.createPptxParagraph(), { placeholder: "header", fontFace:currentStyle.fontFace });
+        slide.addText(current.createPptxParagraph(), {
+          placeholder: "header",
+          fontFace: currentStyle.fontFace,
+        });
         return docParagraph;
       }
 

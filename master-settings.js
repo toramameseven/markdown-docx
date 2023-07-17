@@ -24,7 +24,7 @@ const h6 = { ...mainFont, fontSize: 18 };
 const body = { ...mainFont, fontSize: 18 };
 
 // TITLE_SLIDE
-const title_slide = {
+const titleSlide = {
   title: "TITLE_SLIDE",
   //background: objBkg,
   //background: { color: "46e0e0", transparency: 50 },
@@ -33,6 +33,25 @@ const title_slide = {
     //{ 'line':  { x:3.5, y:1.0, w:6.0, h:0.0, line:{color:'0088CC'}, lineSize:5 } },
     //{ 'chart': { type:'PIE', data:[{labels:['R','G','B'], values:[10,10,5]}], options:{x:11.3, y:0.0, w:2, h:2, dataLabelFontSize:9} } },
     //{ 'image': { x:11.3, y:6.4, w:1.67, h:0.75, data:STARLABS_LOGO_SM } },
+    {
+      placeholder: {
+        options: {
+          name: "title",
+          type: "title",
+          x: "10%",
+          y: "40%",
+          w: "80%",
+          h: "20%",
+          margin: 0,
+          align: "middle",
+          valign: "middle",
+          color: "404040",
+          fontSize: 36,
+          ...mainFont
+        },
+        text: "", // USAGE: Leave blank to have powerpoint substitute default placeholder text (ex: "Click to add title")
+      },
+    },
     {
       rect: { x: 0.0, y: 5.7, w: "100%", h: 0.75, fill: { color: "F1F1F1" } },
     },
@@ -57,7 +76,7 @@ const title_slide = {
 };
 
 // MASTER_SLIDE (MASTER_PLACEHOLDER)
-const master_slide = {
+const masterSlide = {
   title: "MASTER_SLIDE",
   background: { color: "46e0e0", transparency: 50 },
   // background: { color: "E1E1E1", transparency: 50 },
@@ -118,7 +137,7 @@ const master_slide = {
 };
 
 // THANKS_SLIDE (THANKS_PLACEHOLDER)
-const thanks_slide = {
+const thanksSlide = {
   title: "THANKS_SLIDE",
   background: { color: "36ABFF" }, // CORRECT WAY TO SET BACKGROUND COLOR
   //bkgd: "36ABFF", // [[BACKWARDS-COMPAT/DEPRECATED/UAT (`bkgd` will be removed in v4.x)]] **DO NOT USE THIS IN YOUR CODE**
@@ -163,7 +182,7 @@ const thanks_slide = {
   ],
 };
 
-
+// style samples
 
 const BASE_TABLE_OPTS = { x: 0.5, y: 0.13, colW: [9, 3.33] }; // LAYOUT_WIDE w=12.33
 
@@ -240,9 +259,9 @@ const DEMO_TITLE_OPTS = { fontSize: 13, color: "9F9F9F" };
 const LOREM_IPSUM_ENG = "LOREM_IPSUM_ENG";
 
 module.exports = {
-  title_slide,
-  master_slide,
-  thanks_slide,
+  titleSlide: titleSlide,
+  masterSlide: masterSlide,
+  thanksSlide: thanksSlide,
   h1,
   h2,
   h3,
