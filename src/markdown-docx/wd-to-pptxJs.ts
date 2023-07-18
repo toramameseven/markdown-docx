@@ -1,5 +1,5 @@
-const pptxGen = require("pptxgenjs");
-import PptxGenJS from "pptxgenjs";
+import pptxGen from "pptxgenjs";
+import type PptxGenJS from "pptxgenjs";
 import * as Path from "path";
 import * as imageSize from "image-size";
 const TeXToSVG = require("tex-to-svg");
@@ -52,6 +52,8 @@ type PptStyle = {
   body: PptxGenJS.TextPropsOptions;
 };
 
+type TextFrame = { textPropsArray: PptxGenJS.TextProps[]; outputPosition: {} };
+
 const pptStyle: PptStyle = require("C:\\Users\\maru\\Desktop\\github\\markdown-docx\\master-settings.js");
 
 const defaultOutputPosition = {
@@ -76,7 +78,7 @@ export async function wordDownToPptxBody(
   }
 
   try {
-    await wdToPptxJs(body, "", "outPath", Path.dirname(fileWd), option);
+    await wdToPptxJs(body, Path.dirname(fileWd));
   } catch (e) {
     option.message?.(
       MessageType.warn,
@@ -91,17 +93,14 @@ export async function wordDownToPptxBody(
 
 /**
  *
- * @param wd
+ * @param body
  * @param docxTemplatePath
  * @param docxOutPath
  * @param mdSourcePath
  */
 export async function wdToPptxJs(
-  wd: string,
-  docxTemplatePath: string,
-  docxOutPath: string,
-  mdSourcePath: string,
-  option?: DocxOption
+  body: string,
+  mdSourcePath: string
 ): Promise<void> {
   // initialize pptx
   let pptx: PptxGenJS = new pptxGen();
@@ -111,15 +110,9 @@ export async function wdToPptxJs(
   pptx.layout = "LAYOUT_WIDE";
 
   createMasterSlides(pptx);
-  //  let slide = pptx.addSlide({masterName: "MASTER_SLIDE", sectionTitle: "Text" });
-  //  slide.addText("genSlide01", { placeholder: "header" });
 
   // temp objects
-  let currentSlide : PptxGenJS.Slide;// = pptx.addSlide({ masterName: "MASTER_SLIDE" });
-  let currentTextPropsArray: PptxGenJS.TextProps[] = [];
-  let currentParagraph = new DocParagraph(WdNodeType.text);
-  let tableJs: TableJs | undefined = undefined;
-  let nextPosition = defaultOutputPosition;
+  let currentSlide: PptxGenJS.Slide; // = pptx.addSlide({ masterName: "MASTER_SLIDE" });
 
   const documentInfo = {
     title: "",
@@ -131,44 +124,44 @@ export async function wdToPptxJs(
     position: "",
   };
 
-  // main loop
-  const lines = (wd + "\nEndline").split(/\r?\n/);
-  
+  // get lines
+  const lines = (body + "\nEndline").split(/\r?\n/);
+
   // get document information
   const toInfoSearch = lines.length > 100 ? 100 : lines.length;
   for (let i = 0; i < toInfoSearch; i++) {
     const wdCommandList = lines[i].split(_sp);
     // html comment command <!-- word xxxx -->
-    const isResolveCommand = resolveWordCommentsCommands(
-      wdCommandList,
-      documentInfo
-    );
+    resolveWordCommentsCommands(wdCommandList, documentInfo);
   }
 
   // add title slide
-  if (documentInfo.title){
+  if (documentInfo.title) {
     currentSlide = pptx.addSlide({ masterName: "TITLE_SLIDE" });
     currentSlide.addText(documentInfo.title, {
-      placeholder: "title"
+      placeholder: "title",
     });
   }
 
   currentSlide = pptx.addSlide({ masterName: "MASTER_SLIDE" });
+  const currentSheet = new PptSheet();
+  currentSheet.addSetPosition(defaultOutputPosition);
+  currentSheet.setSlide(currentSlide);
+
+  let currentDocxParagraph = new DocParagraph(WdNodeType.text);
+  let tableJs: TableJs | undefined = undefined;
 
   // main loop
   for (let i = 0; i < lines.length; i++) {
     const wdCommandList = lines[i].split(_sp);
+
     // when find create table
     if (wdCommandList[0] === "tableCreate") {
-      // flush texts before.
-      const paragraph = currentParagraph.createPptxParagraph();
-      currentTextPropsArray.push(...paragraph);
-      addTextPropsArrayToSlide(
-        currentSlide,
-        currentTextPropsArray,
-        nextPosition
-      );
-      currentTextPropsArray = [];
+      // flush texts before creating tables.
+      const textPropsArray = currentDocxParagraph.createTextPropsArray();
+      currentSheet.addTextPropsArray(...textPropsArray);
+      currentSheet.addTextFrame();
+
       // initialize table.
       tableJs = new TableJs(
         parseInt(wdCommandList[1]),
@@ -184,25 +177,27 @@ export async function wdToPptxJs(
     } else {
       // in not table command, create table.
       if (tableJs) {
-        tableJs!.createTable(currentSlide);
+        const r = tableJs!.createTable();
+        currentSheet.addTable(r);
         tableJs = undefined;
       }
     }
 
     // image command
     if (wdCommandList[0] === "image") {
-      // flush texts before.
-      const paragraph = currentParagraph.createPptxParagraph();
-      currentTextPropsArray.push(...paragraph);
-      addTextPropsArrayToSlide(
-        currentSlide,
-        currentTextPropsArray,
-        nextPosition
-      );
-      currentTextPropsArray = [];
+      //create text frame
+      const textPropsArray = currentDocxParagraph.createTextPropsArray();
+      currentSheet.addTextPropsArray(...textPropsArray);
+      currentSheet.addTextFrame();
+
       // initialize image
-      const image = createImageChild(mdSourcePath, wdCommandList[1]);
-      currentSlide.addImage(image);
+      const image = createImageChild(
+        mdSourcePath,
+        wdCommandList[1],
+        wdCommandList[2],
+        pptx
+      );
+      currentSheet.addImage(image);
       continue;
     }
 
@@ -217,43 +212,44 @@ export async function wdToPptxJs(
     }
 
     // body commands
-    currentParagraph = await resolveWordDownCommandEx(
+    currentDocxParagraph = await resolveWordDownCommandEx(
       lines[i],
-      currentParagraph,
+      currentDocxParagraph,
       currentSlide,
       mdSourcePath
     );
 
     // when paragraph end, flush paragraph
-    const isNewSheet = currentParagraph.isNewSheet;
-    if (currentParagraph.isFlush || isNewSheet) {
-      const textPropsArray = currentParagraph.createPptxParagraph();
-      currentTextPropsArray.push(...textPropsArray);
+    const isNewSheet = currentDocxParagraph.isNewSheet;
+    if (currentDocxParagraph.isFlush || isNewSheet) {
+      const textPropsArray = currentDocxParagraph.createTextPropsArray();
+      currentSheet.addTextPropsArray(...textPropsArray);
 
       // reset paragraph. but keep the indent.
-      currentParagraph = new DocParagraph(
+      currentDocxParagraph = new DocParagraph(
         WdNodeType.text,
         pptStyle.body,
-        currentParagraph.indent
+        currentDocxParagraph.indent
       );
 
       if (isNewSheet) {
-        addTextPropsArrayToSlide(
-          currentSlide,
-          currentTextPropsArray,
-          nextPosition
-        );
-        currentTextPropsArray = [];
+        currentSheet.addTextFrame();
+        currentSheet.createSheet();
+
+        // new sheet
         currentSlide = pptx.addSlide({ masterName: "MASTER_SLIDE" });
-        currentParagraph.isNewSheet = false;
+        currentSheet.setSlide(currentSlide);
+        currentDocxParagraph.isNewSheet = false;
       }
     }
   }
   // end loop lines
 
-  // cerate paragraph block
-  addTextPropsArrayToSlide(currentSlide, currentTextPropsArray, nextPosition);
-  currentTextPropsArray = [];
+  const textPropsArray = currentDocxParagraph.createTextPropsArray();
+  currentSheet.addTextPropsArray(...textPropsArray);
+  currentSheet.addTextFrame();
+  currentSheet.createSheet();
+
   //Export Presentation
   const ff = `PptxGenJS_Demo_${new Date()
     .toISOString()
@@ -283,15 +279,20 @@ export async function wdToPptxJs(
   runCommand(pptExe, r);
 }
 
+/**
+ *
+ * @param pptx
+ */
 function createMasterSlides(pptx: PptxGenJS) {
+  // https://github.com/gitbrent/PptxGenJS/issues/1175
   // TITLE_SLIDE
-  pptx.defineSlideMaster(pptStyle.titleSlide);
+  pptx.defineSlideMaster(JSON.parse(JSON.stringify(pptStyle.titleSlide)));
 
   // MASTER_SLIDE (MASTER_PLACEHOLDER)
-  pptx.defineSlideMaster(pptStyle.masterSlide);
+  pptx.defineSlideMaster(JSON.parse(JSON.stringify(pptStyle.masterSlide)));
 
   // THANKS_SLIDE (THANKS_PLACEHOLDER)
-  pptx.defineSlideMaster(pptStyle.thanksSlide);
+  pptx.defineSlideMaster(JSON.parse(JSON.stringify(pptStyle.thanksSlide)));
 }
 
 const _sp = "\t";
@@ -326,6 +327,7 @@ const WdNodeType = {
   table: "table",
   tablerow: "tablerow",
   tablecell: "tablecell",
+  tablePos: "tablePos",
   text: "text",
   image: "image",
   link: "link",
@@ -370,6 +372,67 @@ type DocxStyle = (typeof DocxStyle)[keyof typeof DocxStyle];
 /**
  *
  */
+class PptSheet {
+  images: pptxGen.ImageProps[] = [];
+  tables: { tableRows: pptxGen.TableRow[]; options?: pptxGen.TableProps }[] =
+    [];
+  texts: TextFrame[] = [];
+  slide?: pptxGen.Slide;
+  currentTextPropsArray: PptxGenJS.TextProps[] = [];
+  currentTextPropPosition: {} = {};
+
+  setSlide(slide: pptxGen.Slide) {
+    this.slide = slide;
+    this.clear();
+  }
+
+  addImage(image: {}) {
+    this.images.push(image);
+  }
+
+  addTable(table: {
+    tableRows: pptxGen.TableRow[];
+    options?: pptxGen.TableProps;
+  }) {
+    this.tables.push(table);
+  }
+
+  addTextPropsArray(...arr: PptxGenJS.TextProps[]) {
+    this.currentTextPropsArray.push(...arr);
+  }
+
+  addSetPosition(position: {}) {
+    this.currentTextPropPosition = position;
+  }
+
+  addTextFrame() {
+    this.texts.push({
+      textPropsArray: this.currentTextPropsArray,
+      outputPosition: this.currentTextPropPosition,
+    });
+    this.currentTextPropsArray = [];
+  }
+
+  createSheet() {
+    if (this.slide) {
+      this.images.forEach((x) => this.slide!.addImage(x));
+      this.tables.forEach((x) => this.slide!.addTable(x.tableRows, x.options));
+      this.texts.forEach((x) =>
+        this.slide!.addText(x.textPropsArray, x.outputPosition)
+      );
+    }
+  }
+
+  clear() {
+    this.images = [];
+    this.tables = [];
+    this.texts = [];
+  }
+}
+
+/**
+ *
+ */
 class TableJs {
   rows: number;
   columns: number;
@@ -380,6 +443,7 @@ class TableJs {
   mergedCells: number[][][];
   tableWidthArray: number[];
   mdSourcePath: string;
+  tablePosition = {};
 
   constructor(rows: number, columns: number, mdSourcePath: string) {
     this.row = 0;
@@ -396,11 +460,16 @@ class TableJs {
       this.mergedCells[r] = new Array(columns);
     }
     this.tableWidthArray = [];
+    this.tablePosition = getPositionPCT("10,10,80,80");
   }
 
   doTableCommand(line: string) {
     const words = line.split(_sp);
     switch (words[0]) {
+      case "tablePos":
+        this.tablePosition = getPositionPCT(words[1]);
+        return;
+        break;
       case "tableWidthInfo":
         const widthArray = words[1].split(",").map((l) => parseInt(l));
         const sums = widthArray.reduce(function (a, x) {
@@ -452,10 +521,10 @@ class TableJs {
     }
   }
 
-  createTable(slide: PptxGenJS.Slide) {
-    let rows = new Array(this.rows);
+  createTable() {
+    let rows: pptxGen.TableRow[] = new Array(this.rows);
     for (let i = 0; i < this.rows; i++) {
-      rows[i] = new Array<PptxGenJS.TableCell | null>(0);
+      rows[i] = new Array<PptxGenJS.TableCell>(0);
       for (let j = 0; j < this.columns; j++) {
         let thisWidth = {
           size: this.tableWidthArray[j],
@@ -476,7 +545,7 @@ class TableJs {
           this.mergedCells[i][j][0],
           this.mergedCells[i][j][1]
         );
-        console.log(`${i}-${j},${rowspan}-${colspan}`)
+        console.log(`${i}-${j},${rowspan}-${colspan}`);
 
         let tCell = {
           text: pCell,
@@ -490,12 +559,12 @@ class TableJs {
         } else {
           //rows[i][j] = {...tCell, options:{rowspan, colspan}};
 
-          rows[i].push({...tCell, options:{rowspan, colspan}});
+          rows[i].push({ ...tCell, options: { rowspan, colspan } });
         }
       }
     }
 
-    slide.addTable(rows, {
+    const options: pptxGen.TableProps = {
       x: 0,
       y: 2.1,
       w: "100%",
@@ -505,8 +574,24 @@ class TableJs {
       fontSize: 16,
       valign: "middle",
       align: "center",
-      border: { type:"solid", pt: 1, color: "000000" },
-    });
+      border: { type: "solid", pt: 1, color: "000000" },
+      ...this.tablePosition
+    };
+
+    // { tableRows: pptxGen.TableRow[]; options?: pptxGen.TableProps }
+    return { tableRows: rows, options };
+    // slide.addTable(rows, {
+    //   x: 0,
+    //   y: 2.1,
+    //   w: "100%",
+    //   rowH: 0.75,
+    //   fill: { color: "F7F7F7" },
+    //   color: "000000",
+    //   fontSize: 16,
+    //   valign: "middle",
+    //   align: "center",
+    //   border: { type: "solid", pt: 1, color: "000000" },
+    // });
   }
 
   createRawColumnSpan(r1: number, c1: number, r2: number, c2: number) {
@@ -545,7 +630,7 @@ class DocParagraph {
     this.isImage = false;
   }
 
-  createPptxParagraph(): PptxGenJS.TextProps[] {
+  createTextPropsArray(): PptxGenJS.TextProps[] {
     let pStyle = this.isImage ? "picture1" : this.docxStyle;
 
     if (pStyle === "body") {
@@ -590,23 +675,23 @@ class DocParagraph {
   }
 }
 
-function addTextPropsArrayToSlide(
-  currentSlide: PptxGenJS.Slide,
-  textPropsArray: PptxGenJS.TextProps[],
-  outputPosition: {}
-) {
-  // cerate paragraph block
-  currentSlide.addText(textPropsArray, outputPosition);
-}
-
 // ############################################################
 
+/**
+ *
+ * @param wdCommandList
+ * @param documentInfo
+ * @returns
+ */
 function resolveWordCommentsCommands(
   wdCommandList: string[],
   documentInfo: { [v: string]: string }
 ) {
   const documentInfoKeys = Object.keys(documentInfo);
-  if (wdCommandList[0] ==="param" && documentInfoKeys.includes(wdCommandList[1])) {
+  if (
+    wdCommandList[0] === "param" &&
+    documentInfoKeys.includes(wdCommandList[1])
+  ) {
     documentInfo[wdCommandList[1]] = wdCommandList[2];
     return true;
   }
@@ -614,6 +699,11 @@ function resolveWordCommentsCommands(
   return false;
 }
 
+/**
+ *
+ * @param header
+ * @returns
+ */
 function getHeaderStyle(header: string) {
   switch (parseInt(header)) {
     case 1:
@@ -633,6 +723,14 @@ function getHeaderStyle(header: string) {
   }
 }
 
+/**
+ *
+ * @param line
+ * @param docParagraph
+ * @param slide
+ * @param mdSourcePath
+ * @returns
+ */
 async function resolveWordDownCommandEx(
   line: string,
   docParagraph: DocParagraph,
@@ -654,7 +752,7 @@ async function resolveWordDownCommandEx(
       if (words[1] === "1") {
         current = new DocParagraph(WdNodeType.section);
         resolveEmphasis(words[2]).forEach((x) => current.addChild(x));
-        slide.addText(current.createPptxParagraph(), {
+        slide.addText(current.createTextPropsArray(), {
           placeholder: "header",
           fontFace: currentStyle.fontFace,
         });
@@ -798,6 +896,11 @@ async function resolveWordDownCommandEx(
   }
 }
 
+/**
+ *
+ * @param s
+ * @returns
+ */
 function resolveAdmonition(s: string) {
   let admonition: DocxStyle = DocxStyle.note1;
   switch (s.toLocaleLowerCase()) {
@@ -814,6 +917,11 @@ function resolveAdmonition(s: string) {
   return admonition as DocxStyle;
 }
 
+/**
+ *
+ * @param mathEq
+ * @returns
+ */
 async function createMathImage(mathEq: string) {
   const options = {
     width: 1280,
@@ -838,7 +946,39 @@ async function createMathImage(mathEq: string) {
   return child;
 }
 
-function createImageChild(mdSourcePath: string, imagePathR: string) {
+function getPosition(position: string, pptx: pptxGen) {
+  const positions = position.split(",");
+
+  const x: number = parseFloat(positions[0]) * pptx.presLayout.width * 0.01;
+  const y: number = parseFloat(positions[1]) * pptx.presLayout.height * 0.01;
+  const w: number = parseFloat(positions[2]) * pptx.presLayout.width * 0.01;
+  const h: number = parseFloat(positions[3]) * pptx.presLayout.height * 0.01;
+
+  return { x, y, w, h };
+}
+
+function getPositionPCT(position: string) {
+  const positions = position.split(",");
+  return {
+    x: `${positions[0]}%`,
+    y: `${positions[1]}%`,
+    w: `${positions[2]}%`,
+    h: `${positions[3]}%`,
+  };
+}
+
+/**
+ *
+ * @param mdSourcePath
+ * @param imagePathR
+ * @returns
+ */
+function createImageChild(
+  mdSourcePath: string,
+  imagePathR: string,
+  imageAlt: string,
+  pptx: pptxGen
+) {
   const imagePath = Path.resolve(mdSourcePath, imagePathR);
 
   const sizeImage = imageSize.imageSize(imagePath);
@@ -854,10 +994,16 @@ function createImageChild(mdSourcePath: string, imagePathR: string) {
     height *= r;
   }
 
-  //slide.addImage({ path: IMAGE_PATHS.ccLogo.path, x: 9.9, y: 1.1, w: 2.5, h: 2.5, rounding: true });
-  return { path: imagePath, x: 3, y: 3, w: 2.5, h: 2.5, rounding: true };
+  const positions = getPosition(imageAlt, pptx);
+
+  return { path: imagePath, ...positions };
 }
 
+/**
+ *
+ * @param source
+ * @returns
+ */
 function resolveEmphasis(source: string) {
   let rg = /<(|\/)sub>|<(|\/)sup>|<(|\/)codespan>|<(|\/)i>|<(|\/)b>|<(|\/)~~>/g;
 

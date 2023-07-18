@@ -21,6 +21,10 @@
     "prefix": "word rowMerge",
     "body": ["<!-- word rowMerge $1-$2, -->"]
   },
+  "table position": {
+    "prefix": "word tablePos",
+    "body": ["<!-- word tablePos $1,$2,$3,$4 -->"]
+  },
   "table emptyMerge": {
     "prefix": "word emptyMerge",
     "body": ["<!-- word emptyMerge -->"]
