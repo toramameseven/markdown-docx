@@ -1,4 +1,6 @@
 const { inlineSource } = require("inline-source");
+//import { inlineSource } from "inline-source";
+//import * as inlineSource from "inline-source";
 
 import * as path from "path";
 

@@ -1,6 +1,6 @@
 import { getFileContents } from "./tools-common";
 // const toTextile = require('to-textile');
-const toHtml = require('textile-js');
+const toHtml = require("textile-js");
 // https://github.com/borgar/textile-js
 
 // export function htmlToTextile(filePath: string, body: string){
@@ -12,9 +12,9 @@ const toHtml = require('textile-js');
 //   return textile;
 // }
 
-export function textileToHtml(filePath:string, body:string){
+export function textileToHtml(filePath: string, body: string) {
   let s = body;
-  if (s === ""){
+  if (s === "") {
     s = getFileContents(filePath);
   }
   const html = toHtml(s);

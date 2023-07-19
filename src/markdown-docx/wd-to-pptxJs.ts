@@ -4,32 +4,6 @@ import * as Path from "path";
 import * as imageSize from "image-size";
 const TeXToSVG = require("tex-to-svg");
 
-import {
-  Bookmark,
-  ExternalHyperlink,
-  //HeadingLevel,
-  ImageRun,
-  //Indent,
-  //InternalHyperlink,
-  Paragraph,
-  ParagraphChild,
-  patchDocument,
-
-  //PatchDocumentOptions,
-  PatchType,
-  Table,
-  //TableCell,
-  //TableRow,
-  //TextDirection,
-  TableOfContents,
-  TextRun,
-  //VerticalAlign,
-  WidthType,
-  // Document as DocumentDocx,
-  //convertInchesToTwip,
-  //PageReference,
-  SimpleField,
-} from "docx";
 import { svg2imagePng } from "../tools/svg-png-image";
 import { runCommand, selectExistsPath } from "../tools/tools-common";
 import {
@@ -54,7 +28,19 @@ type PptStyle = {
 
 type TextFrame = { textPropsArray: PptxGenJS.TextProps[]; outputPosition: {} };
 
-const pptStyle: PptStyle = require("C:\\Users\\maru\\Desktop\\github\\markdown-docx\\master-settings.js");
+let pptStyle: PptStyle = {
+  titleSlide: { title: "" },
+  masterSlide: { title: "" },
+  thanksSlide: { title: "" },
+  h1: {},
+  h2: {},
+  h3: {},
+  h4: {},
+  h5: {},
+  h6: {},
+  body: {},
+};
+
 
 const defaultOutputPosition = {
   x: "10%",
@@ -94,26 +80,12 @@ export async function wordDownToPptxBody(
 /**
  *
  * @param body
- * @param docxTemplatePath
- * @param docxOutPath
  * @param mdSourcePath
  */
 export async function wdToPptxJs(
   body: string,
   mdSourcePath: string
 ): Promise<void> {
-  // initialize pptx
-  let pptx: PptxGenJS = new pptxGen();
-
-  // FYI: use `headFontFace` and/or `bodyFontFace` to set the default font for the entire presentation (including slide Masters)
-  // pptx.theme = { bodyFontFace: "Arial" };
-  pptx.layout = "LAYOUT_WIDE";
-
-  createMasterSlides(pptx);
-
-  // temp objects
-  let currentSlide: PptxGenJS.Slide; // = pptx.addSlide({ masterName: "MASTER_SLIDE" });
-
   const documentInfo = {
     title: "",
     subTitle: "",
@@ -122,6 +94,7 @@ export async function wdToPptxJs(
     author: "",
     docNumber: "",
     position: "",
+    pptxSettings: "",
   };
 
   // get lines
@@ -134,19 +107,42 @@ export async function wdToPptxJs(
     // html comment command <!-- word xxxx -->
     resolveWordCommentsCommands(wdCommandList, documentInfo);
   }
+  
+  // get ppt settings
+  const settingPath = await selectExistsPath(
+    [
+      documentInfo.pptxSettings,
+      Path.resolve(mdSourcePath, documentInfo.pptxSettings),
+      "../master-settings.js",
+      "../../master-settings.js",
+    ],
+    __dirname
+  );
+  pptStyle = require(settingPath);
+
+  // initialize pptx
+  let pptx: PptxGenJS = new pptxGen();
+
+  // FYI: use `headFontFace` and/or `bodyFontFace` to set the default font for the entire presentation (including slide Masters)
+  // pptx.theme = { bodyFontFace: "Arial" };
+  pptx.layout = "LAYOUT_WIDE";
+
+  // create master slide, some bugs in the slide number.
+  createMasterSlides(pptx);
+
+  // create sheet object
+  const currentSheet = new PptSheet(pptx);  
+  currentSheet.addSetPosition(defaultOutputPosition);
 
   // add title slide
   if (documentInfo.title) {
-    currentSlide = pptx.addSlide({ masterName: "TITLE_SLIDE" });
-    currentSlide.addText(documentInfo.title, {
-      placeholder: "title",
-    });
+    currentSheet.addTitleSlide(documentInfo);
   }
 
-  currentSlide = pptx.addSlide({ masterName: "MASTER_SLIDE" });
-  const currentSheet = new PptSheet();
-  currentSheet.addSetPosition(defaultOutputPosition);
-  currentSheet.setSlide(currentSlide);
+  // currentSlide = pptx.addSlide({ masterName: "MASTER_SLIDE" });
+  // currentSheet.addSetPosition(defaultOutputPosition);
+  // currentSheet.setSlide(currentSlide);
+  currentSheet.addMasterSlide();
 
   let currentDocxParagraph = new DocParagraph(WdNodeType.text);
   let tableJs: TableJs | undefined = undefined;
@@ -215,7 +211,7 @@ export async function wdToPptxJs(
     currentDocxParagraph = await resolveWordDownCommandEx(
       lines[i],
       currentDocxParagraph,
-      currentSlide,
+      currentSheet,
       mdSourcePath
     );
 
@@ -224,7 +220,7 @@ export async function wdToPptxJs(
     if (currentDocxParagraph.isFlush || isNewSheet) {
       const textPropsArray = currentDocxParagraph.createTextPropsArray();
       currentSheet.addTextPropsArray(...textPropsArray);
-
+      
       // reset paragraph. but keep the indent.
       currentDocxParagraph = new DocParagraph(
         WdNodeType.text,
@@ -237,8 +233,7 @@ export async function wdToPptxJs(
         currentSheet.createSheet();
 
         // new sheet
-        currentSlide = pptx.addSlide({ masterName: "MASTER_SLIDE" });
-        currentSheet.setSlide(currentSlide);
+        currentSheet.addMasterSlide();
         currentDocxParagraph.isNewSheet = false;
       }
     }
@@ -380,10 +375,30 @@ class PptSheet {
   slide?: pptxGen.Slide;
   currentTextPropsArray: PptxGenJS.TextProps[] = [];
   currentTextPropPosition: {} = {};
+  pptx: PptxGenJS;
 
-  setSlide(slide: pptxGen.Slide) {
-    this.slide = slide;
+  constructor(pptx: PptxGenJS){
+    this.pptx = pptx;
+  }
+
+  addTitleSlide(documentInfo: {title?: string}){
+    this.slide = this.pptx.addSlide({ masterName: "TITLE_SLIDE" });
+    this.slide.addText(documentInfo.title!, {
+      placeholder: "title",
+    });
+  }
+
+  addMasterSlide(){
+    this.slide = this.pptx.addSlide({ masterName: "MASTER_SLIDE" });
     this.clear();
+    // add position
+  }
+
+  addHeader(textPropsArray: pptxGen.TextProps[], textPropsOptions: pptxGen.TextPropsOptions){
+    this.slide!.addText(textPropsArray, {
+      placeholder: "header",
+      ...textPropsOptions
+    });
   }
 
   addImage(image: {}) {
@@ -528,13 +543,13 @@ class TableJs {
       for (let j = 0; j < this.columns; j++) {
         let thisWidth = {
           size: this.tableWidthArray[j],
-          type: WidthType.PERCENTAGE,
+          //type: pptxGen .PERCENTAGE,
         };
 
         if (this.tableWidthArray.length > 0) {
           thisWidth = {
             size: this.tableWidthArray[j],
-            type: WidthType.PERCENTAGE,
+            //type: WidthType.PERCENTAGE,
           };
         }
 
@@ -575,7 +590,7 @@ class TableJs {
       valign: "middle",
       align: "center",
       border: { type: "solid", pt: 1, color: "000000" },
-      ...this.tablePosition
+      ...this.tablePosition,
     };
 
     // { tableRows: pptxGen.TableRow[]; options?: pptxGen.TableProps }
@@ -734,7 +749,7 @@ function getHeaderStyle(header: string) {
 async function resolveWordDownCommandEx(
   line: string,
   docParagraph: DocParagraph,
-  slide: PptxGenJS.Slide,
+  slide: PptSheet,
   mdSourcePath: string
 ) {
   const words = line.split(_sp);
@@ -752,10 +767,7 @@ async function resolveWordDownCommandEx(
       if (words[1] === "1") {
         current = new DocParagraph(WdNodeType.section);
         resolveEmphasis(words[2]).forEach((x) => current.addChild(x));
-        slide.addText(current.createTextPropsArray(), {
-          placeholder: "header",
-          fontFace: currentStyle.fontFace,
-        });
+        slide.addHeader(current.createTextPropsArray(), currentStyle);
         return docParagraph;
       }
 
@@ -936,16 +948,22 @@ async function createMathImage(mathEq: string) {
   let pngBuffer = Buffer.from(pngArray);
   const sizeImageMath = imageSize.imageSize(pngBuffer);
 
-  const child = new ImageRun({
-    data: pngBuffer,
-    transformation: {
-      width: sizeImageMath.width!,
-      height: sizeImageMath.height!,
-    },
-  });
-  return child;
+  // const child = new ImageRun({
+  //   data: pngBuffer,
+  //   transformation: {
+  //     width: sizeImageMath.width!,
+  //     height: sizeImageMath.height!,
+  //   },
+  // });
+  // return child;
 }
 
+/**
+ *
+ * @param position x,y,w,h in percent
+ * @param pptx for get slide size
+ * @returns position{ pptxGen } in inches
+ */
 function getPosition(position: string, pptx: pptxGen) {
   const positions = position.split(",");
 

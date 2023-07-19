@@ -8,8 +8,6 @@ import {
   // TranslatorConfigObject,
 } from ".";
 
-//import { wordDownTranslators } from "./wordDownConfig";
-
 import * as Fs from "fs";
 import { getFileContents } from "../markdown-docx/common";
 /* ********************************************************* *

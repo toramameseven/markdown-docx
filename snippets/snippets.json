@@ -8,7 +8,8 @@
       "<!-- word param division ${4:division} -->",
       "<!-- word param date ${5:date} -->",
       "<!-- word param docNumber ${6:XXXX-XXXX} -->",
-      "<!-- word toc ${7|1,2,3|} TOC -->$0"
+      "<!-- word param pptxSettings ${7:pptxSettings} -->",
+      "<!-- word toc ${8|1,2,3|} TOC -->$0"
     ],
     "description": "word properties"
   },
