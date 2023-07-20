@@ -255,8 +255,7 @@ const DEMO_TITLE_TEXTBK = {
   bold: true,
   breakLine: true,
 };
-const DEMO_TITLE_OPTS = { fontSize: 13, color: "9F9F9F" };
-const LOREM_IPSUM_ENG = "LOREM_IPSUM_ENG";
+
 
 module.exports = {
   titleSlide: titleSlide,

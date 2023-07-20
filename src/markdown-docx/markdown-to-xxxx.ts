@@ -15,7 +15,7 @@ import { wordDownToDocx } from "./wd-to-docx";
 import { wdToEd } from "./wd-to-ed";
 import { wdToTextile } from "./wd-to-textile";
 import { createInlineHtml } from "../tools/createInlineHtml";
-import { wordDownToPptxBody } from "./wd-to-pptxJs";
+import { wdToPptx } from "./wd-to-pptxJs";
 
 
 /**message function */
@@ -187,7 +187,7 @@ export async function markdownToPptx(
     fileWd = r.wdPath;
 
     //create docx (docxJs or vbs)
-    await wordDownToPptxBody(fileWd, r.wdBody, option);
+    await wdToPptx(fileWd, r.wdBody, option);
   } catch (ex) {
     throw ex;
   } finally {

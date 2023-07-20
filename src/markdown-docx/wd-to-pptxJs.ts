@@ -1,8 +1,21 @@
+/**
+ * https://gitbrent.github.io/PptxGenJS/
+ */
 import pptxGen from "pptxgenjs";
 import type PptxGenJS from "pptxgenjs";
 import * as Path from "path";
 import * as imageSize from "image-size";
 const TeXToSVG = require("tex-to-svg");
+import {
+  DocParagraph,
+  DocxStyle,
+  PptSheet,
+  PptStyle,
+  TableJs,
+  TextFrame,
+  WdNodeType,
+  resolveEmphasis,
+} from "./pptxjs";
 
 import { svg2imagePng } from "../tools/svg-png-image";
 import { runCommand, selectExistsPath } from "../tools/tools-common";
@@ -12,21 +25,6 @@ import {
   ShowMessage,
   getFileContents,
 } from "./common";
-
-type PptStyle = {
-  titleSlide: PptxGenJS.SlideMasterProps;
-  masterSlide: PptxGenJS.SlideMasterProps;
-  thanksSlide: PptxGenJS.SlideMasterProps;
-  h1: PptxGenJS.TextPropsOptions;
-  h2: PptxGenJS.TextPropsOptions;
-  h3: PptxGenJS.TextPropsOptions;
-  h4: PptxGenJS.TextPropsOptions;
-  h5: PptxGenJS.TextPropsOptions;
-  h6: PptxGenJS.TextPropsOptions;
-  body: PptxGenJS.TextPropsOptions;
-};
-
-type TextFrame = { textPropsArray: PptxGenJS.TextProps[]; outputPosition: {} };
 
 let pptStyle: PptStyle = {
   titleSlide: { title: "" },
@@ -41,18 +39,11 @@ let pptStyle: PptStyle = {
   body: {},
 };
 
+const _sp = "\t";
+//
 
-const defaultOutputPosition = {
-  x: "10%",
-  y: "15%",
-  w: "80%",
-  h: "75%",
-  valign: "top",
-  //fill: { color: pptx.SchemeColor.background2 },
-  //color: pptx.SchemeColor.accent1,
-};
-
-export async function wordDownToPptxBody(
+// ############################################################
+export async function wdToPptx(
   fileWd: string,
   wdBody: string,
   option: DocxOption
@@ -86,6 +77,7 @@ export async function wdToPptxJs(
   body: string,
   mdSourcePath: string
 ): Promise<void> {
+  // doc info
   const documentInfo = {
     title: "",
     subTitle: "",
@@ -107,7 +99,7 @@ export async function wdToPptxJs(
     // html comment command <!-- word xxxx -->
     resolveWordCommentsCommands(wdCommandList, documentInfo);
   }
-  
+
   // get ppt settings
   const settingPath = await selectExistsPath(
     [
@@ -131,22 +123,27 @@ export async function wdToPptxJs(
   createMasterSlides(pptx);
 
   // create sheet object
-  const currentSheet = new PptSheet(pptx);  
-  currentSheet.addSetPosition(defaultOutputPosition);
+  const currentSheet = new PptSheet(pptx);
+  currentSheet.setDefaultPosition({
+    ...getPositionPCT("10,15,70,70"),
+    valign: "top",
+  });
 
   // add title slide
   if (documentInfo.title) {
     currentSheet.addTitleSlide(documentInfo);
   }
 
-  // currentSlide = pptx.addSlide({ masterName: "MASTER_SLIDE" });
-  // currentSheet.addSetPosition(defaultOutputPosition);
-  // currentSheet.setSlide(currentSlide);
   currentSheet.addMasterSlide();
 
-  let currentDocxParagraph = new DocParagraph(WdNodeType.text);
+  let currentDocxParagraph = new DocParagraph(
+    WdNodeType.text,
+    pptStyle.body,
+    0
+  );
   let tableJs: TableJs | undefined = undefined;
 
+  documentInfo.position = "";
   // main loop
   for (let i = 0; i < lines.length; i++) {
     const wdCommandList = lines[i].split(_sp);
@@ -156,7 +153,7 @@ export async function wdToPptxJs(
       // flush texts before creating tables.
       const textPropsArray = currentDocxParagraph.createTextPropsArray();
       currentSheet.addTextPropsArray(...textPropsArray);
-      currentSheet.addTextFrame();
+      currentSheet.addTextFrame(); //getPosition(documentInfo.position, pptx));
 
       // initialize table.
       tableJs = new TableJs(
@@ -184,14 +181,15 @@ export async function wdToPptxJs(
       //create text frame
       const textPropsArray = currentDocxParagraph.createTextPropsArray();
       currentSheet.addTextPropsArray(...textPropsArray);
-      currentSheet.addTextFrame();
+      currentSheet.addTextFrame(); //getPosition(documentInfo.position, pptx));
 
       // initialize image
       const image = createImageChild(
         mdSourcePath,
         wdCommandList[1],
         wdCommandList[2],
-        pptx
+        pptx,
+        currentSheet.currentTextPropPosition
       );
       currentSheet.addImage(image);
       continue;
@@ -215,12 +213,20 @@ export async function wdToPptxJs(
       mdSourcePath
     );
 
+    // update current position
+    if (documentInfo.position) {
+      currentSheet.setCurrentPosition({
+        ...getPositionPCT(documentInfo.position),
+      });
+      documentInfo.position = "";
+    }
+
     // when paragraph end, flush paragraph
     const isNewSheet = currentDocxParagraph.isNewSheet;
     if (currentDocxParagraph.isFlush || isNewSheet) {
       const textPropsArray = currentDocxParagraph.createTextPropsArray();
       currentSheet.addTextPropsArray(...textPropsArray);
-      
+
       // reset paragraph. but keep the indent.
       currentDocxParagraph = new DocParagraph(
         WdNodeType.text,
@@ -229,7 +235,7 @@ export async function wdToPptxJs(
       );
 
       if (isNewSheet) {
-        currentSheet.addTextFrame();
+        currentSheet.addTextFrame(); // getPosition(documentInfo.position, pptx));
         currentSheet.createSheet();
 
         // new sheet
@@ -239,10 +245,9 @@ export async function wdToPptxJs(
     }
   }
   // end loop lines
-
   const textPropsArray = currentDocxParagraph.createTextPropsArray();
   currentSheet.addTextPropsArray(...textPropsArray);
-  currentSheet.addTextFrame();
+  currentSheet.addTextFrame(); //getPosition(documentInfo.position, pptx));
   currentSheet.createSheet();
 
   //Export Presentation
@@ -290,408 +295,6 @@ function createMasterSlides(pptx: PptxGenJS) {
   pptx.defineSlideMaster(JSON.parse(JSON.stringify(pptStyle.thanksSlide)));
 }
 
-const _sp = "\t";
-//
-const WdNodeType = {
-  non: "non",
-  section: "section",
-  heading: "heading",
-  OderList: "OderList",
-  NormalList: "NormalList",
-  math: "math",
-  note: "note",
-  warning: "warning",
-
-  // word down
-  author: "author",
-  date: "date",
-  division: "division",
-  docxEngine: "docxEngine",
-  docxTemplate: "docxTemplate",
-  pageSetup: "pageSetup",
-  toc: "toc",
-
-  //marked
-  title: "title",
-  subTitle: "subTitle",
-  paragraph: "paragraph",
-  list: "list",
-  listitem: "listitem",
-  code: "code",
-  blockquote: "blockquote",
-  table: "table",
-  tablerow: "tablerow",
-  tablecell: "tablecell",
-  tablePos: "tablePos",
-  text: "text",
-  image: "image",
-  link: "link",
-  html: "html",
-
-  crossRef: "crossRef",
-  property: "property",
-  clearContent: "clearContent",
-  docNumber: "docNumber",
-  indentPlus: "indentPlus",
-  indentMinus: "indentMinus",
-  endParagraph: "endParagraph",
-  newLine: "newLine",
-  newPage: "newPage",
-  htmlWdCommand: "htmlWdCommand",
-  hr: "hr",
-  // table
-  cols: "cols",
-  rowMerge: "rowMerge",
-  emptyMerge: "emptyMerge",
-} as const;
-
-type WdNodeType = (typeof WdNodeType)[keyof typeof WdNodeType];
-
-const DocxStyle = {
-  "1": "1",
-  Body: "body",
-  Body1: "body1",
-  nList1: "nList1",
-  nList2: "nList2",
-  nList3: "nList3",
-  numList1: "numList1",
-  numList2: "numList2",
-  numList3: "numList3",
-  code: "code",
-  note1: "note1",
-  warning1: "warn1",
-  Error: "Error",
-} as const;
-type DocxStyle = (typeof DocxStyle)[keyof typeof DocxStyle];
-
-/**
- *
- */
-class PptSheet {
-  images: pptxGen.ImageProps[] = [];
-  tables: { tableRows: pptxGen.TableRow[]; options?: pptxGen.TableProps }[] =
-    [];
-  texts: TextFrame[] = [];
-  slide?: pptxGen.Slide;
-  currentTextPropsArray: PptxGenJS.TextProps[] = [];
-  currentTextPropPosition: {} = {};
-  pptx: PptxGenJS;
-
-  constructor(pptx: PptxGenJS){
-    this.pptx = pptx;
-  }
-
-  addTitleSlide(documentInfo: {title?: string}){
-    this.slide = this.pptx.addSlide({ masterName: "TITLE_SLIDE" });
-    this.slide.addText(documentInfo.title!, {
-      placeholder: "title",
-    });
-  }
-
-  addMasterSlide(){
-    this.slide = this.pptx.addSlide({ masterName: "MASTER_SLIDE" });
-    this.clear();
-    // add position
-  }
-
-  addHeader(textPropsArray: pptxGen.TextProps[], textPropsOptions: pptxGen.TextPropsOptions){
-    this.slide!.addText(textPropsArray, {
-      placeholder: "header",
-      ...textPropsOptions
-    });
-  }
-
-  addImage(image: {}) {
-    this.images.push(image);
-  }
-
-  addTable(table: {
-    tableRows: pptxGen.TableRow[];
-    options?: pptxGen.TableProps;
-  }) {
-    this.tables.push(table);
-  }
-
-  addTextPropsArray(...arr: PptxGenJS.TextProps[]) {
-    this.currentTextPropsArray.push(...arr);
-  }
-
-  addSetPosition(position: {}) {
-    this.currentTextPropPosition = position;
-  }
-
-  addTextFrame() {
-    this.texts.push({
-      textPropsArray: this.currentTextPropsArray,
-      outputPosition: this.currentTextPropPosition,
-    });
-    this.currentTextPropsArray = [];
-  }
-
-  createSheet() {
-    if (this.slide) {
-      this.images.forEach((x) => this.slide!.addImage(x));
-      this.tables.forEach((x) => this.slide!.addTable(x.tableRows, x.options));
-      this.texts.forEach((x) =>
-        this.slide!.addText(x.textPropsArray, x.outputPosition)
-      );
-    }
-  }
-
-  clear() {
-    this.images = [];
-    this.tables = [];
-    this.texts = [];
-  }
-}
-
-/**
- *
- */
-class TableJs {
-  rows: number;
-  columns: number;
-  // x, y, list();;
-  cells: PptxGenJS.TextProps[][][];
-  row: number;
-  column: number;
-  mergedCells: number[][][];
-  tableWidthArray: number[];
-  mdSourcePath: string;
-  tablePosition = {};
-
-  constructor(rows: number, columns: number, mdSourcePath: string) {
-    this.row = 0;
-    this.column = 0;
-    this.rows = rows;
-    this.columns = columns;
-    this.mdSourcePath = mdSourcePath;
-    this.cells = new Array(rows);
-    for (let r = 0; r < rows; r++) {
-      this.cells[r] = new Array(columns);
-    }
-    this.mergedCells = new Array(rows);
-    for (let r = 0; r < rows; r++) {
-      this.mergedCells[r] = new Array(columns);
-    }
-    this.tableWidthArray = [];
-    this.tablePosition = getPositionPCT("10,10,80,80");
-  }
-
-  doTableCommand(line: string) {
-    const words = line.split(_sp);
-    switch (words[0]) {
-      case "tablePos":
-        this.tablePosition = getPositionPCT(words[1]);
-        return;
-        break;
-      case "tableWidthInfo":
-        const widthArray = words[1].split(",").map((l) => parseInt(l));
-        const sums = widthArray.reduce(function (a, x) {
-          return a + x;
-        });
-        this.tableWidthArray = widthArray.map((l) => (l / sums) * 100);
-
-        return;
-        break;
-
-      case "tablecontents":
-        this.row = parseInt(words[1]);
-        this.column = parseInt(words[2]);
-        this.cells[this.row][this.column] = [];
-        this.mergedCells[this.row][this.column] = [this.row, this.column];
-        return;
-        break;
-      case "tablecontentslist":
-        if (words[1] === "endParagraph" || words[1] === "newLine") {
-          //
-        } else if (words[1] === "image") {
-          // this.cells[this.row][this.column].push(
-          //   new Paragraph({
-          //     children: [createImageChild(this.mdSourcePath, words[2])],
-          //   })
-          // );
-        } else {
-          this.cells[this.row][this.column].push(...resolveEmphasis(words[2]));
-          return;
-        }
-        break;
-      case "tableMarge":
-        const row = parseInt(words[1]);
-        const column = parseInt(words[2]);
-        const row2 = parseInt(words[3]);
-        const column2 = parseInt(words[4]);
-        this.mergedCells[row][column] = [row2, column2];
-        for (let j = column; j <= column2; j++) {
-          for (let i = row + 1; i <= row2; i++) {
-            this.mergedCells[i][j] = [-1, -1];
-            this.cells[row][column].push(...this.cells[i][j]);
-          }
-        }
-        return;
-        break;
-      default:
-        return;
-        break;
-    }
-  }
-
-  createTable() {
-    let rows: pptxGen.TableRow[] = new Array(this.rows);
-    for (let i = 0; i < this.rows; i++) {
-      rows[i] = new Array<PptxGenJS.TableCell>(0);
-      for (let j = 0; j < this.columns; j++) {
-        let thisWidth = {
-          size: this.tableWidthArray[j],
-          //type: pptxGen .PERCENTAGE,
-        };
-
-        if (this.tableWidthArray.length > 0) {
-          thisWidth = {
-            size: this.tableWidthArray[j],
-            //type: WidthType.PERCENTAGE,
-          };
-        }
-
-        let pCell = this.cells[i][j];
-        const [rowspan, colspan] = this.createRawColumnSpan(
-          i,
-          j,
-          this.mergedCells[i][j][0],
-          this.mergedCells[i][j][1]
-        );
-        console.log(`${i}-${j},${rowspan}-${colspan}`);
-
-        let tCell = {
-          text: pCell,
-        };
-
-        if (
-          this.mergedCells[i][j][0] === -1 &&
-          this.mergedCells[i][j][1] === -1
-        ) {
-          //rows[i][j] = null;
-        } else {
-          //rows[i][j] = {...tCell, options:{rowspan, colspan}};
-
-          rows[i].push({ ...tCell, options: { rowspan, colspan } });
-        }
-      }
-    }
-
-    const options: pptxGen.TableProps = {
-      x: 0,
-      y: 2.1,
-      w: "100%",
-      rowH: 0.75,
-      fill: { color: "F7F7F7" },
-      color: "000000",
-      fontSize: 16,
-      valign: "middle",
-      align: "center",
-      border: { type: "solid", pt: 1, color: "000000" },
-      ...this.tablePosition,
-    };
-
-    // { tableRows: pptxGen.TableRow[]; options?: pptxGen.TableProps }
-    return { tableRows: rows, options };
-    // slide.addTable(rows, {
-    //   x: 0,
-    //   y: 2.1,
-    //   w: "100%",
-    //   rowH: 0.75,
-    //   fill: { color: "F7F7F7" },
-    //   color: "000000",
-    //   fontSize: 16,
-    //   valign: "middle",
-    //   align: "center",
-    //   border: { type: "solid", pt: 1, color: "000000" },
-    // });
-  }
-
-  createRawColumnSpan(r1: number, c1: number, r2: number, c2: number) {
-    return [r2 - r1 + 1, c2 - c1 + 1];
-  }
-}
-
-class DocParagraph {
-  nodeType: WdNodeType;
-  isFlush: boolean;
-  indent: number;
-  // export interface TextProps {
-  // 	text?: string
-  // 	options?: TextPropsOptions
-  // }
-  children: PptxGenJS.TextProps[] = [];
-  textPropsOptions: PptxGenJS.TextPropsOptions;
-  docxStyle: DocxStyle;
-  isImage: boolean;
-  isNewSheet: boolean = false;
-  currentFontSize: number = 24;
-
-  constructor(
-    nodeType: WdNodeType = WdNodeType.non,
-    textPropsOptions: PptxGenJS.TextPropsOptions = {},
-    indent: number = 0,
-    docStyle: DocxStyle = DocxStyle.Body,
-    child?: PptxGenJS.TextProps
-  ) {
-    this.nodeType = nodeType;
-    this.isFlush = false;
-    this.textPropsOptions = textPropsOptions;
-    this.indent = indent;
-    this.children = child ? [child] : [];
-    this.docxStyle = docStyle;
-    this.isImage = false;
-  }
-
-  createTextPropsArray(): PptxGenJS.TextProps[] {
-    let pStyle = this.isImage ? "picture1" : this.docxStyle;
-
-    if (pStyle === "body") {
-      pStyle = `body${this.indent + 1}`;
-    }
-
-    const r = this.children.map((p) => {
-      return {
-        text: p.text,
-        options: { ...this.textPropsOptions, ...p.options },
-      };
-    });
-    return r;
-  }
-
-  addIndent() {
-    this.indent++;
-    if (this.indent > 3) {
-      this.indent = 3;
-    }
-  }
-
-  removeIndent() {
-    this.indent--;
-    if (this.indent < 0) {
-      this.indent = 0;
-    }
-  }
-
-  addChild(s: string | PptxGenJS.TextProps, isImage = false) {
-    const ss = typeof s === "string" ? { text: s } : s;
-    this.isImage = false;
-    if (isImage && this.children.length === 1) {
-      this.isImage = true;
-    }
-    this.children.push(ss);
-  }
-
-  addChildren(s: PptxGenJS.TextProps[]) {
-    this.isImage = false;
-    this.children.push(...s);
-  }
-}
-
-// ############################################################
-
 /**
  *
  * @param wdCommandList
@@ -710,7 +313,6 @@ function resolveWordCommentsCommands(
     documentInfo[wdCommandList[1]] = wdCommandList[2];
     return true;
   }
-
   return false;
 }
 
@@ -783,10 +385,10 @@ async function resolveWordDownCommandEx(
       docParagraph.addChild({
         text: " ",
         options: {
-          fontSize: 32,
           bullet: true,
           // color: PptxGenJS.SchemeColor.accent6,
           indentLevel: parseInt(words[1]),
+          ...pptStyle.body
         },
       });
       fontSize = getHeaderStyle("").fontSize;
@@ -801,10 +403,10 @@ async function resolveWordDownCommandEx(
       docParagraph.addChild({
         text: " ",
         options: {
-          fontSize: 32,
           bullet: { type: "number", style: "romanLcPeriod" },
           // color: PptxGenJS.SchemeColor.accent6,
           indentLevel: parseInt(words[1]),
+          ...pptStyle.body
         },
       });
       fontSize = getHeaderStyle("").fontSize;
@@ -819,10 +421,10 @@ async function resolveWordDownCommandEx(
       docParagraph.addChild({
         text: words[1],
         options: {
-          fontSize: 36,
           fontFace: "Arial",
           //color: pptx.SchemeColor.accent5,
           highlight: "FFFF00",
+          ...pptStyle.body
         },
       });
       return docParagraph;
@@ -964,17 +566,25 @@ async function createMathImage(mathEq: string) {
  * @param pptx for get slide size
  * @returns position{ pptxGen } in inches
  */
-function getPosition(position: string, pptx: pptxGen) {
+function getPositionInch(position: string, pptx: pptxGen) {
   const positions = position.split(",");
 
-  const x: number = parseFloat(positions[0]) * pptx.presLayout.width * 0.01;
-  const y: number = parseFloat(positions[1]) * pptx.presLayout.height * 0.01;
-  const w: number = parseFloat(positions[2]) * pptx.presLayout.width * 0.01;
-  const h: number = parseFloat(positions[3]) * pptx.presLayout.height * 0.01;
+  // 914400; // One (1) inch (OfficeXML measures in EMU (English Metric Units))
+  const pEmp = 1.093613298337708e-8; // 1/ 914400 * 0.01
+
+  const x: number = parseFloat(positions[0]) * pptx.presLayout.width * pEmp;
+  const y: number = parseFloat(positions[1]) * pptx.presLayout.height * pEmp;
+  const w: number = parseFloat(positions[2]) * pptx.presLayout.width * pEmp;
+  const h: number = parseFloat(positions[3]) * pptx.presLayout.height * pEmp;
 
   return { x, y, w, h };
 }
 
+/**
+ * 
+ * @param position x,y,w,h in percent
+ * @returns 
+ */
 function getPositionPCT(position: string) {
   const positions = position.split(",");
   return {
@@ -995,13 +605,13 @@ function createImageChild(
   mdSourcePath: string,
   imagePathR: string,
   imageAlt: string,
-  pptx: pptxGen
+  pptx: pptxGen,
+  pos: { [k: string]: string | number } = {}
 ) {
   const imagePath = Path.resolve(mdSourcePath, imagePathR);
-
   const sizeImage = imageSize.imageSize(imagePath);
-
-  const maxSize = 400; //convertInchesToTwip(3);
+  // max 6inch 15cm
+  const maxSize = 600; //convertInchesToTwip(3);
 
   let width = sizeImage.width ?? 100;
   let height = sizeImage.height ?? 100;
@@ -1012,78 +622,15 @@ function createImageChild(
     height *= r;
   }
 
-  const positions = getPosition(imageAlt, pptx);
+  let positions = {};
+
+  if (imageAlt) {
+    positions = getPositionPCT(imageAlt);
+  }
+
+  if (pos.x && pos.y) {
+    positions = { x: pos.x, y: pos.y, h: height / 94, w: width / 94 };
+  }
 
   return { path: imagePath, ...positions };
-}
-
-/**
- *
- * @param source
- * @returns
- */
-function resolveEmphasis(source: string) {
-  let rg = /<(|\/)sub>|<(|\/)sup>|<(|\/)codespan>|<(|\/)i>|<(|\/)b>|<(|\/)~~>/g;
-
-  let indexBefore = 0;
-  const stack = [];
-  let options: PptxGenJS.TextPropsOptions = {
-    bold: false,
-    italic: false,
-    strike: false,
-    subscript: false,
-    superscript: false,
-    highlight: "",
-    //valign: "top",
-  };
-  let result: any;
-  while ((result = rg.exec(source)) !== null) {
-    // text
-    let text = source.substring(indexBefore, result.index);
-
-    if (text) {
-      stack.push({ text, options });
-    }
-    // tag
-    text = source.substring(result.index + 1, rg.lastIndex - 1);
-    const tag = text.replace("/", "");
-    const isOn = text === tag;
-
-    if (tag === "codespan") {
-      if (isOn) {
-        options = { ...options, highlight: "FF88CC" };
-      } else {
-        options = { ...options, highlight: "" };
-      }
-    } else {
-      options = { ...options, [resolveEmphasisTag(tag)]: isOn };
-    }
-    indexBefore = rg.lastIndex;
-  }
-
-  // text
-  let text = source.substring(indexBefore);
-  if (text) {
-    stack.push({ text, options });
-  }
-  return stack;
-
-  function resolveEmphasisTag(tag: string) {
-    if (tag === "b") {
-      return "bold";
-    }
-    if (tag === "i") {
-      return "italic";
-    }
-    if (tag === "sup") {
-      return "superscript";
-    }
-    if (tag === "sub") {
-      return "subscript";
-    }
-    if (tag === "~~") {
-      return "strike";
-    }
-    return "";
-  }
 }

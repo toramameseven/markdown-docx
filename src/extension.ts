@@ -16,7 +16,7 @@ import {
   markdownToTextile,
   
 } from "./markdown-docx/markdown-to-xxxx";
-import {wordDownToPptxBody} from "./markdown-docx/wd-to-pptxJs";
+import {wdToPptx} from "./markdown-docx/wd-to-pptxJs";
 import { createDocxTemplateFile } from "./markdown-docx/common";
 import { getWorkingDirectory } from "./common-vscode";
 import { textileToHtml } from "./tools/toolsTextile";
@@ -331,7 +331,7 @@ async function exportPptxFromExplorerCore(uriFile: vscode.Uri) {
 
   if (filePath.match(/\.wd$/i)) {
     // wordDown
-    await wordDownToPptxBody(filePath, "", thisOption);
+    await wdToPptx(filePath, "", thisOption);
     return;
   }
 
