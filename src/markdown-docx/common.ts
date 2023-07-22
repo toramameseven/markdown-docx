@@ -50,6 +50,7 @@ export const MessageType = {
   info: "info",
   warn: "warn",
   err: "err",
+  debug: "debug"
 } as const;
 
 export type MessageType = (typeof MessageType)[keyof typeof MessageType];

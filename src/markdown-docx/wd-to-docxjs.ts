@@ -497,16 +497,17 @@ async function resolveWordDownCommandEx(
 
   switch (nodeType) {
     case "section":
-      // section 2 Heading2 heading2
+      // section 2  heading2(id)
       child = new Bookmark({
-        id: words[3],
-        children: resolveEmphasis(words[2]),
+        id: words[2],
+        //children: resolveEmphasis(words[2]),
+        children:[],
       });
       current = new DocParagraph(
         nodeType,
         currentParagraph.indent,
         `hh${words[1]}` as DocStyle,
-        //`${words[1]}` as DocStyle, // we do not know how this works.
+        // `${words[1]}` as DocStyle, // we do not know how this works.
         child
       );
       return current;

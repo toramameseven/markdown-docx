@@ -323,7 +323,7 @@ function createNotDuplicateId(id: string, originalId: string, index = 0) {
 
 //
 const blockHeading = (content: string, index: number) => {
-  //title
+  //title for asciidoc type
   const isAdocTypeTitle = false;
   if (index === 1 && isAdocTypeTitle) {
     return createBlockCommand(wordCommand.title, {
@@ -354,10 +354,12 @@ const blockHeading = (content: string, index: number) => {
   let idTitle = (r && r[4]) ?? title;
   idTitle = slugify(idTitle);
 
+  const lines = splitBlockContents(content);
   const headings = {
     index: (index - headingOffset).toString(),
-    title: title,
+    //title: title,
     idTitle,
+    text: lines.join(_newline)
   };
   return createBlockCommand(markedCommand.heading, headings);
 };

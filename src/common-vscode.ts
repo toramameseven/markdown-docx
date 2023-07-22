@@ -41,6 +41,9 @@ export function showMessage(
     case MessageType.warn:
       showWarn(message, source, showNotification);
       break;
+    case MessageType.debug:
+      showDebug(message, source, showNotification);
+      break;
     case MessageType.err:
     default:
       showError(message, source, showNotification);
@@ -60,6 +63,17 @@ function showInfo(message: unknown, source: string, showNotification = false) {
 
 function showWarn(message: unknown, source: string, showNotification = true) {
   const messageOut = `[Warn   - ${new Date().toLocaleTimeString()}] ${createMessage(
+    message,
+    source
+  )}`;
+  outputTab.appendLine(messageOut.trim());
+  if (showNotification) {
+    vscode.window.showWarningMessage(messageOut);
+  }
+}
+
+function showDebug(message: unknown, source: string, showNotification = true) {
+  const messageOut = `[Debug  - ${new Date().toLocaleTimeString()}] ${createMessage(
     message,
     source
   )}`;

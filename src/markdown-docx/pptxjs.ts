@@ -301,7 +301,7 @@ export class TableJs {
     }
   }
 
-  createTable() {
+  createTable(pos:{}) {
     let rows: pptxGen.TableRow[] = new Array(this.rows);
     for (let i = 0; i < this.rows; i++) {
       rows[i] = new Array<PptxGenJS.TableCell>(0);
@@ -354,7 +354,7 @@ export class TableJs {
       valign: "middle",
       align: "center",
       border: { type: "solid", pt: 1, color: "000000" },
-      ...this.tablePosition,
+      ...pos,
     };
 
     // { tableRows: pptxGen.TableRow[]; options?: pptxGen.TableProps }
@@ -379,7 +379,6 @@ export class TableJs {
 }
 
 export class DocParagraph {
-  nodeType: WdNodeType;
   isFlush: boolean;
   indent: number;
   // export interface TextProps {
@@ -388,40 +387,30 @@ export class DocParagraph {
   // }
   children: PptxGenJS.TextProps[] = [];
   textPropsOptions: PptxGenJS.TextPropsOptions;
-  docxStyle: DocxStyle;
-  isImage: boolean;
   isNewSheet: boolean = false;
   currentFontSize: number = 24;
+  InsideSlideTitle: boolean = false;
 
   constructor(
-    nodeType: WdNodeType = WdNodeType.non,
     textPropsOptions: PptxGenJS.TextPropsOptions = {},
     indent: number = 0,
-    docStyle: DocxStyle = DocxStyle.Body,
     child?: PptxGenJS.TextProps
   ) {
-    this.nodeType = nodeType;
     this.isFlush = false;
     this.textPropsOptions = textPropsOptions;
     this.indent = indent;
     this.children = child ? [child] : [];
-    this.docxStyle = docStyle;
-    this.isImage = false;
   }
 
   createTextPropsArray(): PptxGenJS.TextProps[] {
-    let pStyle = this.isImage ? "picture1" : this.docxStyle;
-
-    if (pStyle === "body") {
-      pStyle = `body${this.indent + 1}`;
-    }
-
     const r = this.children.map((p) => {
       return {
         text: p.text,
         options: { ...this.textPropsOptions, ...p.options },
       };
     });
+    this.children =[];
+    this.isFlush = false;
     return r;
   }
 
@@ -441,15 +430,10 @@ export class DocParagraph {
 
   addChild(s: string | PptxGenJS.TextProps, isImage = false) {
     const ss = typeof s === "string" ? { text: s } : s;
-    this.isImage = false;
-    if (isImage && this.children.length === 1) {
-      this.isImage = true;
-    }
     this.children.push(ss);
   }
 
   addChildren(s: PptxGenJS.TextProps[]) {
-    this.isImage = false;
     this.children.push(...s);
   }
 }

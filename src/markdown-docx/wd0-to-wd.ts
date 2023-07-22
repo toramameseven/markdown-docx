@@ -428,11 +428,18 @@ function convertSubTitle(params: DocxParam, isCommandEnd?: boolean) {
 
 function convertHeading(params: DocxParam, isCommandEnd?: boolean) {
   if (isCommandEnd) {
+    const r = popBlockInfo();
+    r!.blockList.map((i) => {
+      outputWd(i);
+    });
+    addNewLine("convertHeading End");
     return;
   }
-  const r = ["section", params.index, params.title, params.idTitle].join(_sp);
+  // const r = ["section", params.index, params.title, params.idTitle].join(_sp);
+  const r = ["section", params.index, params.idTitle].join(_sp);
   outputWd(r);
-  addNewLine("convertHeading");
+  pushBlockInfo(new Base(wd0Command.heading));
+  // addNewLine("convertHeading");
 }
 
 function convertParagraph(params: DocxParam, isCommandEnd?: boolean) {
