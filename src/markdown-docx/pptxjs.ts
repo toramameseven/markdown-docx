@@ -110,20 +110,22 @@ export type SheetObject = {
   type: SheetObjectType;
   sheetObject: pptxGen.ImageProps | TableProps | TextFrame;
 };
+
 /**
  *
  */
 export class PptSheet {
   sheetObjects: SheetObject[] = [];
-
   slide?: pptxGen.Slide;
   currentTextPropsArray: PptxGenJS.TextProps[] = [];
   currentTextPropPosition: {} = {};
   defaultTextPropPosition: {} = {};
   pptx: PptxGenJS;
+  docxParagraph: DocParagraph;
 
   constructor(pptx: PptxGenJS) {
     this.pptx = pptx;
+    this.docxParagraph = new DocParagraph();
   }
 
   addTitleSlide(documentInfo: { title?: string }) {
@@ -135,7 +137,7 @@ export class PptSheet {
 
   addMasterSlide() {
     this.slide = this.pptx.addSlide({ masterName: "MASTER_SLIDE" });
-    this.clear();
+    this.sheetObjects = [];
     this.currentTextPropPosition = this.defaultTextPropPosition;
     // add position
   }
@@ -167,8 +169,13 @@ export class PptSheet {
     this.currentTextPropsArray = [];
   }
 
-  addTextPropsArray(...arr: PptxGenJS.TextProps[]) {
-    this.currentTextPropsArray.push(...arr);
+  // addTextPropsArray(...arr: PptxGenJS.TextProps[]) {
+  //   this.currentTextPropsArray.push(...arr);
+  // }
+
+  addTextPropsArray() {
+    const textPropsArray = this.docxParagraph.createTextPropsArray();
+    this.currentTextPropsArray.push(...textPropsArray);
   }
 
   setDefaultPosition(position: {}) {
@@ -196,17 +203,13 @@ export class PptSheet {
             break;
           case "image":
             const i = x.sheetObject as pptxGen.ImageProps;
-            this.slide!.addImage(i);            
+            this.slide!.addImage(i);
             break;
           default:
             break;
         }
       });
     }
-  }
-
-  clear() {
-    this.sheetObjects = [];
   }
 }
 
@@ -301,22 +304,22 @@ export class TableJs {
     }
   }
 
-  createTable(pos:{}) {
+  createTable(pos: {}) {
     let rows: pptxGen.TableRow[] = new Array(this.rows);
     for (let i = 0; i < this.rows; i++) {
       rows[i] = new Array<PptxGenJS.TableCell>(0);
       for (let j = 0; j < this.columns; j++) {
-        let thisWidth = {
-          size: this.tableWidthArray[j],
-          //type: pptxGen .PERCENTAGE,
-        };
+        // let thisWidth = {
+        //   size: this.tableWidthArray[j],
+        //   //type: pptxGen .PERCENTAGE,
+        // };
 
-        if (this.tableWidthArray.length > 0) {
-          thisWidth = {
-            size: this.tableWidthArray[j],
-            //type: WidthType.PERCENTAGE,
-          };
-        }
+        // if (this.tableWidthArray.length > 0) {
+        //   thisWidth = {
+        //     size: this.tableWidthArray[j],
+        //     //type: WidthType.PERCENTAGE,
+        //   };
+        // }
 
         let pCell = this.cells[i][j];
         const [rowspan, colspan] = this.createRawColumnSpan(
@@ -327,8 +330,10 @@ export class TableJs {
         );
 
         let tCell = {
-          text: pCell,
+          text: pCell[0] ? pCell : [{ text:"" }],
         };
+
+        console.log(`${i}-${j}, ${pCell[0]}: ${this.mergedCells[i][j][0]}: ${this.mergedCells[i][j][1]}`);
 
         if (
           this.mergedCells[i][j][0] === -1 &&
@@ -336,8 +341,6 @@ export class TableJs {
         ) {
           //rows[i][j] = null;
         } else {
-          //rows[i][j] = {...tCell, options:{rowspan, colspan}};
-
           rows[i].push({ ...tCell, options: { rowspan, colspan } });
         }
       }
@@ -359,18 +362,6 @@ export class TableJs {
 
     // { tableRows: pptxGen.TableRow[]; options?: pptxGen.TableProps }
     return { tableRows: rows, options };
-    // slide.addTable(rows, {
-    //   x: 0,
-    //   y: 2.1,
-    //   w: "100%",
-    //   rowH: 0.75,
-    //   fill: { color: "F7F7F7" },
-    //   color: "000000",
-    //   fontSize: 16,
-    //   valign: "middle",
-    //   align: "center",
-    //   border: { type: "solid", pt: 1, color: "000000" },
-    // });
   }
 
   createRawColumnSpan(r1: number, c1: number, r2: number, c2: number) {
@@ -389,7 +380,7 @@ export class DocParagraph {
   textPropsOptions: PptxGenJS.TextPropsOptions;
   isNewSheet: boolean = false;
   currentFontSize: number = 24;
-  InsideSlideTitle: boolean = false;
+  insideSlideTitle: boolean = false;
 
   constructor(
     textPropsOptions: PptxGenJS.TextPropsOptions = {},
@@ -409,7 +400,7 @@ export class DocParagraph {
         options: { ...this.textPropsOptions, ...p.options },
       };
     });
-    this.children =[];
+    this.children = [];
     this.isFlush = false;
     return r;
   }
@@ -428,7 +419,7 @@ export class DocParagraph {
     }
   }
 
-  addChild(s: string | PptxGenJS.TextProps, isImage = false) {
+  addChild(s: string | PptxGenJS.TextProps) {
     const ss = typeof s === "string" ? { text: s } : s;
     this.children.push(ss);
   }

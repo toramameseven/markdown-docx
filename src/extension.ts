@@ -96,6 +96,14 @@ export function activate(context: vscode.ExtensionContext) {
     )
   );
 
+  // editor md wd to pptx
+  context.subscriptions.push(
+    vscode.commands.registerTextEditorCommand(
+      "editor.ExportPptx",
+      exportPptxFromEditor
+    )
+  );
+
   // editor html to docx
   context.subscriptions.push(
     vscode.commands.registerTextEditorCommand(
@@ -366,6 +374,23 @@ async function exportDocxFromEditor(
   }
 }
 
+async function exportPptxFromEditor(
+  textEditor: {
+    document: { uri: { fsPath: any }; getText: (arg0: any) => any };
+    selection: any;
+  },
+  edit: any
+) {
+  try {
+    vscodeCommon.updateStatusBar(true);
+    await exportPptxFromEditorCore(textEditor, edit);
+  } catch (error) {
+    vscodeCommon.showMessage(MessageType.err, error, "extension");
+  } finally {
+    vscodeCommon.updateStatusBar(false);
+  }
+}
+
 /**
  * convert text(md, wd) to docx
  * @param textEditor
@@ -406,6 +431,45 @@ async function exportDocxFromEditorCore(
   let text = isSelected ? textEditor.document.getText(selection) : "";
   try {
     await markdownToDocx(filePath, text, startLine, thisOption);
+  } catch (error) {
+    vscodeCommon.showMessage(MessageType.err, error, "extension");
+  }
+}
+
+async function exportPptxFromEditorCore(
+  textEditor: {
+    document: { uri: { fsPath: any }; getText: (arg0: any) => any };
+    selection: any;
+  },
+  // eslint-disable-next-line no-unused-vars
+  edit: any
+) {
+  vscodeCommon.outputTab.show();
+
+  const filePath = textEditor.document.uri.fsPath;
+  vscodeCommon.showMessage(
+    MessageType.info,
+    `convert pptx from ${filePath}`,
+    "extension"
+  );
+  resetAbortController();
+  const thisOption = createDocxOptionExtension({
+    ac,
+    message: vscodeCommon.showMessage,
+  });
+
+  if (filePath.match(/\.wd$/i)) {
+    // wordDown
+    await wdToPptx(filePath, "", thisOption);
+    return;
+  }
+
+  let selection = textEditor.selection;
+  const isSelected = selection.start !== selection.end;
+  const startLine = isSelected ? selection.start.line : 0;
+  let text = isSelected ? textEditor.document.getText(selection) : "";
+  try {
+    await markdownToPptx(filePath, text, startLine, thisOption);
   } catch (error) {
     vscodeCommon.showMessage(MessageType.err, error, "extension");
   }

@@ -140,21 +140,22 @@ export async function wdToPptxJs(
     currentSheet.addTitleSlide(documentInfo);
   }
 
+  // create first slide
   currentSheet.addMasterSlide();
 
-  let currentDocxParagraph = new DocParagraph(pptStyle.body, 0);
+  // working table
   let tableJs: TableJs | undefined = undefined;
-
+  // document information
   documentInfo.position = "";
-  // main loop
+
+  // main loop (wd)
   for (let i = 0; i < lines.length; i++) {
     const wdCommandList = lines[i].split(_sp);
 
     // when find create table
     if (wdCommandList[0] === "tableCreate") {
       // flush texts before creating tables.
-      const textPropsArray = currentDocxParagraph.createTextPropsArray();
-      currentSheet.addTextPropsArray(...textPropsArray);
+      currentSheet.addTextPropsArray();
       currentSheet.addTextFrame(); //getPosition(documentInfo.position, pptx));
 
       // initialize table.
@@ -181,8 +182,7 @@ export async function wdToPptxJs(
     // image command
     if (wdCommandList[0] === "image") {
       //create text frame
-      const textPropsArray = currentDocxParagraph.createTextPropsArray();
-      currentSheet.addTextPropsArray(...textPropsArray);
+      currentSheet.addTextPropsArray();
       currentSheet.addTextFrame(); //getPosition(documentInfo.position, pptx));
 
       // initialize image
@@ -207,9 +207,8 @@ export async function wdToPptxJs(
       // update current position
       if (documentInfo.position) {
         //create text frame
-        const textPropsArray = currentDocxParagraph.createTextPropsArray();
-        currentSheet.addTextPropsArray(...textPropsArray);
-        currentSheet.addTextFrame(); //getPosition(documentInfo.position, pptx));
+        currentSheet.addTextPropsArray();
+        currentSheet.addTextFrame();
 
         currentSheet.setCurrentPosition({
           ...getPositionPCT(documentInfo.position),
@@ -220,25 +219,23 @@ export async function wdToPptxJs(
     }
 
     // body commands( main command)
-    currentDocxParagraph = await resolveWordDownCommandEx(
+    await resolveWordDownCommandEx(
       lines[i],
-      currentDocxParagraph,
-      currentSheet,
-      mdSourcePath
+      //currentDocxParagraph,
+      currentSheet
     );
 
     thisMessage?.(
       MessageType.debug,
-      `${functionName}:currentDocxParagraph:${currentDocxParagraph.children.length}`,
+      `${functionName}:currentDocxParagraph:${currentSheet.docxParagraph.children.length}`,
       "wd-to-pptxJs",
       false
     );
 
     // when paragraph end, flush paragraph
-    const isNewSheet = currentDocxParagraph.isNewSheet;
-    if (currentDocxParagraph.isFlush || isNewSheet) {
-      const textPropsArray = currentDocxParagraph.createTextPropsArray();
-      currentSheet.addTextPropsArray(...textPropsArray);
+    const isNewSheet = currentSheet.docxParagraph.isNewSheet;
+    if (currentSheet.docxParagraph.isFlush || isNewSheet) {
+      currentSheet.addTextPropsArray();
 
       if (isNewSheet) {
         currentSheet.addTextFrame(); // getPosition(documentInfo.position, pptx));
@@ -246,7 +243,7 @@ export async function wdToPptxJs(
 
         // new sheet
         currentSheet.addMasterSlide();
-        currentDocxParagraph.isNewSheet = false;
+        currentSheet.docxParagraph.isNewSheet = false;
         thisMessage?.(
           MessageType.debug,
           `${functionName}:add new slide`,
@@ -258,8 +255,7 @@ export async function wdToPptxJs(
   }
 
   // end loop lines
-  const textPropsArray = currentDocxParagraph.createTextPropsArray();
-  currentSheet.addTextPropsArray(...textPropsArray);
+  currentSheet.addTextPropsArray();
   currentSheet.addTextFrame(); //getPosition(documentInfo.position, pptx));
   currentSheet.createSheet();
 
@@ -357,23 +353,19 @@ function getHeaderStyle(header: string) {
 /**
  *
  * @param line
- * @param docParagraph
+ * @param slide.docxParagraph
  * @param slide
  * @param mdSourcePath
  * @returns
  */
 async function resolveWordDownCommandEx(
   line: string,
-  docParagraph: DocParagraph,
+  //slide.docxParagraph: DocParagraph,
   slide: PptSheet,
-  mdSourcePath: string
 ) {
   const functionName = "resolveWordDownCommandEx";
   const words = line.split(_sp);
-  let current: DocParagraph;
   const nodeType = words[0] as WdNodeType;
-  let style: DocxStyle;
-  let child: PptxGenJS.TextProps;
   let fontSize: number | undefined;
 
   thisMessage?.(
@@ -389,7 +381,7 @@ async function resolveWordDownCommandEx(
       // section|1|タイトル(slug)
       const currentStyle = getHeaderStyle(words[1]);
       if (words[1] === "1") {
-        docParagraph.InsideSlideTitle = true;
+        slide.docxParagraph.insideSlideTitle = true;
       }
 
       /*
@@ -406,21 +398,21 @@ async function resolveWordDownCommandEx(
       return current;
 */
       //
-      docParagraph.addChild({
+      slide.docxParagraph.addChild({
         text: " ",
         options: {
           ...pptStyle.body,
         },
       });
 
-      docParagraph.currentFontSize = currentStyle.fontSize ?? 32;
-      return docParagraph;
+      slide.docxParagraph.currentFontSize = currentStyle.fontSize ?? 32;
+      return slide.docxParagraph;
       break;
     case "NormalList":
       // OderList	1
       // text	Consectetur adipiscing elit
       // newLine	convertParagraph	tm
-      docParagraph.addChild({
+      slide.docxParagraph.addChild({
         text: " ",
         options: {
           bullet: true,
@@ -431,14 +423,14 @@ async function resolveWordDownCommandEx(
       });
       fontSize = getHeaderStyle("").fontSize;
       if (fontSize) {
-        docParagraph.currentFontSize = fontSize;
+        slide.docxParagraph.currentFontSize = fontSize;
       } else {
         //todo Error
       }
-      return docParagraph;
+      return slide.docxParagraph;
       break;
     case WdNodeType.OderList:
-      docParagraph.addChild({
+      slide.docxParagraph.addChild({
         text: " ",
         options: {
           bullet: { type: "number", style: "romanLcPeriod" },
@@ -449,14 +441,14 @@ async function resolveWordDownCommandEx(
       });
       fontSize = getHeaderStyle("").fontSize;
       if (fontSize) {
-        docParagraph.currentFontSize = fontSize;
+        slide.docxParagraph.currentFontSize = fontSize;
       } else {
         //todo Error
       }
-      return docParagraph;
+      return slide.docxParagraph;
       break;
     case "code":
-      docParagraph.addChild({
+      slide.docxParagraph.addChild({
         text: words[1],
         options: {
           fontFace: "Arial",
@@ -465,43 +457,43 @@ async function resolveWordDownCommandEx(
           ...pptStyle.body,
         },
       });
-      return docParagraph;
+      return slide.docxParagraph;
       break;
     case WdNodeType.link:
       // link ref|bookmark hover text
       if (!words[3]) {
-        docParagraph.addChild({
+        slide.docxParagraph.addChild({
           text: words[1],
           options: {
             hyperlink: {
               url: words[1],
               tooltip: words[2],
             },
-            fontSize: docParagraph.currentFontSize,
+            fontSize: slide.docxParagraph.currentFontSize,
           },
         });
       } else {
         // outside link
-        docParagraph.addChild({
+        slide.docxParagraph.addChild({
           text: words[3],
           options: {
             hyperlink: {
               url: words[1],
               tooltip: words[2],
             },
-            fontSize: docParagraph.currentFontSize,
+            fontSize: slide.docxParagraph.currentFontSize,
           },
         });
       }
-      return docParagraph;
+      return slide.docxParagraph;
       break;
     case WdNodeType.image:
-      return docParagraph;
+      return slide.docxParagraph;
       break;
     case WdNodeType.hr:
-      docParagraph.isFlush = true;
-      docParagraph.isNewSheet = true;
-      return docParagraph;
+      slide.docxParagraph.isFlush = true;
+      slide.docxParagraph.isNewSheet = true;
+      return slide.docxParagraph;
     case "text":
       const admonition = words[1].match(/^(note|warning)(:\s)(.*)/i);
 
@@ -519,39 +511,40 @@ async function resolveWordDownCommandEx(
       // }
 
       resolveEmphasis(s).forEach((x) =>
-        docParagraph.addChild({
+        slide.docxParagraph.addChild({
           text: x.text,
           options: {
             ...x.options,
-            fontSize: docParagraph.currentFontSize,
+            fontSize: slide.docxParagraph.currentFontSize,
             valign: "top",
           },
         })
       );
-      return docParagraph;
+      return slide.docxParagraph;
       break;
     case "indentPlus":
-      docParagraph.addIndent();
-      return docParagraph;
+      slide.docxParagraph.addIndent();
+      return slide.docxParagraph;
       break;
     case "indentMinus":
-      docParagraph.removeIndent();
-      return docParagraph;
+      slide.docxParagraph.removeIndent();
+      return slide.docxParagraph;
       break;
     case "newLine":
-      if ("convertHeading End" === words[1] && docParagraph.InsideSlideTitle) {
-        const propArray = docParagraph.createTextPropsArray();
+      if ("convertHeading End" === words[1] && slide.docxParagraph.insideSlideTitle) {
+        const propArray = slide.docxParagraph.createTextPropsArray();
         slide.addHeader(propArray, {});
-        return docParagraph;
+        slide.docxParagraph.insideSlideTitle = false;
+        return slide.docxParagraph;
       }
       if (!["convertTitle", "convertSubTitle"].includes(words[1])) {
         // output paragraph
-        docParagraph.addChild({ text: "", options: { breakLine: true } });
-        docParagraph.isFlush = true;
+        slide.docxParagraph.addChild({ text: "", options: { breakLine: true } });
+        slide.docxParagraph.isFlush = true;
       }
-      return docParagraph;
+      return slide.docxParagraph;
     default:
-      return docParagraph;
+      return slide.docxParagraph;
   }
 }
 

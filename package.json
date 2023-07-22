@@ -82,6 +82,11 @@
       },
       {
         "enablement": "markdown-docx.isExperienceFeature",
+        "command": "editor.ExportPptx",
+        "title": "Convert to Pptx"
+      },
+      {
+        "enablement": "markdown-docx.isExperienceFeature",
         "command": "editor.ExportHtmlDocx",
         "title": "Convert html to md"
       },
@@ -148,6 +153,11 @@
         {
           "when": "resourceExtname =~ /\\.wd$|\\.md$/i && !markdown-docx.isRunning",
           "command": "editor.ExportDocx",
+          "group": "myGroup@1"
+        },
+        {
+          "when": "resourceExtname =~ /\\.wd$|\\.md$/i && !markdown-docx.isRunning",
+          "command": "editor.ExportPptx",
           "group": "myGroup@1"
         },
         {
