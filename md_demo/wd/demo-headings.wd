@@ -1,5 +1,6 @@
-section	1	Heading	heading
-newLine	convertHeading	tm
+section	1	heading
+text	Heading
+newLine	convertHeading End	tm
 text	markdown
 newLine	convertParagraph	tm
 code	# Heading1
@@ -26,13 +27,18 @@ code	###### Heading6
 newLine	convertCode	tm
 text	result
 newLine	convertParagraph	tm
-section	2	Heading2	heading2
-newLine	convertHeading	tm
-section	3	Heading3	heading3
-newLine	convertHeading	tm
-section	4	Heading4	heading4
-newLine	convertHeading	tm
-section	5	Heading5	heading5
-newLine	convertHeading	tm
-section	6	Heading6	heading6
-newLine	convertHeading	tm
+section	2	heading2
+text	Heading2
+newLine	convertHeading End	tm
+section	3	heading3
+text	Heading3
+newLine	convertHeading End	tm
+section	4	heading4
+text	Heading4
+newLine	convertHeading End	tm
+section	5	heading5
+text	Heading5
+newLine	convertHeading End	tm
+section	6	heading6
+text	Heading6
+newLine	convertHeading End	tm

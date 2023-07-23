@@ -91,8 +91,9 @@ property	ppp	table of content			tm`;
     // command title    idTitle
     // section heading1 heading1 (if no id, same to title)
     const expect = `
-section	1	heading1	heading1
-newLine	convertHeading	tm`;
+section\t1\theading1
+text\theading1
+newLine\tconvertHeading End\ttm`;
 
     // assert
     assert.strictEqual(mdToWd(removeTopN(markdown)), removeTopN(expect));
@@ -108,8 +109,9 @@ newLine	convertHeading	tm`;
     // command title    idTitle
     // section heading1 heading1 (if no id, same to title)
     const expect = `
-section	6	heading6	heading6
-newLine	convertHeading	tm`;
+section\t6\theading6
+text\theading6
+newLine\tconvertHeading End\ttm`;
 
     // assert
     assert.strictEqual(mdToWd(removeTopN(markdown)), removeTopN(expect));

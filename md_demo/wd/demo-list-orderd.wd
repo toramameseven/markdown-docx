@@ -1,5 +1,6 @@
-section	1	Lists ordered	lists-ordered
-newLine	convertHeading	tm
+section	1	lists-ordered
+text	Lists ordered
+newLine	convertHeading End	tm
 text	markdown
 newLine	convertParagraph	tm
 code	1. Lorem ipsum dolor sit amet

@@ -1,5 +1,6 @@
-section	1	Code	code
-newLine	convertHeading	tm
+section	1	code
+text	Code
+newLine	convertHeading End	tm
 text	markdown
 newLine	convertParagraph	tm
 code	Inline `code`

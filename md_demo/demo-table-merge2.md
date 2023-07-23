@@ -20,6 +20,8 @@ result
 
 cell(4,2) is not merged. (comment cell)
 
+<!-- word param pptxSettings "C:\Users\maru\Desktop\github\markdown-docx\master-settings2.js" -->
+
 | data1-1 | data1-2                 |
 | ------- | ----------------------- |
 | data2-1 | data2-2                 |

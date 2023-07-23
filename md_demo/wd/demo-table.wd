@@ -1,7 +1,9 @@
-section	1	Tables	tables
-newLine	convertHeading	tm
-section	2	normal table	normal-table
-newLine	convertHeading	tm
+section	1	tables
+text	Tables
+newLine	convertHeading End	tm
+section	2	normal-table
+text	normal table
+newLine	convertHeading End	tm
 text	markdown
 newLine	convertParagraph	tm
 code	| data1-1 | data1-2                 |
@@ -18,6 +20,7 @@ text	result
 newLine	convertParagraph	tm
 tableCreate	4	2
 tableWidthInfo	6.5,6.5
+tablePos	10,10,80,80
 tablecontents	0	0	next	left
 tablecontentslist	text	data1-1
 tablecontentslist	endParagraph		tm

@@ -4,7 +4,6 @@ import type PptxGenJS from "pptxgenjs";
 export type PptStyle = {
   titleSlide: PptxGenJS.SlideMasterProps;
   masterSlide: PptxGenJS.SlideMasterProps;
-  thanksSlide: PptxGenJS.SlideMasterProps;
   h1: PptxGenJS.TextPropsOptions;
   h2: PptxGenJS.TextPropsOptions;
   h3: PptxGenJS.TextPropsOptions;
@@ -12,6 +11,7 @@ export type PptStyle = {
   h5: PptxGenJS.TextPropsOptions;
   h6: PptxGenJS.TextPropsOptions;
   body: PptxGenJS.TextPropsOptions;
+  tableProps: PptxGenJS.TableProps;
 };
 
 export type TextFrame = {
@@ -121,21 +121,26 @@ export class PptSheet {
   currentTextPropPosition: {} = {};
   defaultTextPropPosition: {} = {};
   pptx: PptxGenJS;
-  docxParagraph: DocParagraph;
+  docxParagraph: PptParagraph;
+  pptStyle:PptStyle;
 
-  constructor(pptx: PptxGenJS) {
+  constructor(pptx: PptxGenJS, pptStyle: PptStyle) {
     this.pptx = pptx;
-    this.docxParagraph = new DocParagraph();
+    this.pptStyle = pptStyle;
+    this.docxParagraph = new PptParagraph(pptStyle.body.fontSize ?? 18);
   }
 
-  addTitleSlide(documentInfo: { title?: string }) {
+  addTitleSlide(documentInfo: { [v: string]: string }) {
     this.slide = this.pptx.addSlide({ masterName: "TITLE_SLIDE" });
     this.slide.addText(documentInfo.title!, {
       placeholder: "title",
     });
+    this.slide.addText(documentInfo.subTitle!, {
+      placeholder: "subtitle",
+    });
   }
 
-  addMasterSlide() {
+  addDocumentSlide() {
     this.slide = this.pptx.addSlide({ masterName: "MASTER_SLIDE" });
     this.sheetObjects = [];
     this.currentTextPropPosition = this.defaultTextPropPosition;
@@ -250,7 +255,8 @@ export class TableJs {
     const words = line.split(_sp);
     switch (words[0]) {
       case "tablePos":
-        this.tablePosition = getPositionPCT(words[1]);
+        // does not use now!!
+        // this.tablePosition = getPositionPCT(words[1]);
         return;
         break;
       case "tableWidthInfo":
@@ -304,7 +310,7 @@ export class TableJs {
     }
   }
 
-  createTable(pos: {}) {
+  createTable(pos: {}, tableProps?: PptxGenJS.TableProps) {
     let rows: pptxGen.TableRow[] = new Array(this.rows);
     for (let i = 0; i < this.rows; i++) {
       rows[i] = new Array<PptxGenJS.TableCell>(0);
@@ -330,10 +336,12 @@ export class TableJs {
         );
 
         let tCell = {
-          text: pCell[0] ? pCell : [{ text:"" }],
+          text: pCell[0] ? pCell : [{ text: "" }],
         };
 
-        console.log(`${i}-${j}, ${pCell[0]}: ${this.mergedCells[i][j][0]}: ${this.mergedCells[i][j][1]}`);
+        console.log(
+          `${i}-${j}, ${pCell[0]}: ${this.mergedCells[i][j][0]}: ${this.mergedCells[i][j][1]}`
+        );
 
         if (
           this.mergedCells[i][j][0] === -1 &&
@@ -341,7 +349,10 @@ export class TableJs {
         ) {
           //rows[i][j] = null;
         } else {
-          rows[i].push({ ...tCell, options: { rowspan, colspan } });
+          rows[i].push({
+            ...tCell,
+            options: { rowspan, colspan, valign: "middle" },
+          });
         }
       }
     }
@@ -357,6 +368,7 @@ export class TableJs {
       valign: "middle",
       align: "center",
       border: { type: "solid", pt: 1, color: "000000" },
+      ...tableProps,
       ...pos,
     };
 
@@ -369,28 +381,27 @@ export class TableJs {
   }
 }
 
-export class DocParagraph {
-  isFlush: boolean;
-  indent: number;
+export class PptParagraph {
+  isFlush: boolean = false;
+  indent: number = 0;
+
   // export interface TextProps {
   // 	text?: string
   // 	options?: TextPropsOptions
   // }
+
   children: PptxGenJS.TextProps[] = [];
-  textPropsOptions: PptxGenJS.TextPropsOptions;
+  textPropsOptions: PptxGenJS.TextPropsOptions = {};
   isNewSheet: boolean = false;
-  currentFontSize: number = 24;
+  defaultFontSize: number = 18;
+  currentFontSize: number = 18;
   insideSlideTitle: boolean = false;
 
   constructor(
-    textPropsOptions: PptxGenJS.TextPropsOptions = {},
-    indent: number = 0,
-    child?: PptxGenJS.TextProps
+    defaultFontSize: number
   ) {
-    this.isFlush = false;
-    this.textPropsOptions = textPropsOptions;
-    this.indent = indent;
-    this.children = child ? [child] : [];
+    this.defaultFontSize = defaultFontSize;
+    this.currentFontSize = defaultFontSize;
   }
 
   createTextPropsArray(): PptxGenJS.TextProps[] {
@@ -402,6 +413,7 @@ export class DocParagraph {
     });
     this.children = [];
     this.isFlush = false;
+    this.currentFontSize = this.defaultFontSize;
     return r;
   }
 

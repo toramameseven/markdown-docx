@@ -1,5 +1,6 @@
-section	1	Lists mixed	lists-mixed
-newLine	convertHeading	tm
+section	1	lists-mixed
+text	Lists mixed
+newLine	convertHeading End	tm
 text	markdown
 newLine	convertParagraph	tm
 code	1.  ordered1

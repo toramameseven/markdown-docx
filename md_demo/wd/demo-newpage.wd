@@ -1,5 +1,6 @@
-section	1	new page	new-page
-newLine	convertHeading	tm
+section	1	new-page
+text	new page
+newLine	convertHeading End	tm
 text	markdown
 newLine	convertParagraph	tm
 code	next line is `<!-- word newPage -->`
