@@ -47,6 +47,9 @@ let pptxSettingsFilePath = "";
 // wd command separator
 const _sp = "\t";
 
+// slide paging at section
+const isNewSlideAtSection: boolean = true;
+
 // ############################################################
 export async function wdToPptx(
   fileWd: string,
@@ -159,7 +162,9 @@ export async function wdToPptxJs(
   }
 
   // create first slide
-  currentSheet.addDocumentSlide();
+  if (!isNewSlideAtSection) {
+    currentSheet.addDocumentSlide();
+  }
 
   // working table
   let tableJs: TableJs | undefined = undefined;
@@ -248,23 +253,23 @@ export async function wdToPptxJs(
 
     thisMessage?.(
       MessageType.debug,
-      `${functionName}:currentDocxParagraph:${currentSheet.docxParagraph.children.length}`,
+      `${functionName}:currentDocxParagraph:${currentSheet.pptxParagraph.children.length}`,
       "wd-to-pptxJs",
       false
     );
 
     // when paragraph end, flush paragraph
-    const isNewSheet = currentSheet.docxParagraph.isNewSheet;
-    if (currentSheet.docxParagraph.isFlush || isNewSheet) {
+    const isNewSheet = currentSheet.pptxParagraph.isNewSheet;
+    if (currentSheet.pptxParagraph.isFlush || isNewSheet) {
       currentSheet.addTextPropsArray();
 
       if (isNewSheet) {
-        currentSheet.addTextFrame(); // getPosition(documentInfo.position, pptx));
+        currentSheet.addTextFrame();
         currentSheet.createSheet();
 
         // new sheet
         currentSheet.addDocumentSlide();
-        currentSheet.docxParagraph.isNewSheet = false;
+        currentSheet.pptxParagraph.isNewSheet = false;
         thisMessage?.(
           MessageType.debug,
           `${functionName}:add new slide`,
@@ -378,7 +383,6 @@ function getHeaderStyle(header: string) {
  */
 async function resolveWordDownCommandEx(
   line: string,
-  //slide.docxParagraph: DocParagraph,
   slide: PptSheet
 ) {
   const functionName = "resolveWordDownCommandEx";
@@ -399,24 +403,28 @@ async function resolveWordDownCommandEx(
       // section|1|タイトル(slug)
       const currentStyle = getHeaderStyle(words[1]);
       if (words[1] === "1") {
-        slide.docxParagraph.insideSlideTitle = true;
+        if (isNewSlideAtSection){
+          slide.addTextFrame(); 
+          slide.createSheet();
+          slide.addDocumentSlide();
+        }
+        slide.pptxParagraph.insideSlideTitle = true;
       }
       //
-      slide.docxParagraph.addChild({
+      slide.pptxParagraph.addChild({
         text: " ",
         options: {
           ...pptStyle.body,
         },
       });
 
-      slide.docxParagraph.currentFontSize = currentStyle.fontSize ?? 32;
-      return slide.docxParagraph;
+      slide.pptxParagraph.currentFontSize = currentStyle.fontSize ?? 32;
       break;
     case "NormalList":
       // OderList	1
       // text	Consectetur adipiscing elit
       // newLine	convertParagraph	tm
-      slide.docxParagraph.addChild({
+      slide.pptxParagraph.addChild({
         text: " ",
         options: {
           bullet: true,
@@ -427,14 +435,13 @@ async function resolveWordDownCommandEx(
       });
       fontSize = getHeaderStyle("").fontSize;
       if (fontSize) {
-        slide.docxParagraph.currentFontSize = fontSize;
+        slide.pptxParagraph.currentFontSize = fontSize;
       } else {
         //todo Error
       }
-      return slide.docxParagraph;
       break;
     case WdNodeType.OderList:
-      slide.docxParagraph.addChild({
+      slide.pptxParagraph.addChild({
         text: " ",
         options: {
           bullet: { type: "number", style: "romanLcPeriod" },
@@ -445,18 +452,16 @@ async function resolveWordDownCommandEx(
       });
       fontSize = getHeaderStyle("").fontSize;
       if (fontSize) {
-        slide.docxParagraph.currentFontSize = fontSize;
+        slide.pptxParagraph.currentFontSize = fontSize;
       } else {
         //todo Error
       }
-      return slide.docxParagraph;
       break;
     case "code":
-      if (words[1] === ''){
+      if (words[1] === "") {
         // "end code" insert an empty line.
-        return slide.docxParagraph;
       }
-      slide.docxParagraph.addChild({
+      slide.pptxParagraph.addChild({
         text: words[1],
         options: {
           fontFace: "Arial",
@@ -465,43 +470,40 @@ async function resolveWordDownCommandEx(
           ...pptStyle.body,
         },
       });
-      return slide.docxParagraph;
       break;
     case WdNodeType.link:
       // link ref|bookmark hover text
       if (!words[3]) {
-        slide.docxParagraph.addChild({
+        slide.pptxParagraph.addChild({
           text: words[1],
           options: {
             hyperlink: {
               url: words[1],
               tooltip: words[2],
             },
-            fontSize: slide.docxParagraph.currentFontSize,
+            fontSize: slide.pptxParagraph.currentFontSize,
           },
         });
       } else {
         // outside link
-        slide.docxParagraph.addChild({
+        slide.pptxParagraph.addChild({
           text: words[3],
           options: {
             hyperlink: {
               url: words[1],
               tooltip: words[2],
             },
-            fontSize: slide.docxParagraph.currentFontSize,
+            fontSize: slide.pptxParagraph.currentFontSize,
           },
         });
       }
-      return slide.docxParagraph;
       break;
     case WdNodeType.image:
-      return slide.docxParagraph;
       break;
     case WdNodeType.hr:
-      slide.docxParagraph.isFlush = true;
-      slide.docxParagraph.isNewSheet = true;
-      return slide.docxParagraph;
+      if (!isNewSlideAtSection) {
+        slide.pptxParagraph.isNewSheet = true;
+      }
     case "text":
       const admonition = words[1].match(/^(note|warning)(:\s)(.*)/i);
 
@@ -519,46 +521,41 @@ async function resolveWordDownCommandEx(
       // }
 
       resolveEmphasis(s).forEach((x) =>
-        slide.docxParagraph.addChild({
+        slide.pptxParagraph.addChild({
           text: x.text,
           options: {
             ...x.options,
-            fontSize: slide.docxParagraph.currentFontSize,
+            fontSize: slide.pptxParagraph.currentFontSize,
             valign: "top",
           },
         })
       );
-      return slide.docxParagraph;
       break;
     case "indentPlus":
-      slide.docxParagraph.addIndent();
-      return slide.docxParagraph;
+      slide.pptxParagraph.addIndent();
       break;
     case "indentMinus":
-      slide.docxParagraph.removeIndent();
-      return slide.docxParagraph;
+      slide.pptxParagraph.removeIndent();
       break;
     case "newLine":
       if (
         "convertHeading End" === words[1] &&
-        slide.docxParagraph.insideSlideTitle
+        slide.pptxParagraph.insideSlideTitle
       ) {
-        const propArray = slide.docxParagraph.createTextPropsArray();
+        const propArray = slide.pptxParagraph.createTextPropsArray();
         slide.addHeader(propArray, {});
-        slide.docxParagraph.insideSlideTitle = false;
-        return slide.docxParagraph;
+        slide.pptxParagraph.insideSlideTitle = false;
       }
       if (!["convertTitle", "convertSubTitle"].includes(words[1])) {
         // output paragraph
-        slide.docxParagraph.addChild({
+        slide.pptxParagraph.addChild({
           text: "",
           options: { breakLine: true },
         });
-        slide.docxParagraph.isFlush = true;
+        slide.pptxParagraph.isFlush = true;
       }
-      return slide.docxParagraph;
     default:
-      return slide.docxParagraph;
+      // todo error;
   }
 }
 

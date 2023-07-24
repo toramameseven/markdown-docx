@@ -121,13 +121,13 @@ export class PptSheet {
   currentTextPropPosition: {} = {};
   defaultTextPropPosition: {} = {};
   pptx: PptxGenJS;
-  docxParagraph: PptParagraph;
-  pptStyle:PptStyle;
+  pptxParagraph: PptParagraph;
+  pptStyle: PptStyle;
 
   constructor(pptx: PptxGenJS, pptStyle: PptStyle) {
     this.pptx = pptx;
     this.pptStyle = pptStyle;
-    this.docxParagraph = new PptParagraph(pptStyle.body.fontSize ?? 18);
+    this.pptxParagraph = new PptParagraph(pptStyle.body.fontSize ?? 18);
   }
 
   addTitleSlide(documentInfo: { [v: string]: string }) {
@@ -174,19 +174,16 @@ export class PptSheet {
     this.currentTextPropsArray = [];
   }
 
-  // addTextPropsArray(...arr: PptxGenJS.TextProps[]) {
-  //   this.currentTextPropsArray.push(...arr);
-  // }
-
   addTextPropsArray() {
-    const textPropsArray = this.docxParagraph.createTextPropsArray();
+    const textPropsArray = this.pptxParagraph.createTextPropsArray();
     this.currentTextPropsArray.push(...textPropsArray);
   }
 
   setDefaultPosition(position: {}) {
     this.defaultTextPropPosition = { ...position };
-    this.currentTextPropPosition = { ...position };
+    this.setCurrentPosition(position);
   }
+
   setCurrentPosition(position: {}) {
     this.currentTextPropPosition = {
       ...this.defaultTextPropPosition,
@@ -215,6 +212,64 @@ export class PptSheet {
         }
       });
     }
+  }
+}
+
+export class PptParagraph {
+  isFlush: boolean = false;
+  indent: number = 0;
+
+  // export interface TextProps {
+  // 	text?: string
+  // 	options?: TextPropsOptions
+  // }
+
+  children: PptxGenJS.TextProps[] = [];
+  textPropsOptions: PptxGenJS.TextPropsOptions = {};
+  isNewSheet: boolean = false;
+  defaultFontSize: number = 18;
+  currentFontSize: number = 18;
+  insideSlideTitle: boolean = false;
+
+  constructor(defaultFontSize: number) {
+    this.defaultFontSize = defaultFontSize;
+    this.currentFontSize = defaultFontSize;
+  }
+
+  createTextPropsArray(): PptxGenJS.TextProps[] {
+    const r = this.children.map((p) => {
+      return {
+        text: p.text,
+        options: { ...this.textPropsOptions, ...p.options },
+      };
+    });
+    this.children = [];
+    this.isFlush = false;
+    this.currentFontSize = this.defaultFontSize;
+    return r;
+  }
+
+  addIndent() {
+    this.indent++;
+    if (this.indent > 3) {
+      this.indent = 3;
+    }
+  }
+
+  removeIndent() {
+    this.indent--;
+    if (this.indent < 0) {
+      this.indent = 0;
+    }
+  }
+
+  addChild(s: string | PptxGenJS.TextProps) {
+    const ss = typeof s === "string" ? { text: s } : s;
+    this.children.push(ss);
+  }
+
+  addChildren(s: PptxGenJS.TextProps[]) {
+    this.children.push(...s);
   }
 }
 
@@ -381,65 +436,7 @@ export class TableJs {
   }
 }
 
-export class PptParagraph {
-  isFlush: boolean = false;
-  indent: number = 0;
 
-  // export interface TextProps {
-  // 	text?: string
-  // 	options?: TextPropsOptions
-  // }
-
-  children: PptxGenJS.TextProps[] = [];
-  textPropsOptions: PptxGenJS.TextPropsOptions = {};
-  isNewSheet: boolean = false;
-  defaultFontSize: number = 18;
-  currentFontSize: number = 18;
-  insideSlideTitle: boolean = false;
-
-  constructor(
-    defaultFontSize: number
-  ) {
-    this.defaultFontSize = defaultFontSize;
-    this.currentFontSize = defaultFontSize;
-  }
-
-  createTextPropsArray(): PptxGenJS.TextProps[] {
-    const r = this.children.map((p) => {
-      return {
-        text: p.text,
-        options: { ...this.textPropsOptions, ...p.options },
-      };
-    });
-    this.children = [];
-    this.isFlush = false;
-    this.currentFontSize = this.defaultFontSize;
-    return r;
-  }
-
-  addIndent() {
-    this.indent++;
-    if (this.indent > 3) {
-      this.indent = 3;
-    }
-  }
-
-  removeIndent() {
-    this.indent--;
-    if (this.indent < 0) {
-      this.indent = 0;
-    }
-  }
-
-  addChild(s: string | PptxGenJS.TextProps) {
-    const ss = typeof s === "string" ? { text: s } : s;
-    this.children.push(ss);
-  }
-
-  addChildren(s: PptxGenJS.TextProps[]) {
-    this.children.push(...s);
-  }
-}
 
 export function getPositionPCT(position: string) {
   const positions = position.split(",");
