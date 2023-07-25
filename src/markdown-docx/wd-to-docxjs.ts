@@ -167,7 +167,7 @@ class TableJs {
           );
         } else {
           this.cells[this.row][this.column].push(
-            new Paragraph({ children: resolveEmphasis(words[2]) })
+            new Paragraph({ children: resolveEmphasis(words[2]).stack })
           );
           return;
         }
@@ -267,6 +267,8 @@ class DocParagraph {
   children: ParagraphChild[] = [];
   docStyle: DocStyle;
   isImage: boolean;
+  refId: string = "";
+  refString: string = "";
 
   constructor(
     nodeType: NodeType = NodeType.non,
@@ -495,6 +497,7 @@ async function resolveWordDownCommandEx(
   let style: DocStyle;
   let child: ParagraphChild;
 
+
   switch (nodeType) {
     case "section":
       // section 2  heading2(id)
@@ -508,8 +511,9 @@ async function resolveWordDownCommandEx(
         currentParagraph.indent,
         `hh${words[1]}` as DocStyle,
         // `${words[1]}` as DocStyle, // we do not know how this works.
-        child
+        //child
       );
+      current.refId = words[2];
       return current;
       break;
     case "NormalList":
@@ -582,8 +586,10 @@ async function resolveWordDownCommandEx(
         const child = await createMathImage(mathBlock[1]);
         currentParagraph.addChild(child, true);
       } else {
-        resolveEmphasis(s).forEach((x) => currentParagraph.addChild(x));
-      }
+        const {stack, sectionText} = resolveEmphasis(s);
+        stack.forEach((x) => currentParagraph.addChild(x));
+        currentParagraph.refString += sectionText;
+      } 
 
       return currentParagraph;
       break;
@@ -596,6 +602,20 @@ async function resolveWordDownCommandEx(
       return currentParagraph;
       break;
     case "newLine":
+      if (words[1] === "convertHeading End"){
+        child = new Bookmark({
+          id: currentParagraph.refId,
+          children: [new TextRun(currentParagraph.refString)]
+        });
+        current = new DocParagraph(
+          nodeType,
+          currentParagraph.indent,
+          currentParagraph.docStyle,
+          child
+        );
+        current.isFlush = true;
+        return current;
+      }
       if (!["convertTitle", "convertSubTitle"].includes(words[1])) {
         // output paragraph
         currentParagraph.isFlush = true;
@@ -761,6 +781,7 @@ function resolveEmphasis(source: string) {
   let rg = /<(|\/)sub>|<(|\/)sup>|<(|\/)codespan>|<(|\/)i>|<(|\/)b>|<(|\/)~~>/g;
 
   let indexBefore = 0;
+  let sectionText:string = "";
   const stack = [];
   let textProp = {
     bold: false,
@@ -775,6 +796,7 @@ function resolveEmphasis(source: string) {
     // text
     let text = source.substring(indexBefore, result.index);
     if (text) {
+      sectionText += text;
       stack.push(new TextRun({ text, ...textProp }));
     }
     // tag
@@ -797,9 +819,10 @@ function resolveEmphasis(source: string) {
   // text
   let text = source.substring(indexBefore);
   if (text) {
+    sectionText += text;
     stack.push(new TextRun({ text, ...textProp }));
   }
-  return stack;
+  return {stack, sectionText};
 
   function resolveEmphasisTag(tag: string) {
     if (tag === "b") {
