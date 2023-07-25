@@ -167,7 +167,7 @@ class TableJs {
           );
         } else {
           this.cells[this.row][this.column].push(
-            new Paragraph({ children: resolveEmphasis(words[2]).stack })
+            new Paragraph({ children: resolveEmphasis(words[2]) })
           );
           return;
         }
@@ -268,7 +268,6 @@ class DocParagraph {
   docStyle: DocStyle;
   isImage: boolean;
   refId: string = "";
-  refString: string = "";
 
   constructor(
     nodeType: NodeType = NodeType.non,
@@ -355,11 +354,11 @@ export async function wdToDocxJs(
     date: "",
     author: "",
     docNumber: "",
-    crossRef:"[[$n $t (p.$p)]]"
+    crossRef: "[[$n $t (p.$p)]]",
   };
 
   // patch parameter
-  const params ={};
+  const params = {};
 
   for (let i = 0; i < lines.length; i++) {
     const wdCommandList = lines[i].split(_sp);
@@ -418,7 +417,13 @@ export async function wdToDocxJs(
       );
     }
   }
-  await createDocxPatch(patches, docxTemplatePath, docxOutPath, documentInfo, params);
+  await createDocxPatch(
+    patches,
+    docxTemplatePath,
+    docxOutPath,
+    documentInfo,
+    params
+  );
 }
 
 // ############################################################
@@ -466,12 +471,11 @@ function resolveWordCommentsCommands(
 
   // patch words
   if (wdCommandList[0] === "param") {
-    params[wdCommandList[1]] ={
+    (params[wdCommandList[1]] = {
       type: PatchType.PARAGRAPH,
       children: [new TextRun(wdCommandList[2])],
-    },
-    
-    wdCommandList[2];
+    }),
+      wdCommandList[2];
     return true;
   }
 
@@ -497,19 +501,18 @@ async function resolveWordDownCommandEx(
   let style: DocStyle;
   let child: ParagraphChild;
 
-
   switch (nodeType) {
     case "section":
       // section 2  heading2(id)
       child = new Bookmark({
         id: words[2],
         //children: resolveEmphasis(words[2]),
-        children:[],
+        children: [],
       });
       current = new DocParagraph(
         nodeType,
         currentParagraph.indent,
-        `hh${words[1]}` as DocStyle,
+        `hh${words[1]}` as DocStyle
         // `${words[1]}` as DocStyle, // we do not know how this works.
         //child
       );
@@ -586,10 +589,9 @@ async function resolveWordDownCommandEx(
         const child = await createMathImage(mathBlock[1]);
         currentParagraph.addChild(child, true);
       } else {
-        const {stack, sectionText} = resolveEmphasis(s);
+        const stack = resolveEmphasis(s);
         stack.forEach((x) => currentParagraph.addChild(x));
-        currentParagraph.refString += sectionText;
-      } 
+      }
 
       return currentParagraph;
       break;
@@ -602,10 +604,10 @@ async function resolveWordDownCommandEx(
       return currentParagraph;
       break;
     case "newLine":
-      if (words[1] === "convertHeading End"){
+      if (words[1] === "convertHeading End") {
         child = new Bookmark({
           id: currentParagraph.refId,
-          children: [new TextRun(currentParagraph.refString)]
+          children: currentParagraph.children,
         });
         current = new DocParagraph(
           nodeType,
@@ -630,7 +632,7 @@ async function resolveWordDownCommandEx(
   }
 }
 
-function resolveXref(linkRef: string, refFormat: string ="[[$n $t p.$p]]") {
+function resolveXref(linkRef: string, refFormat: string = "[[$n $t p.$p]]") {
   const refItems = [];
   for (let i = 0; i < refFormat.length; i++) {
     let t = refFormat.slice(i, i + 2);
@@ -647,15 +649,14 @@ function resolveXref(linkRef: string, refFormat: string ="[[$n $t p.$p]]") {
   //  \w : full contents
   //  \h :
   for (let i = 0; i < refItems.length; i++) {
-
     switch (refItems[i]) {
-      case '$n':
+      case "$n":
         children.push(new SimpleField(` REF ${linkRef} \\w \\h `));
         break;
-      case '$t':
+      case "$t":
         children.push(new SimpleField(` REF ${linkRef} \\h `));
         break;
-      case '$p':
+      case "$p":
         children.push(new SimpleField(` PAGEREF ${linkRef} \\h `));
         // Expected output: "Mangoes and papayas are $2.79 a pound."
         break;
@@ -746,7 +747,7 @@ async function createImageChild(
   return child;
 }
 
-type Params  = {
+type Params = {
   type: PatchType.PARAGRAPH;
   children: TextRun[];
 };
@@ -764,14 +765,13 @@ export async function createDocxPatch(
   docInfo: { [v: string]: string },
   params: { [v: string]: Params }
 ) {
-
   const patchDoc = await patchDocument(fs.readFileSync(docxTemplatePath), {
     patches: {
       paragraphReplace: {
         type: PatchType.DOCUMENT,
         children: children,
       },
-      ...params
+      ...params,
     },
   });
   fs.writeFileSync(docxOutPath, patchDoc);
@@ -781,7 +781,6 @@ function resolveEmphasis(source: string) {
   let rg = /<(|\/)sub>|<(|\/)sup>|<(|\/)codespan>|<(|\/)i>|<(|\/)b>|<(|\/)~~>/g;
 
   let indexBefore = 0;
-  let sectionText:string = "";
   const stack = [];
   let textProp = {
     bold: false,
@@ -796,7 +795,6 @@ function resolveEmphasis(source: string) {
     // text
     let text = source.substring(indexBefore, result.index);
     if (text) {
-      sectionText += text;
       stack.push(new TextRun({ text, ...textProp }));
     }
     // tag
@@ -819,10 +817,9 @@ function resolveEmphasis(source: string) {
   // text
   let text = source.substring(indexBefore);
   if (text) {
-    sectionText += text;
     stack.push(new TextRun({ text, ...textProp }));
   }
-  return {stack, sectionText};
+  return stack;
 
   function resolveEmphasisTag(tag: string) {
     if (tag === "b") {
