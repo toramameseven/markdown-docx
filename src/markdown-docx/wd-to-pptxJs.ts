@@ -460,6 +460,7 @@ async function resolveWordDownCommandEx(
     case "code":
       if (words[1] === "") {
         // "end code" insert an empty line.
+        return;
       }
       slide.pptxParagraph.addChild({
         text: words[1],
