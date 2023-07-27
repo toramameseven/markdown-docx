@@ -1,5 +1,5 @@
 <!-- word export demo-table-merge2.md-->
-## merge cells No.2
+# merge cells No.2
 
 markdown
 
@@ -28,7 +28,7 @@ cell(4,2) is not merged. (comment cell)
 |         | data3-2                 |
 | data4-1 | <!-- not merged -->     |
 
-## table with emphasis
+# table with emphasis
 
 markdown
 

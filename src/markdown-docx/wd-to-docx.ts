@@ -10,22 +10,17 @@ import { wdToDocxJs } from "./wd-to-docxjs";
 import * as Path from "path";
 import { runCommand, selectExistsPath } from "../tools/tools-common";
 
+
 export async function wordDownToDocx(
   fileWd: string,
   wdBody: string,
   option: DocxOption
 ) {
+
   if (wdBody === "") {
     wdBody = getFileContents(fileWd);
   }
-  wordDownToDocxBody(fileWd, wdBody, option);
-}
 
-export async function wordDownToDocxBody(
-  fileWd: string,
-  wdBody: string,
-  option: DocxOption
-) {
   const defaultTemplate = Path.resolve(
     __dirname,
     `../docxtemplate/${docxTemplate001}`

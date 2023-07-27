@@ -248,7 +248,7 @@ And we use some useful articles below.
 
 * 0.0.2
   * use [DOCX](https://docx.js.org/#/) for creating word files.
-  * we do not support the vbs rendering on vesion `0.0.2`.
+  * we do not support the vbs rendering on version `0.0.2`.
     
 
 * 0.0.1

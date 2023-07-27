@@ -1,15 +1,6 @@
-import {
-  NodeHtmlMarkdown,
-  // NodeHtmlMarkdownOptions,
-  // TranslatorConfig,
-  // TranslatorConfigFactory,
-  // TranslatorCollection,
-  // PostProcessResult,
-  // TranslatorConfigObject,
-} from ".";
-
 import * as Fs from "fs";
-import { getFileContents } from "../markdown-docx/common";
+import Encoding = require("encoding-japanese");
+import { NodeHtmlMarkdown } from ".";
 /* ********************************************************* *
  * Single use
  * If using it once, you can use the static method
@@ -32,6 +23,23 @@ export function htmlToMarkdown(filePath: string, body: string) {
     Fs.writeFileSync(filePath + ".md", r);
   }
   return r;
+}
+
+function getFileContents(filePath: string) {
+  const buffer = Fs.readFileSync(filePath);
+  let fileContents = Encoding.convert(buffer, {
+    to: "UNICODE",
+    type: "string",
+  });
+
+  // bom
+  if (fileContents.charCodeAt(0) === 0xfeff) {
+    fileContents = fileContents.substring(1);
+  }
+
+  const lines = fileContents.split(/\r?\n/g);
+
+  return lines.join("\n");
 }
 
 function testme() {

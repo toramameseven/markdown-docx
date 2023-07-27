@@ -1,6 +1,10 @@
 import { marked } from "marked";
 import { unescape } from "lodash";
-import { getWordDownCommand, MessageType, ShowMessage } from "./common";
+import {
+  getWordDownCommand as parseHtmlComment,
+  MessageType,
+  ShowMessage,
+} from "./common";
 
 const source = "markdown-to-wd";
 let showMessage: ShowMessage | undefined;
@@ -39,7 +43,7 @@ const wordCommand = {
   division: "division",
   cols: "cols",
   rowMerge: "rowMerge",
-  tablePos:"tablePos",
+  tablePos: "tablePos",
   emptyMerge: "emptyMerge",
   newPage: "newPage",
   newLine: "newLine",
@@ -55,7 +59,7 @@ const wordCommand = {
   property: "property",
   clearContent: "clearContent",
   crossRef: "crossRef",
-  param: "param"
+  param: "param",
 } as const;
 
 const _sp = "\t";
@@ -69,7 +73,7 @@ const inline = (inlineType: string) => (content: string) => {
   return content;
 };
 
-// inline for *emphasis* 
+// inline for *emphasis*
 const inlineEx = (inlineType: string) => (content: string) => {
   if (inlineType) {
     return `${inlineType}${content}${inlineType}`;
@@ -107,7 +111,7 @@ const blockQuote = (blokType: string) => (content: string) => {
 //
 const htmlBlock = (content: string) => {
   // word down command is a html comment. <!--
-  const wd0 = getWordCommand(content);
+  const wd0 = resolveHtmlComment(content);
   if (wd0) {
     return wd0;
   }
@@ -135,12 +139,12 @@ const htmlBlock = (content: string) => {
   return `[[ Next html is not allow: ${content} ]]`;
 };
 
-function getWordCommand(content: string) {
+function resolveHtmlComment(content: string) {
   // const testMatch = content.match(/<!--(?<name>.*)-->/i);
   // const command = testMatch?.groups?.name ?? "";
   // const params = command.trim().split(" ");
 
-  const r = getWordDownCommand(content);
+  const r = parseHtmlComment(content);
 
   // wordDown commands
   if (r) {
@@ -282,7 +286,7 @@ function getWordCommand(content: string) {
 }
 
 export function getWordTitle(wd: string) {
-  const r = getWordDownCommand(wd);
+  const r = parseHtmlComment(wd);
   const title = r?.command === "title" ? r.params[0] : "no title";
   return title;
 }
@@ -359,7 +363,7 @@ const blockHeading = (content: string, index: number) => {
     index: (index - headingOffset).toString(),
     //title: title,
     idTitle,
-    text: lines.join(_newline)
+    text: lines.join(_newline),
   };
   return createBlockCommand(markedCommand.heading, headings);
 };
@@ -511,7 +515,6 @@ const createBlockCommandTable = (command: string, params: DocxParam) => {
   return `\n${r}\n/${command}${_sp}${_sp}\n`;
 };
 
-
 // {kye: value} > kye\tvalue.....
 function joinObjectToString(params: DocxParam) {
   const r: string[] = [];
@@ -522,30 +525,29 @@ function joinObjectToString(params: DocxParam) {
   return r.join(_sp);
 }
 
-
 export function markdownToWd0(
   markdown: string,
-  convertType: "docx"|"excel"|"html"|"textile",
+  convertType: "docx" | "excel" | "html" | "textile",
   options?: marked.MarkedOptions,
   messageFunction?: ShowMessage
 ): string {
   idMap.clear();
   showMessage = messageFunction;
 
-  const typeOfConvert ={
+  const typeOfConvert = {
     docx: docxRenderer,
     excel: excelRenderer,
     html: null,
-    textile: textileRenderer
+    textile: textileRenderer,
   };
 
   const render = typeOfConvert[convertType];
 
   let markedOptions = { ...options };
-  if (render){
-    markedOptions = {...markedOptions, renderer:render};
+  if (render) {
+    markedOptions = { ...markedOptions, renderer: render };
   }
-  
+
   const unmarked = marked(markdown, markedOptions);
 
   const unescaped = unescape(unmarked);
@@ -598,7 +600,6 @@ const docxRenderer: marked.Renderer = {
   options: {},
 };
 
-
 /**
  * excel Renderer
  */
@@ -643,7 +644,6 @@ const excelRenderer: marked.Renderer = {
   // etc.
   options: {},
 };
-
 
 /**
  * textile Renderer

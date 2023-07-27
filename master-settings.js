@@ -83,12 +83,12 @@ const titleSlide = {
           y: 5.7,
           w: "100%",
           h: 0.75,
-          fontFace: "Arial",
           color: "363636",
           fontSize: 20,
           align: "center",
           valign: "middle",
           margin: 0,
+          ...mainFontFace
         },
       },
     },
@@ -104,9 +104,9 @@ const masterSlide = {
     x: 0.6,
     y: 7.1,
     color: "FFFFFF",
-    fontFace: "Arial",
     fontSize: 10,
     bold: true,
+    ...mainFontFace
   },
   objects: [
     //{ 'image': { x:11.45, y:5.95, w:1.67, h:0.75, data:STARLABS_LOGO_SM } },
