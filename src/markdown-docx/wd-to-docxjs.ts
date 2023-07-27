@@ -344,8 +344,8 @@ export async function wdToDocxJs(
 
   const lines = (wd + "\nEndline").split(/\r?\n/);
   let currentParagraph = new DocParagraph(NodeType.text);
-  let tableJs: TableJs;
-  let insideTable = false;
+  let tableJs: TableJs|undefined = undefined;
+  //let insideTable = false;
 
   const documentInfo = {
     title: "",
@@ -370,18 +370,17 @@ export async function wdToDocxJs(
         parseInt(wdCommandList[2]),
         mdSourcePath
       );
-      insideTable = true;
       continue;
     }
 
     // table command
     if (wdCommandList[0].includes("table")) {
-      tableJs!.doTableCommand(lines[i]);
+      tableJs?.doTableCommand(lines[i]);
     } else {
       // in not table command, create table.
-      if (insideTable) {
-        patches.push(tableJs!.createTable());
-        insideTable = false;
+      if (tableJs) {
+        patches.push(tableJs.createTable());
+        tableJs = undefined;
       }
     }
 
@@ -467,7 +466,7 @@ function resolveWordCommentsCommands(
 
     patches.push(p);
     return true;
-  }
+  } // table of contents
 
   // patch words
   if (wdCommandList[0] === "param") {
@@ -477,14 +476,15 @@ function resolveWordCommentsCommands(
     }),
       wdCommandList[2];
     return true;
-  }
+  } // patch words
 
   // option
   const documentInfoKeys = Object.keys(documentInfo);
   if (documentInfoKeys.includes(wdCommandList[0])) {
     documentInfo[wdCommandList[0]] = wdCommandList[1];
     return true;
-  }
+  } // option
+
   return false;
 }
 
