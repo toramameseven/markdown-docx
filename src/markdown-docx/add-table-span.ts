@@ -1,0 +1,154 @@
+import { forEach } from "lodash";
+import { getFileContents, selectExistsPath } from "../tools/tools-common";
+import { getWordDownCommand } from "./common";
+
+const wordCommand = {
+  title: "title",
+  rowMerge: "rowMerge",
+  emptyMerge: "emptyMerge",
+} as const;
+
+type TableInfo = {
+  emptyMerge: boolean;
+  rowMergeList: number[];
+  currentRow: number;
+};
+
+export async function addTableSpanToMarkdown(
+  mdFilePath: string,
+  mdBody: string
+) {
+  try {
+    let body = mdBody;
+    if (body === "") {
+      body = getFileContents(mdFilePath);
+    }
+    let lines = body.split(/\r?\n/);
+
+    let tableInfo: TableInfo = {
+      emptyMerge: false,
+      rowMergeList: [],
+      currentRow : -1
+    };
+
+    let currentLine = "";
+    for (let i = 0; i < lines.length; i++) {
+      currentLine = lines[i];
+      tableInfo = resolveHtmlCommentEx(currentLine, tableInfo);
+
+      if (
+        currentLine[0] === "|" &&
+        (tableInfo.emptyMerge || tableInfo.rowMergeList.length)
+      ) {
+
+        // update current row
+        tableInfo = {...tableInfo, currentRow : (tableInfo.currentRow + 1)};
+
+        // table merge
+        let convertedLine = "|";
+        const splitted = currentLine.split("|");
+
+        let isMergeEntireRow: boolean = false;
+        if (tableInfo.rowMergeList.includes(tableInfo.currentRow)){
+          isMergeEntireRow = true;
+        }
+
+        splitted.forEach((x, index) => {
+          if (index === 0 || index === splitted.length - 1) {
+            // this is not table cell.
+            convertedLine += x;
+          } else if (x.trim() === "" || isMergeEntireRow) {
+            convertedLine += x + " ^|";
+          } else {
+            convertedLine += x + "|";
+          }
+        });
+        lines[i] = convertedLine;
+      } else {
+        // outside table
+        if (tableInfo.currentRow> -1) {
+          tableInfo = {
+            emptyMerge: false,
+            rowMergeList: [],
+            currentRow: -1
+          };
+        }
+      }
+      console.log(`====>${tableInfo.currentRow}`);
+
+    }
+
+
+    return lines.join("\n");
+  } catch (error) {
+    console.log(error);
+  }
+  return "";
+}
+
+function resolveHtmlCommentEx(content: string, tableInfo: TableInfo) {
+  // const testMatch = content.match(/<!--(?<name>.*)-->/i);
+  // const command = testMatch?.groups?.name ?? "";
+  // const params = command.trim().split(" ");
+
+  const r = getWordDownCommand(content);
+
+  // wordDown commands
+  if (r) {
+    const { command, params } = r;
+    //if (params.length > 1 && params[0] === wordCommand.word) {
+    switch (command) {
+      // merge info rows
+      // <!-- word rowMerge 3-4,5-6,7-9 -->
+      // rowMerge = 3-4,5-6,7-9
+      // ${this.rowCount}-${this.rowCount} is for all rows
+      case wordCommand.rowMerge:
+        if (params.length) {
+          //[1,2], [4,5]
+          const mList = params[0].split(",").map((x) => x.split("-"));
+          const rowMergeList: number[] = [];
+          mList.forEach(x =>{
+            let [start, end] = x;
+            let startI = parseInt(start);
+            let endI = parseInt(end);
+            for(let i = startI + 1; i < endI + 1; i++){
+              rowMergeList.push(i);
+            }
+          });
+          return { ...tableInfo, rowMergeList };
+        }
+        break;
+      case wordCommand.emptyMerge:
+        return { ...tableInfo, emptyMerge: true };
+      // case wordCommand.title:
+      //   // default ''
+      //   const title = params[0];
+      //   return createBlockCommand(wordCommand.title, {
+      //     title,
+      //   });
+      default:
+        return tableInfo;
+        break;
+    }
+  }
+  return tableInfo;
+}
+
+async function testThis() {
+  const md = `
+<!-- word emptyMerge -->
+<!-- word rowMerge 2-4  -->
+
+cell(4,2) is not merged. (comment cell)
+
+| data1-1 | data1-2                 |
+| ------- | ----------------------- |
+| data2-1 | data2-2                 |
+|         | data3-2                 |
+| data4-1 | <!-- not merged -->     |
+`;
+
+  console.log(await addTableSpanToMarkdown("", md));
+}
+
+testThis();

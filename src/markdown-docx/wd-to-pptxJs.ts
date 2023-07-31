@@ -142,6 +142,10 @@ export async function wdToPptxJs(
   // initialize pptx
   let pptx: PptxGenJS = new pptxGen();
 
+
+  pptx.theme = { headFontFace: "Arial Light" };
+  pptx.theme = { bodyFontFace: "Arial" };
+
   // FYI: use `headFontFace` and/or `bodyFontFace` to set the default font for the entire presentation (including slide Masters)
   // pptx.theme = { bodyFontFace: "Arial" };
   pptx.layout = "LAYOUT_WIDE";

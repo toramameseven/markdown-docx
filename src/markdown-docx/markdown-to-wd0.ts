@@ -1,10 +1,13 @@
-import { marked } from "marked";
+import type { marked as Marked } from "marked";
+import { marked  } from "marked";
 import { unescape } from "lodash";
 import {
   getWordDownCommand as parseHtmlComment,
   MessageType,
   ShowMessage,
 } from "./common";
+import { addTableSpanToMarkdown } from "./add-table-span";
+import { spanTable } from "./marked-extended-tables";
 
 const source = "markdown-to-wd";
 let showMessage: ShowMessage | undefined;
@@ -525,12 +528,12 @@ function joinObjectToString(params: DocxParam) {
   return r.join(_sp);
 }
 
-export function markdownToWd0(
+export async function markdownToWd0(
   markdown: string,
   convertType: "docx" | "excel" | "html" | "textile",
-  options?: marked.MarkedOptions,
+  options?: Marked.MarkedOptions,
   messageFunction?: ShowMessage
-): string {
+) {
   idMap.clear();
   showMessage = messageFunction;
 
@@ -548,8 +551,26 @@ export function markdownToWd0(
     markedOptions = { ...markedOptions, renderer: render };
   }
 
-  const unmarked = marked(markdown, markedOptions);
+  const walkTokens = (token:any) => {
+    if (token.type === 'heading') {
+      token.depth += 1;
+    }
+  };
+  
+  
 
+
+  let mdForMarked = markdown;
+  if (convertType === "html") {
+    marked.use(marked.getDefaults());
+    marked.use(spanTable());
+    marked.use({ walkTokens });
+    mdForMarked = await addTableSpanToMarkdown("", mdForMarked);
+  } else {
+    marked.use(marked.getDefaults());
+  }
+
+  const unmarked = marked(mdForMarked, markedOptions);
   const unescaped = unescape(unmarked);
   const trimmed = unescaped.trim();
   return trimmed;
@@ -558,7 +579,12 @@ export function markdownToWd0(
 /**
  * docx renderer
  */
-const docxRenderer: marked.Renderer = {
+const htmlRenderer: Marked.RendererObject = {};
+
+/**
+ * docx renderer
+ */
+const docxRenderer: Marked.Renderer = {
   // Block elements
   heading: blockHeading,
 
@@ -603,7 +629,7 @@ const docxRenderer: marked.Renderer = {
 /**
  * excel Renderer
  */
-const excelRenderer: marked.Renderer = {
+const excelRenderer: Marked.Renderer = {
   // Block elements
   heading: blockHeading,
 
@@ -648,7 +674,7 @@ const excelRenderer: marked.Renderer = {
 /**
  * textile Renderer
  */
-const textileRenderer: marked.Renderer = {
+const textileRenderer: Marked.Renderer = {
   // Block elements
   heading: blockHeading,
 

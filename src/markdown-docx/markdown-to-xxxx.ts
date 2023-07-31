@@ -328,12 +328,12 @@ export async function markdownToWd(
     const markdownBodyXX = markdownBodyX.replace(/\s{2,}\n/g, "\n\n");
 
     // create wd0
-    const wd0 = markdownToWd0(
+    const wd0 =(await markdownToWd0(
       markdownBodyXX,
       convertType,
       { sanitize: false },
       showMessage
-    ).replace(/(\r?\n)+/g, "\n");
+    )).replace(/(\r?\n)+/g, "\n");
 
     if (convertType === "html") {
       return { wdPath: fileWd, wdBody: wd0 };

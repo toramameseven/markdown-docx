@@ -12,10 +12,10 @@ import { getFileContents } from "../markdown-docx/common";
 //import * as vscode from "vscode";
 // import * as myExtension from '../../extension';
 
-function mdToWd(marked: string) {
+async function mdToWd(marked: string) {
   const markdownBodyX = marked.replace(/@/g, "\\@");
 
-  const wd0 = markdownToWd0(markdownBodyX, "docx", { sanitize: false }).replace(
+  const wd0 = (await markdownToWd0(markdownBodyX, "docx", { sanitize: false })).replace(
     /(\r?\n)+/g,
     "\n"
   );

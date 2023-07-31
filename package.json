@@ -258,7 +258,7 @@
     "test-compile": "tsc -p ./",
     "installEx": "npm run package && code --install-extension markdown-docx-win32-x64-0.0.2.vsix",
     "testm": "set TS_NODE_COMPILER_OPTIONS={\"module\":\"commonjs\"} && mocha -r ts-node/register src/test-node/**/*.ts",
-    "license": "npx license-report --config=./license-report-config.json > usedModules.md"
+    "license": "npx license-report --config=./license-report-config.json > usedModules.md",
   },
   "devDependencies": {
     "@types/encoding-japanese": "^2.0.1",
@@ -288,7 +288,6 @@
     "iconv-lite": "^0.6.3",
     "image-size": "^1.0.2",
     "inline-source": "^8.0.2",
-    "jsdom": "^22.1.0",
     "lodash": "^4.17.21",
     "marked": "^4.2.4",
     "node-html-parser": "^6.1.4",

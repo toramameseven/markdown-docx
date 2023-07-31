@@ -130,6 +130,7 @@ const masterSlide = {
           valign: "middle",
           color: "FFFFFF",
           fontSize: 12,
+          ...mainFontFace
         },
         text: "S.T.A.R. Laboratories - Confidential",
       },
@@ -147,7 +148,8 @@ const masterSlide = {
           align: "middle",
           valign: "top",
           color: "404040",
-          //fontSize: 18,
+          fontSize: 18,
+          ...mainFontFace
         },
         text: "", // USAGE: Leave blank to have powerpoint substitute default placeholder text (ex: "Click to add title")
       },
