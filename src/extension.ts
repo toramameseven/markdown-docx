@@ -259,8 +259,6 @@ async function exportMarkdownFromTextile(uriFile: vscode.Uri) {
   }
 }
 
-
-
 /**
  * convert a md or a wd to a docx on a Explorer.
  * @param uriFile
@@ -571,11 +569,12 @@ function createDocxOptionExtension(option: DocxOption) {
   }
 
   function getUseDocxJs() {
-    const useDocxJs =
-      vscode.workspace
-        .getConfiguration("markdown-docx")
-        .get<boolean>("docxEngine.docxJs") ?? true;
-    return useDocxJs;
+    // const useDocxJs =
+    //   vscode.workspace
+    //     .getConfiguration("markdown-docx")
+    //     .get<boolean>("docxEngine.docxJs") ?? true;
+    // return useDocxJs;
+    return true;
   }
 
   function getIsOverWrite() {

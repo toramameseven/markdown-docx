@@ -1,5 +1,5 @@
-import { forEach } from "lodash";
-import { getFileContents, selectExistsPath } from "../tools/tools-common";
+
+import { getFileContents } from "../tools/tools-common";
 import { getWordDownCommand } from "./common";
 
 const wordCommand = {
@@ -74,8 +74,6 @@ export async function addTableSpanToMarkdown(
           };
         }
       }
-      console.log(`====>${tableInfo.currentRow}`);
-
     }
 
 
@@ -151,4 +149,4 @@ cell(4,2) is not merged. (comment cell)
   console.log(await addTableSpanToMarkdown("", md));
 }
 
-testThis();
+//testThis();
