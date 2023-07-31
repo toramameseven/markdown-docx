@@ -19,7 +19,7 @@ import {
 import {wdToPptx} from "./markdown-docx/wd-to-pptxJs";
 import { createDocxTemplateFile } from "./markdown-docx/common";
 import { getWorkingDirectory } from "./common-vscode";
-import { textileToHtml } from "./tools/toolsTextile";
+import { textileToHtml } from "./markdown-docx/tools/toolsTextile";
 
 
 export let isDebug = false;

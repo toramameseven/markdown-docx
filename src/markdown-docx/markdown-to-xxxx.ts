@@ -14,7 +14,7 @@ import {
 import { wordDownToDocx } from "./wd-to-docx";
 import { wdToEd } from "./wd-to-ed";
 import { wdToTextile } from "./wd-to-textile";
-import { createInlineHtml } from "../tools/createInlineHtml";
+import { createInlineHtml } from "./tools/createInlineHtml";
 import { wdToPptx } from "./wd-to-pptxJs";
 
 

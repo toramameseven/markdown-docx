@@ -2,7 +2,7 @@ import { spawn } from "child_process";
 import Encoding = require("encoding-japanese");
 import path = require("path");
 import * as Fs from "fs";
-import { fileExists } from "../markdown-docx/common";
+import { fileExists } from "../common";
 
 /**
  * run windows process

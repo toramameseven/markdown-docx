@@ -1,12 +1,12 @@
 import * as Fs from "fs";
 import * as path from "path";
-import { getWordTitle, slugify } from "../markdown-docx/markdown-to-wd0";
+import { getWordTitle, slugify } from "../markdown-to-wd0";
 import {
   getFileContents,
   getWordDownCommand,
   fileExists,
   dirExists,
-} from "../markdown-docx/common";
+} from "../common";
 
 export async function splitMarkdownExportCmd(filePath: string) {
   const markdown = getFileContents(filePath);

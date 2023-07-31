@@ -6,7 +6,7 @@ let initialized = false;
 
 export async function svg2imagePng(svg: string) {
   const wasmPath = await selectExistsPath(
-    ["../wasm/svg2png_wasm_bg.wasm", "../../wasm/svg2png_wasm_bg.wasm"],
+    ["../wasm/svg2png_wasm_bg.wasm", "../../wasm/svg2png_wasm_bg.wasm","../../../wasm/svg2png_wasm_bg.wasm"],
     __dirname
   );
 

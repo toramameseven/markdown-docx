@@ -17,8 +17,8 @@ import {
   resolveEmphasis,
 } from "./pptxjs";
 
-import { svg2imagePng } from "../tools/svg-png-image";
-import { runCommand, selectExistsPath } from "../tools/tools-common";
+import { svg2imagePng } from "./tools/svg-png-image";
+import { runCommand, selectExistsPath } from "./tools/tools-common";
 import {
   DocxOption,
   MessageType,

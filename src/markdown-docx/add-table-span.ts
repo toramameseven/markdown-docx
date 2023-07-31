@@ -1,5 +1,5 @@
 
-import { getFileContents } from "../tools/tools-common";
+import { getFileContents } from "./tools/tools-common";
 import { getWordDownCommand } from "./common";
 
 const wordCommand = {

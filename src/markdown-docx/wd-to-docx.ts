@@ -8,7 +8,7 @@ import {
 } from "./common";
 import { wdToDocxJs } from "./wd-to-docxjs";
 import * as Path from "path";
-import { runCommand, selectExistsPath } from "../tools/tools-common";
+import { runCommand, selectExistsPath } from "./tools/tools-common";
 
 
 export async function wordDownToDocx(
