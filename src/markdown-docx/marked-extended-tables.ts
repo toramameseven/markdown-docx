@@ -3,6 +3,8 @@
 /*
 Extends the marked-extended-tables.
 [marked-extended-tables](https://github.com/calculuschild/marked-extended-tables)
+// when merge rows, add <br>
+
 */
 
 export function spanTable() {
@@ -192,6 +194,7 @@ const splitCells = (tableRow, count, prevRow = []) => {
         if (prevCols === numCols && prevCell.colspan === cells[i].colspan) {
           // merge into matching cell in previous row (the "target")
           cells[i].rowSpanTarget = prevCell.rowSpanTarget ?? prevCell;
+          // when merge rows, add <br>
           cells[i].rowSpanTarget.text += `<br>\n${cells[i].text.slice(0, -1)}`;
           cells[i].rowSpanTarget.rowspan += 1;
           cells[i].rowspan = 0;

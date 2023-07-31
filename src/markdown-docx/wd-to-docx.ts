@@ -5,6 +5,7 @@ import {
   fileExists,
   vbsSpawn,
   docxTemplate001,
+  templatesPath
 } from "./common";
 import { wdToDocxJs } from "./wd-to-docxjs";
 import * as Path from "path";
@@ -23,11 +24,11 @@ export async function wordDownToDocx(
 
   const defaultTemplate = Path.resolve(
     __dirname,
-    `../docxtemplate/${docxTemplate001}`
+    `../${templatesPath}/${docxTemplate001}`
   );
   const defaultTemplate2 = Path.resolve(
     __dirname,
-    `../../docxtemplate/${docxTemplate001}`
+    `../../${templatesPath}/${docxTemplate001}`
   );
   const template = await selectExistsPath(
     [

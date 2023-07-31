@@ -1,11 +1,12 @@
-<!-- word param title "sample document" -->
-<!-- word param subTitle "sample document subTitle" -->
-<!-- word param division divisionXXX -->
-<!-- word param date dateXXX -->
-<!-- word param author authorXXX -->
-<!-- word param docNumber XXXX-0004 -->
+<!-- word patch title "sample document" -->
+<!-- word patch subTitle "sample document subTitle" -->
+<!-- word patch division divisionXXX -->
+<!-- word patch date dateXXX -->
+<!-- word patch author authorXXX -->
+<!-- word patch docNumber XXXX-0004 -->
 <!-- word newLine -->
 <!-- word toc 3 "toc caption" -->
+<!-- word levelOffset 1 -->
 
 
 <!-- https://markdown-it.github.io/ -->

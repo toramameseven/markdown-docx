@@ -72,6 +72,7 @@ export type ShowMessage = (
 
 export type UpdateStatusBar = (isRunning: boolean) => void;
 export const docxTemplate001 = "_template_001.docx";
+export const templatesPath = "templates";
 
 export async function createDocxTemplateFile(wfFsPath:string) {
   const folderOut =wfFsPath;
@@ -81,7 +82,7 @@ export async function createDocxTemplateFile(wfFsPath:string) {
     !(await fileExists(fileOut))
   ) {
     fs.copyFileSync(
-      path.resolve(__dirname, `../docxtemplate/${docxTemplate001}`),
+      path.resolve(__dirname, `../${templatesPath}/${docxTemplate001}`),
       fileOut
     );
   } else {
@@ -97,6 +98,7 @@ export function getFileContents(filePath: string) {
     to: "UNICODE",
     type: "string",
   });
+  
   // bom
   if (fileContents.charCodeAt(0) === 0xfeff) {
     fileContents = fileContents.substring(1);
@@ -122,7 +124,7 @@ export function getWordDownCommand(wd: string) {
   const testMatch = wd.match(/^<!--(?<name>.*)-->/i);
   const command = testMatch?.groups?.name ?? "";
   const commandList = command.trim().split(/\s(?=(?:[^"]*"[^"]*")*[^"]*$)/i);
-  if (commandList[0] === "word" && commandList[1]) {
+  if (commandList[0].match(/word|pptx|oox/i) && commandList[1]) {
     const params = (commandList.slice(2) ?? []).map((l) =>
       l.replace(/\"/g, "")
     );

@@ -1,4 +1,3 @@
-import { isInteger } from "lodash";
 import { MessageType, ShowMessage, getWordDownMergeCommand } from "./common";
 
 let showMessage: ShowMessage | undefined;
@@ -45,6 +44,7 @@ const wd0Command = {
 
   // word down
   param: "param",
+  placeholder: "placeholder",
   author: "author",
   date: "date",
   division: "division",
@@ -69,7 +69,7 @@ const wd0Command = {
   rowMerge: "rowMerge",
   emptyMerge: "emptyMerge",
 } as const;
-type Wd0Command = typeof wd0Command[keyof typeof wd0Command];
+type Wd0Command = (typeof wd0Command)[keyof typeof wd0Command];
 
 interface BaseBlock {
   blockType: Wd0Command;
@@ -117,7 +117,7 @@ class Table implements BaseBlock {
     this.columnCount = 0;
     this.rows = [];
     this.row = [];
-    this.tableWidthInfo ='';
+    this.tableWidthInfo = "";
     //  "1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1";
     this.rowMerge = "";
     this.tablePos = "";
@@ -163,11 +163,13 @@ class Table implements BaseBlock {
     // <!-- word cols 1,4  -->
     // tableWidthInfo = 1,4
 
-    let outTableInfo = this.tableWidthInfo ? this.tableWidthInfo : this.getColumnSize();
+    let outTableInfo = this.tableWidthInfo
+      ? this.tableWidthInfo
+      : this.getColumnSize();
 
     commands.push(`tableWidthInfo\t${outTableInfo}`);
 
-    if (this.tablePos){
+    if (this.tablePos) {
       commands.push(`tablePos\t${this.tablePos}`);
     }
 
@@ -299,17 +301,17 @@ class Table implements BaseBlock {
     return ret;
   }
 
-  getColumnSize(){
+  getColumnSize() {
     let columnSize = new Array<number[]>(this.columnCount);
-    for(let  c = 0; c < this.columnCount; c++) {
+    for (let c = 0; c < this.columnCount; c++) {
       columnSize[c] = [];
     }
 
     for (let i = 0; i < this.rowCount; i++) {
       for (let j = 0; j < this.columnCount; j++) {
         let blockList = this.rows[i][j].blockList;
-        const blockStringLen = blockList.map(
-          (v) => count(v.trim().replace(/<!--.*?-->/g, ""))
+        const blockStringLen = blockList.map((v) =>
+          count(v.trim().replace(/<!--.*?-->/g, ""))
         );
         columnSize[j] = [...columnSize[j], ...blockStringLen];
       }
@@ -327,27 +329,25 @@ class Table implements BaseBlock {
       for (let i = 0; i < s.length; i++) {
         if (s[i].match(/[ -~]/)) {
           len += 0.5;
-        }
-        else {
+        } else {
           len += 1;
         }
       }
       return len;
     }
 
-    function averageLength(dataset: number[]){
-
-      if (dataset.length === 0){
+    function averageLength(dataset: number[]) {
+      if (dataset.length === 0) {
         dataset = [3];
       }
 
-      const sum = dataset.reduce((a, b) => { 
+      const sum = dataset.reduce((a, b) => {
         return a + b;
-       });
-      
+      });
+
       let average = sum / dataset.length;
 
-      if (average < 3){
+      if (average < 3) {
         average = 3;
       }
 
@@ -362,12 +362,9 @@ class Table implements BaseBlock {
       //   return a + b;
       //  });
 
-
       // return deviationSum / (dataset.length);
     }
   }
-
-
 
   initialize() {
     this.blockList = [];
@@ -375,7 +372,7 @@ class Table implements BaseBlock {
     this.columnCount = 0;
     this.rows = [];
     this.row = [];
-    this.tableWidthInfo = '';
+    this.tableWidthInfo = "";
     //  "1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1";
     this.rowMerge = "";
     this.emptyMerge = false;
@@ -669,11 +666,18 @@ function convertPageSetup(params: DocxParam, isCommandEnd?: boolean) {
   outputWd(r);
 }
 
-function convertPatchParameter(params: DocxParam, isCommandEnd?: boolean) {
+function convertParameter(params: DocxParam, isCommandEnd?: boolean) {
   if (isCommandEnd) {
     return;
   }
   const r = ["param", params.key, params.value, "", "", "tm"].join(_sp);
+  outputWd(r);
+}
+function convertPlaceholder(params: DocxParam, isCommandEnd?: boolean) {
+  if (isCommandEnd) {
+    return;
+  }
+  const r = ["placeholder", params.key, params.value, "", "", "tm"].join(_sp);
   outputWd(r);
 }
 
@@ -933,7 +937,13 @@ function resolveCommand(
       if (isCommandEnd) {
         return;
       }
-      convertPatchParameter(params, isCommandEnd);
+      convertParameter(params, isCommandEnd);
+      break;
+    case wd0Command.placeholder:
+      if (isCommandEnd) {
+        return;
+      }
+      convertPlaceholder(params, isCommandEnd);
       break;
     case wd0Command.author:
       if (isCommandEnd) {

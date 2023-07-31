@@ -63,6 +63,7 @@ const wordCommand = {
   clearContent: "clearContent",
   crossRef: "crossRef",
   param: "param",
+  placeholder: "placeholder",
 } as const;
 
 const _sp = "\t";
@@ -216,7 +217,8 @@ function resolveHtmlComment(content: string) {
           crossRef,
         });
       case wordCommand.param:
-        return createBlockCommand(wordCommand.param, {
+      case wordCommand.placeholder:
+        return createBlockCommand(command, {
           key: params[0],
           value: params[1],
         });
@@ -551,15 +553,19 @@ export async function markdownToWd0(
     markedOptions = { ...markedOptions, renderer: render };
   }
 
+
+  // get markdown levelOffset
+  const offsetMatch = markdown.match(/<!--\s+(oox|word|pptx)\s+levelOffset\s+(?<name>.*)\s+-->/i);
+  let levelOffset = parseInt(offsetMatch?.groups?.name ?? "0");
+  levelOffset = Number.isNaN( levelOffset) ? 0 : levelOffset;
+  
+
   const walkTokens = (token:any) => {
     if (token.type === 'heading') {
-      token.depth += 1;
+      token.depth += levelOffset;
     }
   };
   
-  
-
-
   let mdForMarked = markdown;
   if (convertType === "html") {
     marked.use(marked.getDefaults());
@@ -568,6 +574,7 @@ export async function markdownToWd0(
     mdForMarked = await addTableSpanToMarkdown("", mdForMarked);
   } else {
     marked.use(marked.getDefaults());
+    marked.use({ walkTokens });
   }
 
   const unmarked = marked(mdForMarked, markedOptions);
@@ -575,11 +582,6 @@ export async function markdownToWd0(
   const trimmed = unescaped.trim();
   return trimmed;
 }
-
-/**
- * docx renderer
- */
-const htmlRenderer: Marked.RendererObject = {};
 
 /**
  * docx renderer

@@ -76,6 +76,12 @@ export async function wdToPptx(
   return;
 }
 
+
+type DocumentInfo =  {
+  placeholder: { [v: string]: string };
+  param: { [v: string]: string };
+}
+
 /**
  *
  * @param body
@@ -88,16 +94,7 @@ export async function wdToPptxJs(
 ): Promise<void> {
   const functionName = "wdToPptxJs";
   // doc info
-  const documentInfo = {
-    title: "",
-    subTitle: "",
-    division: "",
-    date: "",
-    author: "",
-    docNumber: "",
-    position: "",
-    pptxSettings: "",
-  };
+  const documentInfo:DocumentInfo = { placeholder: {}, param: {} };
 
   thisMessage = option.message;
 
@@ -115,10 +112,10 @@ export async function wdToPptxJs(
   // get ppt settings
   const settingPath = await selectExistsPath(
     [
-      documentInfo.pptxSettings,
-      Path.resolve(mdSourcePath, documentInfo.pptxSettings),
-      "../master-settings.js",
-      "../../master-settings.js",
+      documentInfo.param.pptxSettings,
+      Path.resolve(mdSourcePath, documentInfo.param.pptxSettings),
+      "../templates/master-settings.js",
+      "../../templates/master-settings.js",
     ],
     __dirname
   );
@@ -142,7 +139,6 @@ export async function wdToPptxJs(
   // initialize pptx
   let pptx: PptxGenJS = new pptxGen();
 
-
   pptx.theme = { headFontFace: "Arial Light" };
   pptx.theme = { bodyFontFace: "Arial" };
 
@@ -161,8 +157,8 @@ export async function wdToPptxJs(
   });
 
   // add title slide
-  if (documentInfo.title) {
-    currentSheet.addTitleSlide(documentInfo);
+  if (documentInfo.placeholder.title) {
+    currentSheet.addTitleSlide(documentInfo.placeholder);
   }
 
   // create first slide
@@ -173,7 +169,7 @@ export async function wdToPptxJs(
   // working table
   let tableJs: TableJs | undefined = undefined;
   // document information
-  documentInfo.position = "";
+  documentInfo.param.position = "";
 
   // main loop (wd)
   for (let i = 0; i < lines.length; i++) {
@@ -235,15 +231,15 @@ export async function wdToPptxJs(
 
     if (isResolveCommand) {
       // update current position
-      if (documentInfo.position) {
+      if (documentInfo.param.position) {
         //create text frame
         currentSheet.addTextPropsArray();
         currentSheet.addTextFrame();
         // update position
         currentSheet.setCurrentPosition({
-          ...getPositionPCT(documentInfo.position),
+          ...getPositionPCT(documentInfo.param.position),
         });
-        documentInfo.position = "";
+        documentInfo.param.position = "";
       }
       continue;
     }
@@ -296,9 +292,9 @@ export async function wdToPptxJs(
 
   const outPathPPtx = Path.resolve(Path.dirname(mdSourcePath), ff);
 
-  pptx.title = documentInfo.title; // "PptxGenJS Test Suite Presentation";
-  pptx.subject = documentInfo.subTitle; // "PptxGenJS Test Suite Export";
-  pptx.author = documentInfo.author; // ("Brent Ely");
+  pptx.title = documentInfo.placeholder.title ?? ""; // "PptxGenJS Test Suite Presentation";
+  pptx.subject = documentInfo.placeholder.subTitle ?? ""; // "PptxGenJS Test Suite Export";
+  pptx.author = documentInfo.placeholder.author ?? ""; // ("Brent Ely");
   pptx.revision = "1";
 
   const r = await pptx.writeFile({
@@ -339,15 +335,15 @@ function createMasterSlides(pptx: PptxGenJS) {
  */
 function resolveWordCommentsCommands(
   wdCommandList: string[],
-  documentInfo: { [v: string]: string }
+  documentInfo:DocumentInfo
 ) {
   const functionName = "resolveWordCommentsCommands";
-  const documentInfoKeys = Object.keys(documentInfo);
-  if (
-    wdCommandList[0] === "param" &&
-    documentInfoKeys.includes(wdCommandList[1])
-  ) {
-    documentInfo[wdCommandList[1]] = wdCommandList[2];
+  if (wdCommandList[0] === "placeholder") {
+    documentInfo.placeholder[wdCommandList[1]] = wdCommandList[2];
+    return true;
+  }
+  if (wdCommandList[0] === "param") {
+    documentInfo.param[wdCommandList[1]] = wdCommandList[2];
     return true;
   }
   return false;
@@ -385,10 +381,7 @@ function getHeaderStyle(header: string) {
  * @param mdSourcePath
  * @returns
  */
-async function resolveWordDownCommandEx(
-  line: string,
-  slide: PptSheet
-) {
+async function resolveWordDownCommandEx(line: string, slide: PptSheet) {
   const functionName = "resolveWordDownCommandEx";
   const words = line.split(_sp);
   const nodeType = words[0] as WdNodeType;
@@ -406,9 +399,10 @@ async function resolveWordDownCommandEx(
       // word
       // section|1|タイトル(slug)
       const currentStyle = getHeaderStyle(words[1]);
-      if (words[1] === "1") {
-        if (isNewSlideAtSection){
-          slide.addTextFrame(); 
+      // ## is slide title
+      if (words[1] === "2") {
+        if (isNewSlideAtSection) {
+          slide.addTextFrame();
           slide.createSheet();
           slide.addDocumentSlide();
         }
@@ -560,7 +554,7 @@ async function resolveWordDownCommandEx(
         slide.pptxParagraph.isFlush = true;
       }
     default:
-      // todo error;
+    // todo error;
   }
 }
 

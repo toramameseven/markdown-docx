@@ -12,6 +12,7 @@ type TableInfo = {
   emptyMerge: boolean;
   rowMergeList: number[];
   currentRow: number;
+  levelOffset: number;
 };
 
 export async function addTableSpanToMarkdown(
@@ -28,7 +29,8 @@ export async function addTableSpanToMarkdown(
     let tableInfo: TableInfo = {
       emptyMerge: false,
       rowMergeList: [],
-      currentRow : -1
+      currentRow : -1,
+      levelOffset: 0
     };
 
     let currentLine = "";
@@ -68,6 +70,7 @@ export async function addTableSpanToMarkdown(
         // outside table
         if (tableInfo.currentRow> -1) {
           tableInfo = {
+            ...tableInfo,
             emptyMerge: false,
             rowMergeList: [],
             currentRow: -1

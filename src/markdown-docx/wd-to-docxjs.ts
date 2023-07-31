@@ -358,7 +358,7 @@ export async function wdToDocxJs(
   };
 
   // patch parameter
-  const params = {};
+  const patchInfo = {};
 
   for (let i = 0; i < lines.length; i++) {
     const wdCommandList = lines[i].split(_sp);
@@ -389,7 +389,7 @@ export async function wdToDocxJs(
       wdCommandList,
       patches,
       documentInfo,
-      params
+      patchInfo
     );
 
     if (isResolveCommand) {
@@ -421,7 +421,7 @@ export async function wdToDocxJs(
     docxTemplatePath,
     docxOutPath,
     documentInfo,
-    params
+    patchInfo
   );
 }
 
@@ -441,7 +441,7 @@ function resolveWordCommentsCommands(
   wdCommandList: string[],
   patches: (Paragraph | Table | TableOfContents)[],
   documentInfo: { [v: string]: string },
-  params: { [v: string]: Params }
+  patchInfo: { [v: string]: PatchInfo }
 ) {
   // table of contents
   if (wdCommandList[0] === "toc") {
@@ -469,8 +469,8 @@ function resolveWordCommentsCommands(
   } // table of contents
 
   // patch words
-  if (wdCommandList[0] === "param") {
-    (params[wdCommandList[1]] = {
+  if (wdCommandList[0] === "patch") {
+    (patchInfo[wdCommandList[1]] = {
       type: PatchType.PARAGRAPH,
       children: [new TextRun(wdCommandList[2])],
     }),
@@ -509,10 +509,15 @@ async function resolveWordDownCommandEx(
         //children: resolveEmphasis(words[2]),
         children: [],
       });
+      // ## hh1
+      // ### hh2
+      // ###### hh5
+      // markdownHeader - 1 = hh
+      const hhHeader = parseInt(words[1]) - 1;
       current = new DocParagraph(
         nodeType,
         currentParagraph.indent,
-        `hh${words[1]}` as DocStyle
+        `hh${hhHeader}` as DocStyle
         // `${words[1]}` as DocStyle, // we do not know how this works.
         //child
       );
@@ -747,7 +752,7 @@ async function createImageChild(
   return child;
 }
 
-type Params = {
+type PatchInfo = {
   type: PatchType.PARAGRAPH;
   children: TextRun[];
 };
@@ -763,7 +768,7 @@ export async function createDocxPatch(
   docxTemplatePath: string,
   docxOutPath: string,
   docInfo: { [v: string]: string },
-  params: { [v: string]: Params }
+  patchInfo: { [v: string]: PatchInfo }
 ) {
   const patchDoc = await patchDocument(fs.readFileSync(docxTemplatePath), {
     patches: {
@@ -771,7 +776,7 @@ export async function createDocxPatch(
         type: PatchType.DOCUMENT,
         children: children,
       },
-      ...params,
+      ...patchInfo,
     },
   });
   fs.writeFileSync(docxOutPath, patchDoc);
