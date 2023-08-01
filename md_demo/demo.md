@@ -1,9 +1,9 @@
-<!-- word patch title "sample document" -->
-<!-- word patch subTitle "sample document subTitle" -->
-<!-- word patch division divisionXXX -->
-<!-- word patch date dateXXX -->
-<!-- word patch author authorXXX -->
-<!-- word patch docNumber XXXX-0004 -->
+<!-- word placeholder title "sample document" -->
+<!-- word placeholder subTitle "sample document subTitle" -->
+<!-- word placeholder division divisionXXX -->
+<!-- word placeholder date dateXXX -->
+<!-- word placeholder author authorXXX -->
+<!-- word placeholder docNumber XXXX-0004 -->
 <!-- word newLine -->
 <!-- word toc 3 "toc caption" -->
 <!-- word levelOffset 1 -->

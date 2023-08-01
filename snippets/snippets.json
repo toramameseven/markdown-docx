@@ -2,13 +2,13 @@
   "word front all": {
     "prefix": "word properties",
     "body": [
-      "<!-- word patch title ${1:title} -->",
-      "<!-- word patch subTitle ${2:subTitle} -->",
-      "<!-- word patch author ${3:author} -->",
-      "<!-- word patch division ${4:division} -->",
-      "<!-- word patch date ${5:date} -->",
-      "<!-- word patch docNumber ${6:XXXX-XXXX} -->",
-      "<!-- word toc ${8|1,2,3|} TOC -->$0"
+      "<!-- word placeholder title ${1:title} -->",
+      "<!-- word placeholder subTitle ${2:subTitle} -->",
+      "<!-- word placeholder author ${3:author} -->",
+      "<!-- word placeholder division ${4:division} -->",
+      "<!-- word placeholder date ${5:date} -->",
+      "<!-- word placeholder docNumber ${6:XXXX-XXXX} -->",
+      "<!-- word toc ${7|1,2,3|} TOC -->$0"
     ],
     "description": "word properties"
   },

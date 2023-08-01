@@ -2,7 +2,7 @@
 <html lang="en" class="">
   <head>
     <meta charset="UTF-8" />
-    <title>CodePen Demo</title>
+    <title>[[html main title]]</title>
     <meta name="robots" content="noindex" />
     <style type="text/css">
       body {
@@ -140,8 +140,29 @@
 
       nav ul li {
         counter-increment: item;
+        margin: 0 0 0 -1em;
+        padding: 0;
         list-style-type: none;
+        font-size: medium;
       }
+
+      nav ul ul li {
+        counter-increment: item;
+        margin: 0 0 0 -3em;
+        padding: 0;
+        list-style-type: none;
+        font-size: medium;
+      }
+
+      nav ul ul ul li {
+        counter-increment: item;
+        margin: 0 0 0 -5em;
+        padding: 0;
+        list-style-type: none;
+        font-size: medium;
+      }
+
+
       nav ul li:first-child {
         counter-reset: item;
       }
@@ -236,7 +257,7 @@
             "A `main` tag section is required to query headings from."
           );
         }
-        headings = main.querySelectorAll("h2, h3, h4, h5");
+        headings = main.querySelectorAll("h2, h3, h4");
         let previousHeading;
         let currentSectionList = document.createElement("ul");
         tocElement.appendChild(currentSectionList);

@@ -468,15 +468,15 @@ function resolveWordCommentsCommands(
     return true;
   } // table of contents
 
-  // patch words
-  if (wdCommandList[0] === "patch") {
+  // placeholder words
+  if (wdCommandList[0] === "placeholder") {
     (patchInfo[wdCommandList[1]] = {
       type: PatchType.PARAGRAPH,
       children: [new TextRun(wdCommandList[2])],
     }),
       wdCommandList[2];
     return true;
-  } // patch words
+  } // placeholder words
 
   // option
   const documentInfoKeys = Object.keys(documentInfo);
