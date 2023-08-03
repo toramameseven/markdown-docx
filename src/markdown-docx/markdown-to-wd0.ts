@@ -1,5 +1,5 @@
 import type { marked as Marked } from "marked";
-import { marked  } from "marked";
+import { marked } from "marked";
 import { unescape } from "lodash";
 import {
   getWordDownCommand as parseHtmlComment,
@@ -553,19 +553,20 @@ export async function markdownToWd0(
     markedOptions = { ...markedOptions, renderer: render };
   }
 
-
   // get markdown levelOffset
-  const offsetMatch = markdown.match(/<!--\s+(oox|word|pptx)\s+levelOffset\s+(?<name>.*)\s+-->/i);
+  const offsetMatch = markdown.match(
+    /<!--\s+(oox|word|pptx)\s+levelOffset\s+(?<name>.*)\s+-->/i
+  );
   let levelOffset = parseInt(offsetMatch?.groups?.name ?? "0");
-  levelOffset = Number.isNaN( levelOffset) ? 0 : levelOffset;
-  
+  levelOffset = Number.isNaN(levelOffset) ? 0 : levelOffset;
 
-  const walkTokens = (token:any) => {
-    if (token.type === 'heading') {
+  const walkTokens = (token: any) => {
+    if (token.type === "heading") {
       token.depth += levelOffset;
     }
   };
-  
+
+  // https://marked.js.org/
   let mdForMarked = markdown;
   if (convertType === "html") {
     marked.use(marked.getDefaults());
@@ -578,9 +579,8 @@ export async function markdownToWd0(
   }
 
   const unmarked = marked(mdForMarked, markedOptions);
-  const unescaped = unescape(unmarked);
-  const trimmed = unescaped.trim();
-  return trimmed;
+  const toOutput = convertType === "html" ? unmarked : unescape(unmarked);
+  return toOutput.trim();
 }
 
 /**

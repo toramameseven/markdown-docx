@@ -35,12 +35,46 @@
         padding: 2rem 3rem;
       }
 
-      nav {
-        flex: 1 1 300px;
+      .toc1.active {
+        flex: 1 1 0;
         /* background-color: #333344; */
-        min-width: 240px;
-        paddings: 1rem;
+        min-width: 0;
+        /* padding: 1rem; */
         overflow-y: auto;
+        font-size: small;
+      }
+      .toc1  {
+          flex: 1 1 300px;
+          /* background-color: #333344; */
+          min-width: 120px;
+          /* padding: 1rem; */
+          overflow-y: auto;
+          font-size: small;
+        }
+
+      @media screen and (min-width: 1000px) {
+      .toc1  {
+          flex: 1 1 300px;
+          /* background-color: #333344; */
+          min-width: 120px;
+          /* padding: 1rem; */
+          overflow-y: auto;
+          font-size: small;
+        }
+      }
+
+      @media screen and (max-width: 1000px) {
+      .toc1  {
+        flex: 1 1 0;
+        /* background-color: #333344; */
+        min-width: 0;
+        /* padding: 1rem; */
+        overflow-y: auto;
+        font-size: small;
+        }
+        .openbtn1{
+          display: none;
+        }
       }
 
       table {
@@ -138,6 +172,16 @@
         content: "■" " ";
       }
 
+
+      code {
+        display: inline-block;
+        padding: 0.1em 0.25em;
+        color: #444;
+        background-color: #e7edf3;
+        border-radius: 3px;
+        border: solid 1px #d6dde4;
+      }
+      
       nav ul li {
         counter-increment: item;
         margin: 0 0 0 -1em;
@@ -169,14 +213,67 @@
       nav ul li:before {
         content: counters(item, ".") ". ";
         float: left;
-      } /*# sourceMappingURL=numbered.css.map */
+      }
+      
+      .openbtn1 {
+        position: relative;
+        background: #57a2c7;
+        cursor: pointer;
+        width: 50px;
+        height: 50px;
+        border-radius: 5px;
+      }
+      .openbtn1 span {
+        display: inline-block;
+        transition: all 0.4s;
+        position: absolute;
+        left: 14px;
+        height: 3px;
+        border-radius: 2px;
+        background: #fff;
+        width: 22px;
+      }
+      .openbtn1.active span:nth-of-type(1) {
+        top: 14px;
+        transform: translateY(6px) rotate(-45deg);
+        width: 22px;
+      }
+      .openbtn1.active span:nth-of-type(2) {
+        opacity: 0;
+      }
+      .openbtn1.active span:nth-of-type(3) {
+        top: 36px;
+        transform: translateY(-6px) rotate(45deg);
+        width: 22px;
+      }
+
+      .openbtn1 span:nth-of-type(1) {
+        top: 24px;
+        transform: translateY(6px) rotate(-45deg);
+        width: 22px;
+      }
+      .openbtn1 span:nth-of-type(2) {
+        opacity: 0;
+      }
+      .openbtn1 span:nth-of-type(3) {
+        top: 25px;
+        transform: translateY(-6px) rotate(45deg);
+        width: 22px;
+      }
+      /*# sourceMappingURL=numbered.css.map */
     </style>
   </head>
 
 
     <body>
-      <nav id="toc"></nav>
-      <main>[[html main contents]]</main>
+      <nav id="toc" class="toc1"></nav>
+      <main>
+        <div class="openbtn1">
+          <span></span>
+          <span></span>
+          <span></span>
+       </div>
+       [[html main contents]]</main>
     </body>
 
     <script>
@@ -331,10 +428,19 @@
         if ("IntersectionObserver" in window) {
           observeHeadings();
         }
+        const nav = document.getElementsByClassName('toc1')[0];
+        nav.classList.toggle('active');
       });
 
       window.addEventListener("unload", (event) => {
         headerObserver.disconnect();
       });
+
+      const btn = document.getElementsByClassName('openbtn1')[0];
+      const nav = document.getElementsByClassName('toc1')[0];
+      btn.addEventListener('click',function(){
+        this.classList.toggle('active');
+        nav.classList.toggle('active');
+      })
     </script>
 </html>
