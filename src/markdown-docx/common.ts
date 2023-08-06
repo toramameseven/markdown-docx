@@ -124,7 +124,7 @@ export function getWordDownCommand(wd: string) {
   const testMatch = wd.match(/^<!--(?<name>.*)-->/i);
   const command = testMatch?.groups?.name ?? "";
   const commandList = command.trim().split(/\s(?=(?:[^"]*"[^"]*")*[^"]*$)/i);
-  if (commandList[0].match(/word|pptx|oox/i) && commandList[1]) {
+  if (commandList[0].match(/word|ppt|oox/i) && commandList[1]) {
     const params = (commandList.slice(2) ?? []).map((l) =>
       l.replace(/\"/g, "")
     );

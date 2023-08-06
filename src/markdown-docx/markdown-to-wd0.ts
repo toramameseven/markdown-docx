@@ -547,7 +547,7 @@ export async function markdownToWd0(
 
   // get markdown levelOffset
   const offsetMatch = markdown.match(
-    /<!--\s+(oox|word|pptx)\s+levelOffset\s+(?<name>.*)\s+-->/i
+    /<!--\s+(oox|word|ppt)\s+levelOffset\s+(?<name>.*)\s+-->/i
   );
   let levelOffset = parseInt(offsetMatch?.groups?.name ?? "0");
   levelOffset = Number.isNaN(levelOffset) ? 0 : levelOffset;

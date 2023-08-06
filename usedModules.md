@@ -5,14 +5,14 @@
 | front-matter                     | MIT          | git://github.com/jxson/front-matter.git                        | Jason Campbell <jasoncampbell@google.com> (http://twitter.com/jxson) |
 | iconv-lite                       | MIT          | git://github.com/ashtuchkin/iconv-lite.git                     | Alexander Shtuchkin <ashtuchkin@gmail.com>                           |
 | image-size                       | MIT          | git://github.com/image-size/image-size.git                     | netroy <aditya@netroy.in> (http://netroy.in/)                        |
+| inline-source                    | MIT          | git://github.com/popeindustries/inline-source.git              | Alexander Pope <alex@pope.industries>                                |
 | lodash                           | MIT          | git+https://github.com/lodash/lodash.git                       | John-David Dalton <john.david.dalton@gmail.com>                      |
 | marked                           | MIT          | git://github.com/markedjs/marked.git                           | Christopher Jeffrey                                                  |
-| mathjax-full                     | Apache-2.0   | git+https://github.com/mathjax/Mathjax-src.git                 | n/a                                                                  |
-| node-html-markdown               | MIT          | git+ssh://git@github.com/crosstype/node-html-markdown.git      | Ron S. http://twitter.com/ron                                        |
 | node-html-parser                 | MIT          | https://github.com/taoqf/node-fast-html-parser.git             | Xiaoyi Shi <ashi009@gmail.com>                                       |
 | pptxgenjs                        | MIT          | git+https://github.com/gitbrent/PptxGenJS.git                  | Brent Ely https://github.com/gitbrent/                               |
 | svg2png-wasm                     | MIT          | git+https://github.com/ssssota/svg2png-wasm.git                | ssssota                                                              |
 | tex-to-svg                       | MIT          | git+https://github.com/CreatifCreateur/TeX-to-SVG.git          | @CreatifCreateur                                                     |
+| textile-js                       | MIT          | git://github.com/borgar/textile-js.git                         | Borgar Þorsteinsson <borgar@borgar.net>                              |
 | @types/encoding-japanese         | MIT          | https://github.com/DefinitelyTyped/DefinitelyTyped.git         | n/a                                                                  |
 | @types/glob                      | MIT          | https://github.com/DefinitelyTyped/DefinitelyTyped.git         | n/a                                                                  |
 | @types/lodash                    | MIT          | https://github.com/DefinitelyTyped/DefinitelyTyped.git         | n/a                                                                  |

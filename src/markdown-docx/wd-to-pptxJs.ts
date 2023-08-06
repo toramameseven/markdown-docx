@@ -80,7 +80,7 @@ export async function wdToPptx(
 type DocumentInfo =  {
   placeholder: { [v: string]: string };
   param: { [v: string]: string };
-}
+};
 
 /**
  *
@@ -152,7 +152,7 @@ export async function wdToPptxJs(
   // create sheet object
   const currentSheet = new PptSheet(pptx, pptStyle);
   currentSheet.setDefaultPosition({
-    ...getPositionPCT("10,15,70,70"),
+    ...getPositionPercent("10,15,70,70"),
     valign: "top",
   });
 
@@ -237,7 +237,7 @@ export async function wdToPptxJs(
         currentSheet.addTextFrame();
         // update position
         currentSheet.setCurrentPosition({
-          ...getPositionPCT(documentInfo.param.position),
+          ...getPositionPercent(documentInfo.param.position),
         });
         documentInfo.param.position = "";
       }
@@ -633,7 +633,7 @@ function getPositionInch(position: string, pptx: pptxGen) {
  * @param position x,y,w,h in percent
  * @returns
  */
-function getPositionPCT(position: string) {
+function getPositionPercent(position: string) {
   const functionName = "getPositionPCT";
   try {
     const positions = position.split(",");
@@ -710,7 +710,7 @@ function createImageChild(
   let positions = {};
 
   if (imageAlt) {
-    positions = getPositionPCT(imageAlt);
+    positions = getPositionPercent(imageAlt);
   }
 
   if (pos.x && pos.y) {

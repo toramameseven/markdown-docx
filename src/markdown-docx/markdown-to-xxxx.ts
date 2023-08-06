@@ -58,14 +58,16 @@ export async function markdownToDocx(
     );
 
     // get template and engine from the body text. engine is only for vba(vbs).
-    const docxEngineInsideWdBody = getDocxEngine(wdBody);
+    // only vbs mode // const docxEngineInsideWdBody = getDocxEngine(wdBody);
     const templateInsideWdBody = getDocxTemplate(wdBody);
     fileWd = wdPath;
 
     // get docx docxEngine and docxTemplate in a wd file or options.
-    option.docxEngine = docxEngineInsideWdBody
-      ? docxEngineInsideWdBody
-      : option.docxEngine;
+    // does not use vbs rendering
+    // option.docxEngine = docxEngineInsideWdBody
+    //   ? docxEngineInsideWdBody
+    //   : option.docxEngine;
+
     option.docxTemplate = templateInsideWdBody
       ? templateInsideWdBody
       : option.docxTemplate;
@@ -311,6 +313,7 @@ export async function markdownToWd(
     );
 
     // get file contents
+    // include files here
     let fileContents = getFileContents(filePath);
 
     // get front matter and body
@@ -395,11 +398,12 @@ function getFrontMatterAndBody(
   return { frontMatter, markdownBody };
 }
 
-function getDocxEngine(wd: string) {
-  const testMatch = wd.match(/^docxEngine\t(?<docxEngine>.*)\t/i);
-  const docxEngine = testMatch?.groups?.docxEngine ?? "";
-  return docxEngine;
-}
+// does not use vbs
+// function getDocxEngine(wd: string) {
+//   const testMatch = wd.match(/^docxEngine\t(?<docxEngine>.*)\t/i);
+//   const docxEngine = testMatch?.groups?.docxEngine ?? "";
+//   return docxEngine;
+// }
 
 function getDocxTemplate(wd: string) {
   const testMatch = wd.match(/^docxTemplate\t(?<docxTemplate>.*)\t/im);
