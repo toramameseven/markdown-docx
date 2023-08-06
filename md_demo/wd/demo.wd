@@ -1,13 +1,13 @@
-param	title	sample document			tm
-param	subTitle	sample document subTitle			tm
-param	division	divisionXXX			tm
-param	date	dateXXX			tm
-param	author	authorXXX			tm
-param	docNumber	XXXX-0004			tm
+placeholder	title	sample document			tm
+placeholder	subTitle	sample document subTitle			tm
+placeholder	division	divisionXXX			tm
+placeholder	date	dateXXX			tm
+placeholder	author	authorXXX			tm
+placeholder	docNumber	XXXX-0004			tm
 newLine	wd0NewLine	tm
 toc	3	toc caption	tm
 newLine	convertToc	tm
-section	1	title-subtitle-and-table-of-content
+section	2	title-subtitle-and-table-of-content
 text	title subtitle and table of content
 newLine	convertHeading End	tm
 text	markdown
@@ -24,7 +24,7 @@ text	This sample markdown is modified from the document of
 link	https://markdown-it.github.io/		markdown-it	tm
 text	.
 newLine	convertParagraph	tm
-section	1	heading
+section	2	heading
 text	Heading
 newLine	convertHeading End	tm
 text	markdown
@@ -53,22 +53,22 @@ code	###### Heading6
 newLine	convertCode	tm
 text	result
 newLine	convertParagraph	tm
-section	2	heading2
+section	3	heading2
 text	Heading2
 newLine	convertHeading End	tm
-section	3	heading3
+section	4	heading3
 text	Heading3
 newLine	convertHeading End	tm
-section	4	heading4
+section	5	heading4
 text	Heading4
 newLine	convertHeading End	tm
-section	5	heading5
+section	6	heading5
 text	Heading5
 newLine	convertHeading End	tm
-section	6	heading6
+section	7	heading6
 text	Heading6
 newLine	convertHeading End	tm
-section	1	horizontal-rules
+section	2	horizontal-rules
 text	Horizontal Rules
 newLine	convertHeading End	tm
 text	markdown
@@ -88,7 +88,7 @@ newLine	convertParagraph	tm
 hr	
 hr	
 hr	
-section	1	br
+section	2	br
 text	BR
 newLine	convertHeading End	tm
 text	markdown
@@ -115,8 +115,11 @@ text	test
 newLine	wd0NewLine	tm
 text	upper line is <codespan><br></codespan>
 newLine	convertParagraph	tm
-section	1	new-page
+section	2	new-page
 text	new page
+newLine	convertHeading End	tm
+section	3	markdown
+text	markdown
 newLine	convertHeading End	tm
 text	markdown
 newLine	convertParagraph	tm
@@ -137,14 +140,14 @@ newLine	convertParagraph	tm
 newPage				tm
 text	upper line is <codespan><!-- word newPage --></codespan>
 newLine	convertParagraph	tm
-section	1	typographic-replacements
+section	2	typographic-replacements
 text	Typographic replacements
 newLine	convertHeading End	tm
 text	NOTE: All @ are replaced to "\@" in <b>markdown to docx</b>.
 newLine	convertParagraph	tm
 text	anonymous@com.com
 newLine	convertParagraph	tm
-section	1	emphasis
+section	2	emphasis
 text	Emphasis
 newLine	convertHeading End	tm
 text	markdown
@@ -185,7 +188,7 @@ text	<~~>Strikethrough</~~>
 newLine	convertParagraph	tm
 text	2<sup>x</sup><sub>y</sub>
 newLine	convertParagraph	tm
-section	1	emphasis2
+section	2	emphasis2
 text	Emphasis2
 newLine	convertHeading End	tm
 text	markdown
@@ -218,7 +221,7 @@ text	2<sup>x</sup><sub>y</sub>
 newLine	convertParagraph	tm
 text	NOTE: Sometime Emphasis does not work. That time, please add some spaces between words.
 newLine	convertParagraph	tm
-section	1	blockquotes
+section	2	blockquotes
 text	Blockquotes
 newLine	convertHeading End	tm
 text	NOTE: <b>markdown to docx</b> does not support blockquote.
@@ -250,7 +253,7 @@ text	 				tm
 text	...or with spaces between arrows.
 newLine	convertParagraph	tm
 indentMinus
-section	1	lists-unordered
+section	2	lists-unordered
 text	Lists Unordered
 newLine	convertHeading End	tm
 text	NOTE: <b>markdown to docx</b>  supports only three layers.
@@ -315,7 +318,7 @@ link	links			tm
 text	 send you
 newLine	convertListItem End	tm
 indentMinus
-section	1	lists-ordered
+section	2	lists-ordered
 text	Lists ordered
 newLine	convertHeading End	tm
 text	markdown
@@ -373,7 +376,7 @@ OderList	1
 text	bar
 newLine	convertListItem End	tm
 indentMinus
-section	1	lists-mixed
+section	2	lists-mixed
 text	Lists mixed
 newLine	convertHeading End	tm
 text	markdown
@@ -401,7 +404,7 @@ newLine	convertListItem End	tm
 indentMinus
 indentMinus
 indentMinus
-section	1	code
+section	2	code
 text	Code
 newLine	convertHeading End	tm
 text	markdown
@@ -412,7 +415,7 @@ text	result
 newLine	convertParagraph	tm
 text	Inline <codespan>code</codespan>
 newLine	convertParagraph	tm
-section	1	indented-code
+section	2	indented-code
 text	Indented code
 newLine	convertHeading End	tm
 text	markdown
@@ -435,7 +438,7 @@ code	line 2 of code
 newLine	convertCode	tm
 code	line 3 of code
 newLine	convertCode	tm
-section	1	block-code-syntax-highlighting
+section	2	block-code-syntax-highlighting
 text	Block code syntax highlighting
 newLine	convertHeading End	tm
 text	NOTE: <b>markdown to docx</b> does not support Syntax highlighting.
@@ -448,10 +451,10 @@ code	};
 newLine	convertCode	tm
 code	console.log(foo(5));
 newLine	convertCode	tm
-section	1	tables
+section	2	tables
 text	Tables
 newLine	convertHeading End	tm
-section	2	normal-table
+section	3	normal-table
 text	normal table
 newLine	convertHeading End	tm
 text	markdown
@@ -470,7 +473,6 @@ text	result
 newLine	convertParagraph	tm
 tableCreate	4	2
 tableWidthInfo	6.5,6.5
-tablePos	10,10,80,80
 tablecontents	0	0	next	left
 tablecontentslist	text	data1-1
 tablecontentslist	endParagraph		tm
@@ -495,7 +497,7 @@ tablecontentslist	endParagraph		tm
 tablecontents	3	1	next	left
 tablecontentslist	text	data4-2
 tablecontentslist	endParagraph		tm
-section	2	merge-cells-no1
+section	3	merge-cells-no1
 text	merge cells No.1
 newLine	convertHeading End	tm
 indentPlus
@@ -523,7 +525,6 @@ text	result
 newLine	convertParagraph	tm
 tableCreate	4	2
 tableWidthInfo	6.5,6.5
-tablePos	10,10,80,80
 tablecontents	0	0	next	left
 tablecontentslist	text	data1-1
 tablecontentslist	endParagraph		tm
@@ -548,7 +549,7 @@ tablecontents	3	1	next	left
 tablecontentslist	endParagraph		tm
 tableMarge	1	0	2	0	text	data2-1
 tableMarge	2	1	3	1	text	data3-2
-section	2	merge-cells-no2
+section	3	merge-cells-no2
 text	merge cells No.2
 newLine	convertHeading End	tm
 text	markdown
@@ -577,7 +578,6 @@ text	cell(4,2) is not merged. (comment cell)
 newLine	convertParagraph	tm
 tableCreate	4	2
 tableWidthInfo	6.5,5.625
-tablePos	10,10,80,80
 tablecontents	0	0	next	left
 tablecontentslist	text	data1-1
 tablecontentslist	endParagraph		tm
@@ -602,7 +602,7 @@ tablecontents	3	1	next	left
 tablecontentslist	text	
 tablecontentslist	endParagraph		tm
 tableMarge	1	0	2	0	text	data2-1
-section	2	table-with-emphasis
+section	3	table-with-emphasis
 text	table with emphasis
 newLine	convertHeading End	tm
 text	markdown
@@ -621,7 +621,6 @@ text	result
 newLine	convertParagraph	tm
 tableCreate	4	2
 tableWidthInfo	6.5,13.25
-tablePos	10,10,80,80
 tablecontents	0	0	next	left
 tablecontentslist	text	data1-1
 tablecontentslist	endParagraph		tm
@@ -645,7 +644,7 @@ tablecontentslist	endParagraph		tm
 tablecontents	3	1	next	left
 tablecontentslist	text	<b>This is bold text</b>
 tablecontentslist	endParagraph		tm
-section	2	table-column-width
+section	3	table-column-width
 text	table column width
 newLine	convertHeading End	tm
 text	markdown
@@ -668,7 +667,6 @@ text	result
 newLine	convertParagraph	tm
 tableCreate	4	2
 tableWidthInfo	2,1
-tablePos	10,10,80,80
 tablecontents	0	0	next	left
 tablecontentslist	text	data1-1
 tablecontentslist	endParagraph		tm
@@ -693,7 +691,7 @@ tablecontentslist	endParagraph		tm
 tablecontents	3	1	next	left
 tablecontentslist	text	data4-2
 tablecontentslist	endParagraph		tm
-section	2	right-aligned-and-rows-merge
+section	3	right-aligned-and-rows-merge
 text	Right aligned and rows merge
 newLine	convertHeading End	tm
 text	markdown
@@ -716,7 +714,6 @@ text	result
 newLine	convertParagraph	tm
 tableCreate	4	2
 tableWidthInfo	1,3
-tablePos	10,10,80,80
 tablecontents	0	0	next	right
 tablecontentslist	text	data1-1
 tablecontentslist	endParagraph		tm
@@ -745,7 +742,7 @@ tableMarge	2	0	3	0	text	data3-1
 tableMarge	2	1	3	1	text	data3-2
 text	NOTE: aligned is not worked
 newLine	convertParagraph	tm
-section	2	table-with-new-line
+section	3	table-with-new-line
 text	table with new line
 newLine	convertHeading End	tm
 text	markdown
@@ -764,7 +761,6 @@ text	result
 newLine	convertParagraph	tm
 tableCreate	4	2
 tableWidthInfo	6.5,7.5
-tablePos	10,10,80,80
 tablecontents	0	0	next	left
 tablecontentslist	text	data1-1
 tablecontentslist	endParagraph		tm
@@ -793,10 +789,10 @@ tablecontentslist	text	data4-2
 tablecontentslist	endParagraph		tm
 text	NOTE: does not work
 newLine	convertParagraph	tm
-section	1	links
+section	2	links
 text	Links
 newLine	convertHeading End	tm
-section	2	cross-reference-in-a-docx
+section	3	cross-reference-in-a-docx
 text	cross reference in a docx
 newLine	convertHeading End	tm
 text	markdown
@@ -815,10 +811,10 @@ code	* look me [refs2 with space](#refs2-with-space) send you
 newLine	convertCode	tm
 text	result
 newLine	convertParagraph	tm
-section	2	refs1
+section	3	refs1
 text	refs1
 newLine	convertHeading End	tm
-section	2	refs2-with-space
+section	3	refs2-with-space
 text	refs2 with space
 newLine	convertHeading End	tm
 indentPlus
@@ -833,7 +829,7 @@ link	refs2-with-space			tm
 text	 send you
 newLine	convertListItem End	tm
 indentMinus
-section	2	normal-link
+section	3	normal-link
 text	normal link
 newLine	convertHeading End	tm
 code	look you [link text](http://dev.nodeca.com) see me
@@ -868,7 +864,7 @@ link	https://github.com/nodeca/pica		https://github.com/nodeca/pica	tm
 text	 (enable linkify to see)
 newLine	convertParagraph	tm
 indentMinus
-section	1	images
+section	2	images
 text	Images
 newLine	convertHeading End	tm
 text	markdown
@@ -891,7 +887,7 @@ text	NOTE: <b>markdown to docx</b>  supports only image files.
 newLine	convertParagraph	tm
 text	NOTE: Inline images do not work well.
 newLine	convertParagraph	tm
-section	1	math
+section	2	math
 text	Math
 newLine	convertHeading End	tm
 text	markdown
@@ -910,7 +906,7 @@ text	$\sqrt{3x-1}+(1+x)^2$
 newLine	convertParagraph	tm
 text	NOTE: math works so so.
 newLine	convertParagraph	tm
-section	1	admonition
+section	2	admonition
 text	Admonition
 newLine	convertHeading End	tm
 text	markdown

@@ -467,7 +467,6 @@ text	result
 newLine	convertParagraph	tm
 tableCreate	4	2
 tableWidthInfo	6.5,6.5
-tablePos	10,10,80,80
 tablecontents	0	0	next	left
 tablecontentslist	text	data1-1
 tablecontentslist	endParagraph		tm
@@ -520,7 +519,6 @@ text	result
 newLine	convertParagraph	tm
 tableCreate	4	2
 tableWidthInfo	6.5,6.5
-tablePos	10,10,80,80
 tablecontents	0	0	next	left
 tablecontentslist	text	data1-1
 tablecontentslist	endParagraph		tm
@@ -545,7 +543,7 @@ tablecontents	3	1	next	left
 tablecontentslist	endParagraph		tm
 tableMarge	1	0	2	0	text	data2-1
 tableMarge	2	1	3	1	text	data3-2
-section	2	merge-cells-no2
+section	1	merge-cells-no2
 text	merge cells No.2
 newLine	convertHeading End	tm
 text	markdown
@@ -575,7 +573,6 @@ newLine	convertParagraph	tm
 param	pptxSettings	C:\Users\maru\Desktop\github\markdown-docx\master-settings2.js			tm
 tableCreate	4	2
 tableWidthInfo	6.5,5.625
-tablePos	10,10,80,80
 tablecontents	0	0	next	left
 tablecontentslist	text	data1-1
 tablecontentslist	endParagraph		tm
@@ -600,7 +597,7 @@ tablecontents	3	1	next	left
 tablecontentslist	text	
 tablecontentslist	endParagraph		tm
 tableMarge	1	0	2	0	text	data2-1
-section	2	table-with-emphasis
+section	1	table-with-emphasis
 text	table with emphasis
 newLine	convertHeading End	tm
 text	markdown
@@ -619,7 +616,6 @@ text	result
 newLine	convertParagraph	tm
 tableCreate	4	2
 tableWidthInfo	6.5,13.25
-tablePos	10,10,80,80
 tablecontents	0	0	next	left
 tablecontentslist	text	data1-1
 tablecontentslist	endParagraph		tm
@@ -667,7 +663,6 @@ text	result
 newLine	convertParagraph	tm
 tableCreate	4	2
 tableWidthInfo	2,1
-tablePos	10,10,80,80
 tablecontents	0	0	next	left
 tablecontentslist	text	data1-1
 tablecontentslist	endParagraph		tm
@@ -715,7 +710,6 @@ text	result
 newLine	convertParagraph	tm
 tableCreate	4	2
 tableWidthInfo	1,3
-tablePos	10,10,80,80
 tablecontents	0	0	next	right
 tablecontentslist	text	data1-1
 tablecontentslist	endParagraph		tm
@@ -763,7 +757,6 @@ text	result
 newLine	convertParagraph	tm
 tableCreate	4	2
 tableWidthInfo	6.5,7.5
-tablePos	10,10,80,80
 tablecontents	0	0	next	left
 tablecontentslist	text	data1-1
 tablecontentslist	endParagraph		tm

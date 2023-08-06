@@ -21,7 +21,6 @@ text	result
 newLine	convertParagraph	tm
 tableCreate	4	2
 tableWidthInfo	1,3
-tablePos	10,10,80,80
 tablecontents	0	0	next	right
 tablecontentslist	text	data1-1
 tablecontentslist	endParagraph		tm
@@ -69,7 +68,6 @@ text	result
 newLine	convertParagraph	tm
 tableCreate	4	2
 tableWidthInfo	6.5,7.5
-tablePos	10,10,80,80
 tablecontents	0	0	next	left
 tablecontentslist	text	data1-1
 tablecontentslist	endParagraph		tm
