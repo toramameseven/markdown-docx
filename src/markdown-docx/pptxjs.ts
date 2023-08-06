@@ -51,7 +51,6 @@ export const WdNodeType = {
   table: "table",
   tablerow: "tablerow",
   tablecell: "tablecell",
-  tablePos: "tablePos",
   text: "text",
   image: "image",
   link: "link",
@@ -309,11 +308,6 @@ export class TableJs {
   doTableCommand(line: string) {
     const words = line.split(_sp);
     switch (words[0]) {
-      case "tablePos":
-        // does not use now!!
-        // this.tablePosition = getPositionPCT(words[1]);
-        return;
-        break;
       case "tableWidthInfo":
         const widthArray = words[1].split(",").map((l) => parseInt(l));
         const sums = widthArray.reduce(function (a, x) {

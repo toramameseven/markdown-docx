@@ -38,7 +38,7 @@ function removeTopN(s: string) {
 
 suite("Extension Test Suite", () => {
   // ==========================================
-  test("title", () => {
+  test("title", async () => {
     // marked
     const markdown = `
 <!-- word title "Markdown to Docx samples" -->`;
@@ -49,11 +49,11 @@ title\tMarkdown to Docx samples
 newLine\tconvertTitle\ttm`;
 
     // assert
-    assert.strictEqual(mdToWd(removeTopN(markdown)), removeTopN(expect));
+    assert.strictEqual(await mdToWd(removeTopN(markdown)), removeTopN(expect));
   });
 
   // ==========================================
-  test("toc", () => {
+  test("toc", async () => {
     // marked
     const markdown = `
 <!-- word toc 1 "table of content"-->`;
@@ -64,11 +64,11 @@ toc	1	table of content	tm
 newLine	convertToc	tm`;
 
     // assert
-    assert.strictEqual(mdToWd(removeTopN(markdown)), removeTopN(expect));
+    assert.strictEqual(await mdToWd(removeTopN(markdown)), removeTopN(expect));
   });
 
   // ==========================================
-  test("property", () => {
+  test("property", async () => {
     // marked
     const markdown = `
 <!-- word property ppp "table of content" -->`;
@@ -78,11 +78,11 @@ newLine	convertToc	tm`;
 property	ppp	table of content			tm`;
 
     // assert
-    assert.strictEqual(mdToWd(removeTopN(markdown)), removeTopN(expect));
+    assert.strictEqual(await mdToWd(removeTopN(markdown)), removeTopN(expect));
   });
 
   // ==========================================
-  test("heading1", () => {
+  test("heading1", async () => {
     // marked
     const markdown = `
 # heading1`;
@@ -96,11 +96,11 @@ text\theading1
 newLine\tconvertHeading End\ttm`;
 
     // assert
-    assert.strictEqual(mdToWd(removeTopN(markdown)), removeTopN(expect));
+    assert.strictEqual(await mdToWd(removeTopN(markdown)), removeTopN(expect));
   });
 
   // ==========================================
-  test("heading6", () => {
+  test("heading6", async () => {
     // marked
     const markdown = `
 ###### heading6`;
@@ -114,11 +114,11 @@ text\theading6
 newLine\tconvertHeading End\ttm`;
 
     // assert
-    assert.strictEqual(mdToWd(removeTopN(markdown)), removeTopN(expect));
+    assert.strictEqual(await mdToWd(removeTopN(markdown)), removeTopN(expect));
   });
 
   // ==========================================
-  test("hr", () => {
+  test("hr", async () => {
     // marked
     const markdown = `
 ___
@@ -134,11 +134,11 @@ hr
 hr	`;
 
     // assert
-    assert.strictEqual(mdToWd(removeTopN(markdown)), removeTopN(expect));
+    assert.strictEqual(await mdToWd(removeTopN(markdown)), removeTopN(expect));
   });
 
   // ==========================================
-  test("br", () => {
+  test("br", async () => {
     // marked
     const markdown = `
 next line is \`<br>\`
@@ -153,11 +153,11 @@ text	upper line is <codespan><br></codespan>
 newLine	convertParagraph	tm`;
 
     // assert
-    assert.strictEqual(mdToWd(removeTopN(markdown)), removeTopN(expect));
+    assert.strictEqual(await mdToWd(removeTopN(markdown)), removeTopN(expect));
   });
 
   // ==========================================
-  test("new page", () => {
+  test("new page", async () => {
     // marked
     const markdown = `
 <!-- word newPage -->`;
@@ -167,11 +167,11 @@ newLine	convertParagraph	tm`;
 newPage				tm`;
 
     // assert
-    assert.strictEqual(mdToWd(removeTopN(markdown)), removeTopN(expect));
+    assert.strictEqual(await mdToWd(removeTopN(markdown)), removeTopN(expect));
   });
 
   // ==========================================
-  test("at mark", () => {
+  test("at mark", async () => {
     // marked
     const markdown = `
 anonymous@com.com`;
@@ -182,11 +182,11 @@ text\tanonymous@com.com
 newLine\tconvertParagraph\ttm`;
 
     // assert
-    assert.strictEqual(mdToWd(removeTopN(markdown)), removeTopN(expect));
+    assert.strictEqual(await mdToWd(removeTopN(markdown)), removeTopN(expect));
   });
 
   // ==========================================
-  test("emphasis1", () => {
+  test("emphasis1", async () => {
     // marked
     const markdown = `
 **This is bold text**
@@ -216,11 +216,11 @@ newLine	convertParagraph	tm
 text	2<sup>x</sup><sub>y</sub>
 newLine	convertParagraph	tm`;
     // assert
-    assert.strictEqual(mdToWd(removeTopN(markdown)), removeTopN(expect));
+    assert.strictEqual(await mdToWd(removeTopN(markdown)), removeTopN(expect));
   });
 
   // ==========================================
-  test("XXXXX", () => {
+  test("XXXXX", async () => {
     // marked
     const markdown = ``;
 
@@ -228,7 +228,7 @@ newLine	convertParagraph	tm`;
     const expect = ``;
 
     // assert
-    assert.strictEqual(mdToWd(removeTopN(markdown)), removeTopN(expect));
+    assert.strictEqual(await mdToWd(removeTopN(markdown)), removeTopN(expect));
   });
 
   // ==========================================

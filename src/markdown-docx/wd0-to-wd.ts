@@ -32,7 +32,6 @@ const wd0Command = {
   code: "code",
   blockquote: "blockquote",
   table: "table",
-  tablePos: "tablePos",
   tablerow: "tablerow",
   tablecell: "tablecell",
   text: "text",
@@ -108,7 +107,6 @@ class Table implements BaseBlock {
   tableWidthInfo: string;
   rowMerge: string;
   emptyMerge: boolean;
-  tablePos: string;
 
   constructor() {
     this.blockType = wd0Command.table;
@@ -120,7 +118,6 @@ class Table implements BaseBlock {
     this.tableWidthInfo = "";
     //  "1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1";
     this.rowMerge = "";
-    this.tablePos = "";
     this.emptyMerge = false;
   }
 
@@ -168,10 +165,6 @@ class Table implements BaseBlock {
       : this.getColumnSize();
 
     commands.push(`tableWidthInfo\t${outTableInfo}`);
-
-    if (this.tablePos) {
-      commands.push(`tablePos\t${this.tablePos}`);
-    }
 
     // merge info rows
     // <!-- word rowMerge 3-4,5-6,7-9 -->
@@ -896,12 +889,6 @@ function resolveCommand(
         return;
       }
       table.tableWidthInfo = params.cols;
-      break;
-    case wd0Command.tablePos:
-      if (isCommandEnd) {
-        return;
-      }
-      table.tablePos = params.tablePos;
       break;
     case wd0Command.rowMerge:
       if (isCommandEnd) {

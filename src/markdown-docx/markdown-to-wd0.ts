@@ -46,7 +46,6 @@ const wordCommand = {
   division: "division",
   cols: "cols",
   rowMerge: "rowMerge",
-  tablePos: "tablePos",
   emptyMerge: "emptyMerge",
   newPage: "newPage",
   newLine: "newLine",
@@ -164,13 +163,6 @@ function resolveHtmlComment(content: string) {
         if (params.length) {
           return createBlockCommand(wordCommand.rowMerge, {
             rowMerge: params[0],
-          });
-        }
-        break;
-      case wordCommand.tablePos:
-        if (params.length) {
-          return createBlockCommand(wordCommand.tablePos, {
-            tablePos: params[0],
           });
         }
         break;

@@ -29,27 +29,27 @@ text	Heading
 newLine	convertHeading End	tm
 text	markdown
 newLine	convertParagraph	tm
-code	# Heading1
+code	## Heading1
 newLine	convertCode	tm
 code	
 newLine	convertCode	tm
-code	## Heading2
+code	### Heading2
 newLine	convertCode	tm
 code	
 newLine	convertCode	tm
-code	### Heading3
+code	#### Heading3
 newLine	convertCode	tm
 code	
 newLine	convertCode	tm
-code	#### Heading4
+code	##### Heading4
 newLine	convertCode	tm
 code	
 newLine	convertCode	tm
-code	##### Heading5
+code	###### Heading5
 newLine	convertCode	tm
 code	
 newLine	convertCode	tm
-code	###### Heading6
+code	####### Heading6
 newLine	convertCode	tm
 text	result
 newLine	convertParagraph	tm
@@ -65,9 +65,8 @@ newLine	convertHeading End	tm
 section	6	heading5
 text	Heading5
 newLine	convertHeading End	tm
-section	7	heading6
-text	Heading6
-newLine	convertHeading End	tm
+text	####### Heading6
+newLine	convertParagraph	tm
 section	2	horizontal-rules
 text	Horizontal Rules
 newLine	convertHeading End	tm
@@ -797,11 +796,11 @@ text	cross reference in a docx
 newLine	convertHeading End	tm
 text	markdown
 newLine	convertParagraph	tm
-code	## refs1
+code	### refs1
 newLine	convertCode	tm
 code	
 newLine	convertCode	tm
-code	## refs2 with space
+code	### refs2 with space
 newLine	convertCode	tm
 code	
 newLine	convertCode	tm

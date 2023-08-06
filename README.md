@@ -23,7 +23,7 @@ We do not use Microsoft Word at version 0.0.2.
   
 ## Extensions for word
 
-##### general
+###### general
 
 `<!-- word [command] parameters -->` is used for word command.
 
@@ -42,9 +42,9 @@ We do not use Microsoft Word at version 0.0.2.
 
   insert new page
 
-* `<!-- word param placeHolder "the value" -->`
+* `<!-- word placeHolder "key" "the value" -->`
 
-  `{{placeHolder}}` in a docx file is replaced to "the value".
+  `{{key}}` in a docx file is replaced to `the value`.
 
 * `<!-- word crossRef "[[$n $t (p.$p)]]" -->`
 
@@ -55,7 +55,7 @@ We do not use Microsoft Word at version 0.0.2.
   
   `[[1.1 this section (p.10)]]`
 
-##### table
+###### table
 
 * `<!-- word cols 1,2 -->`
 
@@ -77,10 +77,6 @@ You can see the sample file in the [markdown-docx site](https://github.com/toram
 
 ### markdown docx
 
-* markdown-docx.path.docxEngine
-
-  Set your original docx rendering vbs. This does not work now.
-
 * markdown-docx.path.docxTemplate
 
   Set your original docx file for template.
@@ -89,22 +85,11 @@ You can see the sample file in the [markdown-docx site](https://github.com/toram
    
   If set true, `$x+1$` type math is rendered.
 
-* markdown-docx.docxEngine.timeout
-
-  60000 ms is default. docx rendering is so slow, you can set bigger value.
-
 * markdown-docx.docxEngine.debug  
 
   some debug option is enabled.  
 
   * intermediate files *.wd0, *.wd are not deleted.
-
-* markdown-docx.docxEngine.logInterval
-
-* markdown-docx.docxEngine.docxJs  
-
-  if true, use [DOCX](https://docx.js.org/#/).  
-  From now on, this feature will be the main feature.
 
 * markdown-docx.docxEngine.isOverWrite
 
@@ -143,7 +128,7 @@ It is better, set your language font.
 1. ctrl + shift + p  
 2. select **create a docx template**
 
-you get a sample template.
+You get a sample template. In this template, you see the placeholder described at next section.
 
 ### place holder
 
@@ -163,9 +148,9 @@ Next place holders are used in the sample template.
   * `{{date}}`
   * `{{docNumber}}`
 
-markdown    
+markdown  
 ```
-<!-- word param title "sample document" -->
+<!-- word placeholder title "sample document" -->
 ```
 
 docx template
@@ -181,9 +166,10 @@ docx template
 next styles are created.
 
 * hh1 to hh4
-    * `#` to `#####`
+    * `##` to `######`
+    * If your document start with `#`, set command `<!-- word levelOffset 1 -- >`.
 * wdHeading5
-    * `#####`, `######`
+    * `######`, `#######`
 * body1
 * body2
 * body3
@@ -214,15 +200,6 @@ next styles are created.
 
 ## vbs rendering does not support
 
-### user properties
-
-NOTE: user properties works only on vbs mode.
-
-* dNumber
-* dDivision
-* dDate
-* dAuthor
-
 ## How to package
 
 1. npm install -g vsce
@@ -243,15 +220,12 @@ And we use some useful articles below.
 * [koukimura's page](https://koukimra.com/) is used to resize pictures.
 * [minnano macro page](https://www.wordvbalab.com/) is used for emphasis styles.
 
-
-
 ## Release Notes
 
 * 0.0.2
   * use [DOCX](https://docx.js.org/#/) for creating word files.
   * we do not support the vbs rendering on version `0.0.2`.
     
-
 * 0.0.1
   * first Release.
 

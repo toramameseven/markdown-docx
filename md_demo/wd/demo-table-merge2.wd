@@ -25,7 +25,7 @@ text	result
 newLine	convertParagraph	tm
 text	cell(4,2) is not merged. (comment cell)
 newLine	convertParagraph	tm
-param	pptxSettings	C:\Users\maru\Desktop\github\markdown-docx\master-settings2.js			tm
+param	pptxSettings	C:\Users\XXXX\Desktop\github\markdown-docx\master-settings2.js			tm
 tableCreate	4	2
 tableWidthInfo	6.5,5.625
 tablecontents	0	0	next	left

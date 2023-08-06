@@ -1,10 +1,10 @@
 // images
 let objBkg = {
-  path: "C:\\Users\\maru\\Desktop\\github\\markdown-docx\\src\\markdown-pptx\\starlabs_bkgd.jpg",
+  path: "C:\\starlabs_bkgd.jpg",
 };
 
 let objImg = {
-  path: "C:\\Users\\maru\\Desktop\\github\\markdown-docx\\src\\markdown-pptx\\starlabs_logo.png",
+  path: "C:\\starlabs_logo.png",
   x: 4.6,
   y: 3.5,
   w: 4,

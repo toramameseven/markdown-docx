@@ -6,12 +6,12 @@
 <!-- word placeholder docNumber XXXX-0004 -->
 <!-- word newLine -->
 <!-- word toc 3 "toc caption" -->
-<!-- word levelOffset 1 -->
+<!-- word levelOffset 0 -->
 
 
 <!-- https://markdown-it.github.io/ -->
 
-# title subtitle and table of content 
+## title subtitle and table of content 
 
 markdown
 
@@ -27,41 +27,41 @@ The result is above.
 This sample markdown is modified from the document of [markdown-it](https://markdown-it.github.io/).
 
 <!-- word export demo-headings.md-->
-# Heading
+## Heading
 
 markdown
 
 ```
-# Heading1
+## Heading1
 
-## Heading2
+### Heading2
 
-### Heading3
+#### Heading3
 
-#### Heading4
+##### Heading4
 
-##### Heading5
+###### Heading5
 
-###### Heading6
+####### Heading6
 ```
 
 result
 
-## Heading2
+### Heading2
 
-### Heading3
+#### Heading3
 
-#### Heading4
+##### Heading4
 
-##### Heading5
+###### Heading5
 
-###### Heading6
+####### Heading6
 
 
 
 
 <!-- word export demo-Horizontal.md-->
-# Horizontal Rules
+## Horizontal Rules
 
 markdown
 
@@ -82,7 +82,7 @@ ___
 
 
 <!-- word export demo-br.md-->
-# BR
+## BR
 
 markdown
 
@@ -108,9 +108,9 @@ upper line is `<br>`
 
 
 <!-- word export demo-newpage.md-->
-# new page
+## new page
 
-## markdown
+### markdown
 
 markdown
 
@@ -131,7 +131,7 @@ upper line is `<!-- word newPage -->`
 
 
 <!-- word export demo-Typographic.md-->
-# Typographic replacements
+## Typographic replacements
 
 NOTE: All @ are replaced to "\\@" in **markdown to docx**.
 
@@ -139,7 +139,7 @@ anonymous@com.com
 
 
 <!-- word export demo-Emphasis.md-->
-# Emphasis
+## Emphasis
 
 markdown
 
@@ -171,7 +171,7 @@ _This is italic text_
 2<sup>x</sup><sub>y</sub>
 
 <!-- word export demo-Emphasis2.md-->
-# Emphasis2
+## Emphasis2
 
 markdown
 
@@ -197,7 +197,7 @@ NOTE: Sometime Emphasis does not work. That time, please add some spaces between
 
 
 <!-- word export demo-Blockquotes.md-->
-# Blockquotes
+## Blockquotes
 
 NOTE: **markdown to docx** does not support blockquote.
 
@@ -222,7 +222,7 @@ result
 
 
 <!-- word export demo-list-unordered.md-->
-# Lists Unordered
+## Lists Unordered
 
 NOTE: **markdown to docx**  supports only three layers.
 
@@ -253,7 +253,7 @@ result
 * look me [](#links) send you
 
 <!-- word export demo-list-orderd.md-->
-# Lists ordered
+## Lists ordered
 
 markdown
 
@@ -286,7 +286,7 @@ NOTE: **markdown to docx** does not support numbering with offset:
 1. bar
 
 <!-- word export demo-list-mixed.md-->
-# Lists mixed
+## Lists mixed
 
 markdown
 
@@ -303,7 +303,7 @@ result
 
 
 <!-- word export demo-code.md-->
-# Code
+## Code
 
 markdown
 
@@ -315,7 +315,7 @@ result
 Inline `code`
 
 <!-- word export demo-code-indented.md-->
-# Indented code
+## Indented code
 
 markdown
 
@@ -333,7 +333,7 @@ result
     line 3 of code
 
 <!-- word export demo-code-fences.md-->
-# Block code syntax highlighting
+## Block code syntax highlighting
 
 NOTE: **markdown to docx** does not support Syntax highlighting.
 
@@ -346,9 +346,9 @@ console.log(foo(5));
 
 
 <!-- word export demo-table.md-->
-# Tables
+## Tables
 
-## normal table
+### normal table
 
 markdown
 
@@ -370,7 +370,7 @@ result
 
 
 <!-- word export demo-table-merge.md-->
-## merge cells No.1
+### merge cells No.1
 
 * cell(3,1) and cell(4,2) are merged.
   
@@ -399,7 +399,7 @@ result
 
 
 <!-- word export demo-table-merge2.md-->
-## merge cells No.2
+### merge cells No.2
 
 markdown
 
@@ -426,7 +426,7 @@ cell(4,2) is not merged. (comment cell)
 |         | data3-2                 |
 | data4-1 | <!-- not merged -->     |
 
-## table with emphasis
+### table with emphasis
 
 markdown
 
@@ -448,7 +448,7 @@ result
 
 
 <!-- word export demo-table-columns.md-->
-## table column width
+### table column width
 
 markdown
 
@@ -474,7 +474,7 @@ result
 
 
 <!-- word export demo-table-rowmerge.md-->
-## Right aligned and rows merge
+### Right aligned and rows merge
 
 markdown
 
@@ -501,7 +501,7 @@ result
 NOTE: aligned is not worked
 
 
-## table with new line
+### table with new line
 
 markdown
 
@@ -524,17 +524,17 @@ NOTE: does not work
 
 
 
-# Links
+## Links
 
 <!-- word export demo-links-xref.md-->
-## cross reference in a docx
+### cross reference in a docx
 
 markdown
 
 ```
-## refs1
+### refs1
 
-## refs2 with space
+### refs2 with space
 
 * look me [refs1](#refs1) send you
 * look me [refs2 with space](#refs2-with-space) send you
@@ -542,16 +542,16 @@ markdown
 
 result
 
-## refs1
+### refs1
 
-## refs2 with space
+### refs2 with space
 
 * look me [refs1](#refs1) send you
 * look me [refs2 with space](#refs2-with-space) send you
 
 
 <!-- word export demo-normalLink.md-->
-## normal link
+### normal link
 
 ```
 look you [link text](http://dev.nodeca.com) see me
@@ -573,7 +573,7 @@ Jason Campbell <jasoncampbell@google.com> (http://twitter.com/jxson)
 
 
 <!-- word export demo-image.md-->
-# Images
+## Images
 
 markdown
 
@@ -594,7 +594,7 @@ NOTE: **markdown to docx**  supports only image files.
 NOTE: Inline images do not work well.
 
 <!-- word export demo-math.md-->
-# Math
+## Math
 
 markdown
 
@@ -614,7 +614,7 @@ NOTE: math works so so.
 
 
 <!-- word export demo-admonition.md-->
-# Admonition
+## Admonition
 
 markdown
 
