@@ -112,8 +112,8 @@ export async function wdToPptxJs(
   // get ppt settings
   const settingPath = await selectExistsPath(
     [
-      documentInfo.param.pptxSettings,
-      Path.resolve(mdSourcePath, documentInfo.param.pptxSettings),
+      documentInfo.param.pptxSettings ?? "",
+      Path.resolve(mdSourcePath, documentInfo.param.pptxSettings ?? ""),
       "../templates/master-settings.js",
       "../../templates/master-settings.js",
     ],
@@ -342,10 +342,16 @@ function resolveWordCommentsCommands(
     documentInfo.placeholder[wdCommandList[1]] = wdCommandList[2];
     return true;
   }
+
   if (wdCommandList[0] === "param") {
     documentInfo.param[wdCommandList[1]] = wdCommandList[2];
     return true;
   }
+
+  if  (wdCommandList[0] === "section" && wdCommandList[1] === "1"){
+
+  }
+
   return false;
 }
 
