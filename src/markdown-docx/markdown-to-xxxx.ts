@@ -209,7 +209,7 @@ export async function markdownToHtml(
 ) {
   option.message && (showMessage = option.message);
   const dirPath = Path.dirname(pathMarkdown);
-  const fileNameMd = Path.basename(pathMarkdown).replace(/\.md$/i, "");
+  const fileNameMd = Path.basename(pathMarkdown);
   const fileHtml = await createPath(dirPath, fileNameMd, "html", true);
 
   // convert markdown to docx

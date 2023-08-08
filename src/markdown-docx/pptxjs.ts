@@ -229,6 +229,7 @@ export class PptParagraph {
   defaultFontSize: number = 18;
   currentFontSize: number = 18;
   insideSlideTitle: boolean = false;
+  insideDocumentTitle: boolean = false;
 
   constructor(defaultFontSize: number) {
     this.defaultFontSize = defaultFontSize;
@@ -246,6 +247,12 @@ export class PptParagraph {
     this.isFlush = false;
     this.currentFontSize = this.defaultFontSize;
     return r;
+  }
+
+  clear(){
+    this.children = [];
+    this.isFlush = false;
+    this.currentFontSize = this.defaultFontSize;    
   }
 
   addIndent() {

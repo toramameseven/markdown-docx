@@ -63,7 +63,7 @@ export async function wdToPptx(
   }
 
   try {
-    await wdToPptxJs(body, Path.dirname(fileWd), option);
+    await wdToPptxJs(body, fileWd, option);
   } catch (e) {
     option.message?.(
       MessageType.warn,
@@ -76,8 +76,7 @@ export async function wdToPptx(
   return;
 }
 
-
-type DocumentInfo =  {
+type DocumentInfo = {
   placeholder: { [v: string]: string };
   param: { [v: string]: string };
 };
@@ -85,16 +84,17 @@ type DocumentInfo =  {
 /**
  *
  * @param body
- * @param mdSourcePath
+ * @param wdFullPath
  */
 export async function wdToPptxJs(
   body: string,
-  mdSourcePath: string,
+  wdFullPath: string,
   option: DocxOption
 ): Promise<void> {
   const functionName = "wdToPptxJs";
   // doc info
-  const documentInfo:DocumentInfo = { placeholder: {}, param: {} };
+  const documentInfo: DocumentInfo = { placeholder: {}, param: {} };
+  const wdDirFullPath = Path.dirname(wdFullPath);
 
   thisMessage = option.message;
 
@@ -102,18 +102,19 @@ export async function wdToPptxJs(
   const lines = (body + "\nEndline").split(/\r?\n/);
 
   // get document information
-  const toInfoSearch = lines.length > 100 ? 100 : lines.length;
+  const toInfoSearch = lines.length > 50 ? 49 : lines.length - 1;
   for (let i = 0; i < toInfoSearch; i++) {
     const wdCommandList = lines[i].split(_sp);
+    const wdCommandList2 = lines[i + 1].split(_sp);
     // html comment command <!-- word xxxx -->
-    resolveWordCommentsCommands(wdCommandList, documentInfo);
+    resolveWordCommentsCommands(wdCommandList, wdCommandList2, documentInfo);
   }
 
   // get ppt settings
   const settingPath = await selectExistsPath(
     [
       documentInfo.param.pptxSettings ?? "",
-      Path.resolve(mdSourcePath, documentInfo.param.pptxSettings ?? ""),
+      Path.resolve(wdDirFullPath, documentInfo.param.pptxSettings ?? ""),
       "../templates/master-settings.js",
       "../../templates/master-settings.js",
     ],
@@ -126,6 +127,12 @@ export async function wdToPptxJs(
     }
     pptStyle = require(settingPath);
     pptxSettingsFilePath = settingPath;
+    thisMessage?.(
+      MessageType.info,
+      `${functionName}:ppt setting is ${pptxSettingsFilePath}.`,
+      "wd-to-pptxJs",
+      false
+    );
   } catch (e) {
     thisMessage?.(
       MessageType.debug,
@@ -172,9 +179,9 @@ export async function wdToPptxJs(
   documentInfo.param.position = "";
 
   // main loop (wd)
-  for (let i = 0; i < lines.length; i++) {
+  for (let i = 0; i < lines.length - 1; i++) {
     const wdCommandList = lines[i].split(_sp);
-
+    const wdCommandList2 = lines[i + 1].split(_sp);
     // when find create table
     if (wdCommandList[0] === "tableCreate") {
       // flush texts before creating tables.
@@ -185,7 +192,7 @@ export async function wdToPptxJs(
       tableJs = new TableJs(
         parseInt(wdCommandList[1]),
         parseInt(wdCommandList[2]),
-        mdSourcePath
+        wdDirFullPath
       );
       continue;
     }
@@ -213,7 +220,7 @@ export async function wdToPptxJs(
 
       // initialize image
       const image = createImageChild(
-        mdSourcePath,
+        wdDirFullPath,
         wdCommandList[1],
         wdCommandList[2],
         pptx,
@@ -226,6 +233,7 @@ export async function wdToPptxJs(
     // html comment command <!-- word xxxx -->
     const isResolveCommand = resolveWordCommentsCommands(
       wdCommandList,
+      wdCommandList2,
       documentInfo
     );
 
@@ -286,11 +294,10 @@ export async function wdToPptxJs(
   currentSheet.createSheet();
 
   //Export Presentation
-  const ff = `PptxGenJS_Demo_${new Date()
-    .toISOString()
-    .replace(/\D/gi, "")}.pptx`;
-
-  const outPathPPtx = Path.resolve(Path.dirname(mdSourcePath), ff);
+  const outPathPPtx = Path.resolve(
+    wdDirFullPath,
+    Path.basename(wdFullPath, ".wd") + ".md.pptx"
+  );
 
   pptx.title = documentInfo.placeholder.title ?? ""; // "PptxGenJS Test Suite Presentation";
   pptx.subject = documentInfo.placeholder.subTitle ?? ""; // "PptxGenJS Test Suite Export";
@@ -335,7 +342,8 @@ function createMasterSlides(pptx: PptxGenJS) {
  */
 function resolveWordCommentsCommands(
   wdCommandList: string[],
-  documentInfo:DocumentInfo
+  wdCommandList2: string[],
+  documentInfo: DocumentInfo
 ) {
   const functionName = "resolveWordCommentsCommands";
   if (wdCommandList[0] === "placeholder") {
@@ -344,12 +352,16 @@ function resolveWordCommentsCommands(
   }
 
   if (wdCommandList[0] === "param") {
-    documentInfo.param[wdCommandList[1]] = wdCommandList[2];
+    for (let i = 2; i < wdCommandList.length; i +=2) {
+      if (wdCommandList[i - 1]) {
+        documentInfo.param[wdCommandList[i - 1]] = wdCommandList[i];
+      }
+    }
     return true;
   }
 
-  if  (wdCommandList[0] === "section" && wdCommandList[1] === "1"){
-
+  if (wdCommandList[0] === "section" && wdCommandList[1] === "1") {
+    documentInfo.placeholder["title"] = wdCommandList2[1];
   }
 
   return false;
@@ -413,6 +425,10 @@ async function resolveWordDownCommandEx(line: string, slide: PptSheet) {
           slide.addDocumentSlide();
         }
         slide.pptxParagraph.insideSlideTitle = true;
+      }
+
+      if (words[1] === "1") {
+        slide.pptxParagraph.insideDocumentTitle = true;
       }
       //
       slide.pptxParagraph.addChild({
@@ -551,6 +567,17 @@ async function resolveWordDownCommandEx(line: string, slide: PptSheet) {
         slide.addHeader(propArray, {});
         slide.pptxParagraph.insideSlideTitle = false;
       }
+
+      // # is document title, so this does not render #.
+      if (
+        "convertHeading End" === words[1] &&
+        slide.pptxParagraph.insideDocumentTitle
+      ) {
+        slide.pptxParagraph.insideDocumentTitle = false;
+        slide.pptxParagraph.clear();
+        return;
+      }
+
       if (!["convertTitle", "convertSubTitle"].includes(words[1])) {
         // output paragraph
         slide.pptxParagraph.addChild({

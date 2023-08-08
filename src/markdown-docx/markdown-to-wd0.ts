@@ -210,10 +210,16 @@ function resolveHtmlComment(content: string) {
         });
       case wordCommand.param:
       case wordCommand.placeholder:
-        return createBlockCommand(command, {
-          key: params[0],
-          value: params[1],
-        });
+        let r = "";
+        for (let i = 1; i < params.length; i += 2) {
+          if (params[i - 1]) {
+            r += createBlockCommand(command, {
+              key: params[i - 1],
+              value: params[i],
+            });
+          }
+        }
+        return r;
       case wordCommand.clearContent:
         const isClearContent = params[0] ?? false;
         return createBlockCommand(command, {
