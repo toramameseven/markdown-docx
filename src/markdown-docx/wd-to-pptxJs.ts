@@ -158,7 +158,7 @@ export async function wdToPptxJs(
 
   // create sheet object
   const currentSheet = new PptSheet(pptx, pptStyle);
-  currentSheet.setDefaultPosition({
+  currentSheet.setDefaultPositionPCT({
     ...getPositionPercent("10,15,70,70"),
     valign: "top",
   });
@@ -204,7 +204,7 @@ export async function wdToPptxJs(
       // in not table command, create table.
       if (tableJs) {
         const r = tableJs!.createTable(
-          currentSheet.currentTextPropPosition,
+          currentSheet.currentTextPropPositionPCT,
           pptStyle.tableProps
         );
         currentSheet.addTable(r);
@@ -224,7 +224,8 @@ export async function wdToPptxJs(
         wdCommandList[1],
         wdCommandList[2],
         pptx,
-        currentSheet.currentTextPropPosition
+        currentSheet.currentTextPropPositionPCT,
+        parseInt(documentInfo.param.dpi ?? "96")
       );
       currentSheet.addImage(image);
       continue;
@@ -244,7 +245,7 @@ export async function wdToPptxJs(
         currentSheet.addTextPropsArray();
         currentSheet.addTextFrame();
         // update position
-        currentSheet.setCurrentPosition({
+        currentSheet.setCurrentPositionPCT({
           ...getPositionPercent(documentInfo.param.position),
         });
         documentInfo.param.position = "";
@@ -352,7 +353,7 @@ function resolveWordCommentsCommands(
   }
 
   if (wdCommandList[0] === "param") {
-    for (let i = 2; i < wdCommandList.length; i +=2) {
+    for (let i = 2; i < wdCommandList.length; i += 2) {
       if (wdCommandList[i - 1]) {
         documentInfo.param[wdCommandList[i - 1]] = wdCommandList[i];
       }
@@ -663,7 +664,7 @@ function getPositionInch(position: string, pptx: pptxGen) {
 
 /**
  *
- * @param position x,y,w,h in percent
+ * @param position "x,y,w,h" in percent
  * @returns
  */
 function getPositionPercent(position: string) {
@@ -724,30 +725,37 @@ function createImageChild(
   imagePathR: string,
   imageAlt: string,
   pptx: pptxGen,
-  pos: { [k: string]: string | number } = {}
+  pos: { [k: string]: string } = {},
+  dpi: number = 96,
 ) {
   const imagePath = Path.resolve(mdSourcePath, imagePathR);
+
+  // pixel > inch
   const sizeImage = imageSize.imageSize(imagePath);
-  // max 6inch 15cm
-  const maxSize = 600; //convertInchesToTwip(3);
+  let imageWidthInch = (sizeImage.width ?? 100) / dpi;
+  let imageHeightInch = (sizeImage.height ?? 100) / dpi;
 
-  let width = sizeImage.width ?? 100;
-  let height = sizeImage.height ?? 100;
+  // slide size in (inch / 100)
+  const pEmp = 1.093613298337708e-8; // 1/ 914400 * 0.01
+  const slideWidth = pptx.presLayout.width * pEmp;
+  const slideHeight = pptx.presLayout.height * pEmp;
 
-  if (width > maxSize || height > maxSize) {
-    const r = maxSize / Math.max(width, height);
-    width *= r;
-    height *= r;
+  //frame size inch
+  const frameWidth = slideWidth * parseFloat(pos.w.replace("%", ""));
+  const frameHeight = slideHeight * parseFloat(pos.w.replace("%", ""));
+
+  const maxOutputSizeInch = Math.min(frameWidth, frameHeight);
+
+  if (imageWidthInch > maxOutputSizeInch || imageHeightInch > maxOutputSizeInch) {
+    const r = maxOutputSizeInch / Math.max(imageWidthInch, imageHeightInch);
+    imageWidthInch *= r;
+    imageHeightInch *= r;
   }
 
   let positions = {};
 
-  if (imageAlt) {
-    positions = getPositionPercent(imageAlt);
-  }
-
   if (pos.x && pos.y) {
-    positions = { x: pos.x, y: pos.y, h: height / 94, w: width / 94 };
+    positions = { x: pos.x, y: pos.y, h: imageHeightInch, w: imageWidthInch};
   }
 
   return { path: imagePath, ...positions };

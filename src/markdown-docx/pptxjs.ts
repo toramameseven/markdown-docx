@@ -117,8 +117,8 @@ export class PptSheet {
   sheetObjects: SheetObject[] = [];
   slide?: pptxGen.Slide;
   currentTextPropsArray: PptxGenJS.TextProps[] = [];
-  currentTextPropPosition: {} = {};
-  defaultTextPropPosition: {} = {};
+  currentTextPropPositionPCT: {} = {};
+  defaultTextPropPositionPCT: {} = {};
   pptx: PptxGenJS;
   pptxParagraph: PptParagraph;
   pptStyle: PptStyle;
@@ -142,7 +142,7 @@ export class PptSheet {
   addDocumentSlide() {
     this.slide = this.pptx.addSlide({ masterName: "MASTER_SLIDE" });
     this.sheetObjects = [];
-    this.currentTextPropPosition = this.defaultTextPropPosition;
+    this.currentTextPropPositionPCT = this.defaultTextPropPositionPCT;
     // add position
   }
 
@@ -167,7 +167,7 @@ export class PptSheet {
   addTextFrame(textPosition: {} = {}) {
     const sheetObject = {
       textPropsArray: this.currentTextPropsArray,
-      outputPosition: { ...this.currentTextPropPosition, ...textPosition },
+      outputPosition: { ...this.currentTextPropPositionPCT, ...textPosition },
     };
     this.sheetObjects.push({ type: "text", sheetObject });
     this.currentTextPropsArray = [];
@@ -178,14 +178,14 @@ export class PptSheet {
     this.currentTextPropsArray.push(...textPropsArray);
   }
 
-  setDefaultPosition(position: {}) {
-    this.defaultTextPropPosition = { ...position };
-    this.setCurrentPosition(position);
+  setDefaultPositionPCT(position: {}) {
+    this.defaultTextPropPositionPCT = { ...position };
+    this.setCurrentPositionPCT(position);
   }
 
-  setCurrentPosition(position: {}) {
-    this.currentTextPropPosition = {
-      ...this.defaultTextPropPosition,
+  setCurrentPositionPCT(position: {}) {
+    this.currentTextPropPositionPCT = {
+      ...this.defaultTextPropPositionPCT,
       ...position,
     };
   }
