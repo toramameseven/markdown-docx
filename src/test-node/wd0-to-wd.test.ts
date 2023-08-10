@@ -235,7 +235,7 @@ newLine	convertParagraph	tm`;
   test("demo-admonition", async () => {
     // marked
     const mdFile = "demo-admonition";
-    const mdPath = path.resolve(__dirname, "../../md_demo", mdFile + ".md");
+    const mdPath = path.resolve(__dirname, "../../md_demo/md", mdFile + ".md");
     const wd = await mdFileToWd(mdPath);
 
     // expect
@@ -250,7 +250,7 @@ newLine	convertParagraph	tm`;
 });
 
 suite("Demo Test Suite", () => {
-  const r = path.resolve(__dirname, "../../md_demo");
+  const r = path.resolve(__dirname, "../../md_demo/md");
 
   Fs.readdir(r, (err, files) => {
     files
@@ -266,7 +266,7 @@ suite("Demo Test Suite", () => {
     test(mdBaseName, async () => {
       // marked
       const mdFile = mdBaseName;
-      const mdPath = path.resolve(__dirname, "../../md_demo", mdFile + ".md");
+      const mdPath = path.resolve(__dirname, "../../md_demo/md", mdFile + ".md");
       const wd = await mdFileToWd(mdPath);
 
       // expect
