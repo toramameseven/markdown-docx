@@ -107,7 +107,7 @@ export async function wdToPptxJs(
     const wdCommandList = lines[i].split(_sp);
     const wdCommandList2 = lines[i + 1].split(_sp);
     // html comment command <!-- word xxxx -->
-    resolveWordCommentsCommands(wdCommandList, wdCommandList2, documentInfo);
+    resolveCommentCommand(wdCommandList, wdCommandList2, documentInfo);
   }
 
   // get ppt settings
@@ -232,7 +232,7 @@ export async function wdToPptxJs(
     }
 
     // html comment command <!-- word xxxx -->
-    const isResolveCommand = resolveWordCommentsCommands(
+    const isResolveCommand = resolveCommentCommand(
       wdCommandList,
       wdCommandList2,
       documentInfo
@@ -341,7 +341,7 @@ function createMasterSlides(pptx: PptxGenJS) {
  * @param documentInfo
  * @returns
  */
-function resolveWordCommentsCommands(
+function resolveCommentCommand(
   wdCommandList: string[],
   wdCommandList2: string[],
   documentInfo: DocumentInfo
@@ -360,7 +360,8 @@ function resolveWordCommentsCommands(
     }
     return true;
   }
-
+  
+  // not comment command
   if (wdCommandList[0] === "section" && wdCommandList[1] === "1") {
     documentInfo.placeholder["title"] = wdCommandList2[1];
   }
