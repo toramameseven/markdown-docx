@@ -1,4 +1,5 @@
 import { MessageType, ShowMessage } from "./common";
+import { WdCommand, wdCommand } from "./wd0-to-wd";
 
 class Cell {
   blockList: string[] = [];
@@ -122,59 +123,6 @@ function multibyteCharCount(str: string) {
   return len;
 }
 
-const wdCommand = {
-  text: "text",
-  normalList: "NormalList",
-  oderList: "OderList",
-  newLine: "newLine",
-  section: "section",
-  code: "code",
-  image: "image",
-  link: "link",
-  hr: "hr",
-  tableCreate: "tableCreate",
-  tablecontents: "tablecontents",
-  tablecontentslist: "tablecontentslist",
-
-  // marked
-  title: "title",
-  subTitle: "subTitle",
-  heading: "heading",
-  paragraph: "paragraph",
-  list: "list",
-  listitem: "listitem",
-  blockquote: "blockquote",
-  table: "table",
-  tablerow: "tablerow",
-  tablecell: "tablecell",
-  html: "html",
-
-  non: "non",
-
-  // word down
-  author: "author",
-  date: "date",
-  division: "division",
-  docxEngine: "docxEngine",
-  docxTemplate: "docxTemplate",
-  pageSetup: "pageSetup",
-  toc: "toc",
-
-  crossRef: "crossRef",
-  property: "property",
-  clearContent: "clearContent",
-  docNumber: "docNumber",
-  indentPlus: "indentPlus",
-  indentMinus: "indentMinus",
-  endParagraph: "endParagraph",
-  newPage: "newPage",
-  htmlWdCommand: "htmlWdCommand",
-  // table
-  cols: "cols",
-  rowMerge: "rowMerge",
-  emptyMerge: "emptyMerge",
-} as const;
-type WdCommand = typeof wdCommand[keyof typeof wdCommand];
 
 let showMessage: ShowMessage | undefined;
 
@@ -354,10 +302,10 @@ function resolveCommand(command: WdCommand, params: string[]) {
     case wdCommand.text:
       convertText(params);
       break;
-    case wdCommand.normalList:
+    case wdCommand.NormalList:
       convertNormalList(params);
       break;
-    case wdCommand.oderList:
+    case wdCommand.OderList:
       convertOderList(params);
       break;
     case wdCommand.newLine:

@@ -13,7 +13,7 @@ import {
   PptStyle,
   TableJs,
   TextFrame,
-  WdNodeType,
+  wdCommand,
   resolveEmphasis,
 } from "./pptxjs";
 
@@ -462,7 +462,7 @@ async function resolveWordDownCommandEx(line: string, slide: PptSheet) {
         //todo Error
       }
       break;
-    case WdNodeType.OderList:
+    case wdCommand.OderList:
       slide.pptxParagraph.addChild({
         text: " ",
         options: {
@@ -494,7 +494,7 @@ async function resolveWordDownCommandEx(line: string, slide: PptSheet) {
         },
       });
       break;
-    case WdNodeType.link:
+    case wdCommand.link:
       // link ref|bookmark hover text
       if (!words[3]) {
         slide.pptxParagraph.addChild({
@@ -521,9 +521,9 @@ async function resolveWordDownCommandEx(line: string, slide: PptSheet) {
         });
       }
       break;
-    case WdNodeType.image:
+    case wdCommand.image:
       break;
-    case WdNodeType.hr:
+    case wdCommand.hr:
       if (!isNewSlideAtSection) {
         slide.pptxParagraph.isNewSheet = true;
       }

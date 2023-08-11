@@ -3,10 +3,10 @@ import {
   getFileContents,
   MessageType,
   fileExists,
-  vbsSpawn,
   docxTemplate001,
   templatesPath
 } from "./common";
+
 import { wdToDocxJs } from "./wd-to-docxjs";
 import * as Path from "path";
 import { runCommand, selectExistsPath } from "./tools/tools-common";
@@ -81,7 +81,7 @@ export async function wordDownToDocx(
       false
     );
 
-    // render by vba(vbs)
+    // render
     try {
       await wdToDocxJs(wdBody, template, outPath, Path.dirname(fileWd), option);
     } catch (e) {
@@ -94,6 +94,7 @@ export async function wordDownToDocx(
       return;
     }
 
+    // open the docx file
     if (!option.isOpenWord) {
       return;
     }
@@ -116,39 +117,8 @@ export async function wordDownToDocx(
     runCommand(wordExe, outPath);
     return;
   }
-
-  const docxEngineInsideBody = getDocxEngineFromWd(wdBody);
-  const thisEngine = docxEngineInsideBody
-    ? docxEngineInsideBody
-    : option.docxEngine;
-
-  //docxEngine options
-  option.message?.(
-    MessageType.info,
-    `docx docxEngine: ${thisEngine ? thisEngine : "use inside"}`,
-    "wd-to-docx",
-    false
-  );
-
-  return await vbsSpawn(
-    option.docxEngine ?? "wordDownToDocx.vbs",
-    option.timeOut ?? 600000,
-    [
-      fileWd,
-      option.docxTemplate ?? "",
-      option.mathExtension ? "1" : "0",
-      option.isDebug ? "1" : "0",
-    ],
-    option.ac,
-    option.message
-  );
 }
 
-function getDocxEngineFromWd(wd: string) {
-  const testMatch = wd.match(/^docxEngine\t(?<docxEngine>.*)\t/i);
-  const docxEngine = testMatch?.groups?.docxEngine ?? "";
-  return docxEngine;
-}
 
 function getDocxTemplateFromWd(wd: string) {
   const testMatch = wd.match(/^docxTemplate\t(?<docxTemplate>.*?)\t/im);

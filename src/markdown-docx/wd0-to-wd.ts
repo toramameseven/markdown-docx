@@ -1,4 +1,5 @@
 import { MessageType, ShowMessage, getWordDownMergeCommand } from "./common";
+import { Wd0Command, wd0Command } from "./markdown-to-wd0";
 
 let showMessage: ShowMessage | undefined;
 
@@ -21,54 +22,32 @@ let listInfos: ListInfo[] = [
   },
 ];
 
-const wd0Command = {
-  // marked
-  title: "title",
-  subTitle: "subTitle",
-  heading: "heading",
-  paragraph: "paragraph",
-  list: "list",
-  listitem: "listitem",
-  code: "code",
-  blockquote: "blockquote",
-  table: "table",
-  tablerow: "tablerow",
-  tablecell: "tablecell",
-  text: "text",
-  image: "image",
-  link: "link",
-  html: "html",
-
-  non: "non",
-
-  // word down
-  param: "param",
-  placeholder: "placeholder",
-  author: "author",
-  date: "date",
-  division: "division",
-  docxEngine: "docxEngine",
-  docxTemplate: "docxTemplate",
-  pageSetup: "pageSetup",
-  toc: "toc",
-
-  crossRef: "crossRef",
-  property: "property",
-  clearContent: "clearContent",
-  docNumber: "docNumber",
-  indentPlus: "indentPlus",
-  indentMinus: "indentMinus",
-  endParagraph: "endParagraph",
-  newLine: "newLine",
-  newPage: "newPage",
-  htmlWdCommand: "htmlWdCommand",
-  hr: "hr",
-  // table
-  cols: "cols",
-  rowMerge: "rowMerge",
-  emptyMerge: "emptyMerge",
+export const wdCommand = {
+  non:"non",
+  newLine:"newLine",
+  section:"section",
+  listitem:"listitem",
+  indentPlus:"indentPlus",
+  code:"code",
+  hr:"hr",
+  image:"image",
+  text:"text",
+  link:"link",
+  newPage:"newPage",
+  param:"param",
+  placeholder:"placeholder",
+  toc:"toc",
+  list:"list",
+  indentMinus:"indentMinus",
+  tableCreate:"tableCreate",
+  tableWidthInfo:"tableWidthInfo",
+  tableMarge:"tableMarge",
+  tablecontents:"tablecontents",
+  tablecontentslist:"tablecontentslist",
+  OderList:"OderList",
+  NormalList:"NormalList",
 } as const;
-type Wd0Command = (typeof wd0Command)[keyof typeof wd0Command];
+export type WdCommand = (typeof wdCommand)[keyof typeof wdCommand];
 
 interface BaseBlock {
   blockType: Wd0Command;
@@ -127,6 +106,7 @@ class Table implements BaseBlock {
     cell.y = this.columnCount;
     this.row.push(cell);
   }
+
   appendTextToLastCell(text: string) {
     const cell = this.row.pop();
     if (cell) {
@@ -134,11 +114,13 @@ class Table implements BaseBlock {
       this.row.push(cell);
     }
   }
+
   newRow() {
     this.rowCount++;
     this.columnCount = 0;
     this.row = [];
   }
+
   endRow() {
     this.rows.push([...this.row]);
     this.row = [];
@@ -155,7 +137,7 @@ class Table implements BaseBlock {
     const commands: string[] = [];
     const commandContents: string[] = [];
     const commandMergeInfos: string[] = [];
-    commands.push(`tableCreate\t${this.rowCount}\t${this.columnCount}`);
+    commands.push(`${wdCommand.tableCreate}\t${this.rowCount}\t${this.columnCount}`);
 
     // <!-- word cols 1,4  -->
     // tableWidthInfo = 1,4
@@ -164,7 +146,7 @@ class Table implements BaseBlock {
       ? this.tableWidthInfo
       : this.getColumnSize();
 
-    commands.push(`tableWidthInfo\t${outTableInfo}`);
+    commands.push(`${wdCommand.tableWidthInfo}\t${outTableInfo}`);
 
     // merge info rows
     // <!-- word rowMerge 3-4,5-6,7-9 -->
@@ -238,7 +220,7 @@ class Table implements BaseBlock {
                   : "empty";
               commandMergeInfos.push(
                 //`tableMarge\t${cellStartRow0}\t${j}\t${cellEndRow0}\t${j}\t${this.rows[cellStartRow0][j].blockList[0]}`
-                `tableMarge\t${cellStartRow0}\t${j}\t${cellEndRow0}\t${j}\t${mergeData}`
+                `${wdCommand.tableMarge}\t${cellStartRow0}\t${j}\t${cellEndRow0}\t${j}\t${mergeData}`
               );
             }
             cellStartRow0 = i;
@@ -251,7 +233,7 @@ class Table implements BaseBlock {
               ? this.rows[cellStartRow0][j].blockList[0]
               : "empty";
           commandMergeInfos.push(
-            `tableMarge\t${cellStartRow0}\t${j}\t${cellEndRow0}\t${j}\t${mergeData}`
+            `${wdCommand.tableMarge}\t${cellStartRow0}\t${j}\t${cellEndRow0}\t${j}\t${mergeData}`
           );
         }
       } // for loop column
@@ -262,7 +244,7 @@ class Table implements BaseBlock {
         const end = parseInt(rows[1]) - 1;
         if (start < end) {
           commandMergeInfos.push(
-            `tableMarge\t${start}\t${j}\t${end}\t${j}\t${this.rows[start][
+            `${wdCommand.tableMarge}\t${start}\t${j}\t${end}\t${j}\t${this.rows[start][
               j
             ].blockList.join("")}`
           );
@@ -278,14 +260,14 @@ class Table implements BaseBlock {
         const blockList = this.rows[i][j].blockList;
         //const cellValue = blockList.join("\n");
         commandContents.push(
-          `tablecontents\t${i}\t${j}\tnext\t${this.rows[i][j].align}`
+          `${wdCommand.tablecontents}\t${i}\t${j}\tnext\t${this.rows[i][j].align}`
         );
         const tableCellCommands = blockList.map(
-          (i) => `tablecontentslist\t${i.trim().replace(/<!--.*?-->/g, "")}`
+          (i) => `${wdCommand.tablecontentslist}\t${i.trim().replace(/<!--.*?-->/g, "")}`
           //(i) => `tablecontentslist\t${i}`
         );
         // detect end paragraph without newline
-        tableCellCommands.push(`tablecontentslist\tendParagraph\t\ttm`);
+        tableCellCommands.push(`${wdCommand.tablecontentslist}\tendParagraph\t\ttm`);
         commandContents.push(...tableCellCommands);
       }
     }
@@ -393,27 +375,8 @@ function getBlockInfoTypeLast() {
 //   convert functions
 
 function addNewLine(info: string) {
-  const r = [wd0Command.newLine, info, "tm"].join(_sp);
+  const r = [wdCommand.newLine, info, "tm"].join(_sp);
   outputWd(r);
-}
-
-function convertTitle(params: DocxParam, isCommandEnd?: boolean) {
-  if (isCommandEnd) {
-    return;
-  }
-  // main title
-  const r = [wd0Command.title, params.title].join(_sp);
-  outputWd(r);
-  addNewLine("convertTitle");
-}
-
-function convertSubTitle(params: DocxParam, isCommandEnd?: boolean) {
-  if (isCommandEnd) {
-    return;
-  }
-  const r = [wd0Command.subTitle, params.subTitle].join(_sp);
-  outputWd(r);
-  addNewLine("convertSubTitle");
 }
 
 function convertHeading(params: DocxParam, isCommandEnd?: boolean) {
@@ -426,7 +389,7 @@ function convertHeading(params: DocxParam, isCommandEnd?: boolean) {
     return;
   }
   // const r = ["section", params.index, params.title, params.idTitle].join(_sp);
-  const r = ["section", params.index, params.idTitle].join(_sp);
+  const r = [wdCommand.section, params.index, params.idTitle].join(_sp);
   outputWd(r);
   pushBlockInfo(new Base(wd0Command.heading));
   // addNewLine("convertHeading");
@@ -503,7 +466,7 @@ function convertList(params: DocxParam, isCommandEnd?: boolean) {
       outputWd(i);
     });
     // when end list, not newline
-    outputWd(wd0Command.indentMinus);
+    outputWd(wdCommand.indentMinus);
     return;
   }
 
@@ -518,7 +481,7 @@ function convertList(params: DocxParam, isCommandEnd?: boolean) {
     ordered: params.ordered === "1",
     indent: listInfos![listInfos!.length - 1].indent + 1,
   };
-  outputWd(wd0Command.indentPlus);
+  outputWd(wdCommand.indentPlus);
   listInfos!.push(r);
   pushBlockInfo(new Base(wd0Command.list));
 }
@@ -545,8 +508,8 @@ function convertListItem(params: DocxParam, isCommandEnd?: boolean) {
   }
   params.checked = "";
   const listType = listInfos[listInfos.length - 1].ordered
-    ? "OderList"
-    : "NormalList";
+    ? wdCommand.OderList
+    : wdCommand.NormalList;
 
   const r = [
     listType,
@@ -563,7 +526,7 @@ function convertCode(params: DocxParam, isCommandEnd?: boolean) {
     const code = popBlockInfo();
     code!.blockList.forEach((i) => {
       const codeParam = i.split(_sp);
-      const r = ["code", codeParam[1]].join(_sp);
+      const r = [wdCommand.code, codeParam[1]].join(_sp);
       outputWd(r);
       addNewLine("convertCode");
     });
@@ -576,7 +539,7 @@ function convertHr(params: DocxParam, isCommandEnd?: boolean) {
   if (isCommandEnd) {
     return;
   }
-  const r = ["hr", params.href].join(_sp);
+  const r = [wdCommand.hr, params.href].join(_sp);
   outputWd(r);
 }
 
@@ -585,7 +548,7 @@ function convertImage(params: DocxParam, isCommandEnd?: boolean) {
     return;
   }
   //href images/main_window2.png, text caption sss, title image title
-  const r = ["image", params.href, params.text, params.title, "tm"].join(_sp);
+  const r = [wdCommand.image, params.href, params.text, params.title, "tm"].join(_sp);
   outputWd(r);
 }
 
@@ -601,7 +564,7 @@ function convertText(params: DocxParam | string, isCommandEnd?: boolean) {
   } else if (typeof params === "object") {
     plainText = (params as DocxParam).text;
   }
-  const wordDownText = ["text", plainText].join(_sp);
+  const wordDownText = [wdCommand.text, plainText].join(_sp);
   outputWd(wordDownText);
 }
 
@@ -625,7 +588,7 @@ function convertHtml(params: DocxParam, isCommandEnd?: boolean) {
   if (params.text.match(/<br>/i)) {
     r = [wd0Command.newLine, "convertHtml <BR>", "tm"].join(_sp);
   } else {
-    r = ["text", params.text].join(_sp);
+    r = [wdCommand.text, params.text].join(_sp);
   }
   outputWd(r);
 }
@@ -634,28 +597,14 @@ function convertLink(params: DocxParam, isCommandEnd?: boolean) {
   if (isCommandEnd) {
     return;
   }
-  const r = ["link", params.href, params.title, params.text, "tm"].join(_sp);
+  const r = [wdCommand.link, params.href, params.title, params.text, "tm"].join(_sp);
   outputWd(r);
 }
 function convertNewPage(params: DocxParam, isCommandEnd?: boolean) {
   if (isCommandEnd) {
     return;
   }
-  const r = ["newPage", params.href, params.title, params.text, "tm"].join(_sp);
-  outputWd(r);
-}
-function convertPageSetup(params: DocxParam, isCommandEnd?: boolean) {
-  if (isCommandEnd) {
-    return;
-  }
-  const r = [
-    "pageSetup",
-    params.orientation,
-    params.pagesize,
-    "",
-    "",
-    "tm",
-  ].join(_sp);
+  const r = [wdCommand.newPage, params.href, params.title, params.text, "tm"].join(_sp);
   outputWd(r);
 }
 
@@ -663,92 +612,19 @@ function convertParameter(params: DocxParam, isCommandEnd?: boolean) {
   if (isCommandEnd) {
     return;
   }
-  const r = ["param", params.key, params.value, "", "", "tm"].join(_sp);
+  const r = [wdCommand.param, params.key, params.value, "", "", "tm"].join(_sp);
   outputWd(r);
 }
+
 function convertPlaceholder(params: DocxParam, isCommandEnd?: boolean) {
   if (isCommandEnd) {
     return;
   }
-  const r = ["placeholder", params.key, params.value, "", "", "tm"].join(_sp);
+  const r = [wdCommand.placeholder, params.key, params.value, "", "", "tm"].join(_sp);
   outputWd(r);
 }
 
-function convertEngine(params: DocxParam, isCommandEnd?: boolean) {
-  if (isCommandEnd) {
-    return;
-  }
-  const r = ["docxEngine", params.docxEngine, "", "", "", "tm"].join(_sp);
-  outputWd(r);
-}
-function convertTemplate(params: DocxParam, isCommandEnd?: boolean) {
-  if (isCommandEnd) {
-    return;
-  }
-  const r = ["docxTemplate", params.docxTemplate, "", "", "", "tm"].join(_sp);
-  outputWd(r);
-}
 
-function convertAuthor(params: DocxParam, isCommandEnd?: boolean) {
-  if (isCommandEnd) {
-    return;
-  }
-  const r = ["author", params.author, "", "", "", "tm"].join(_sp);
-  outputWd(r);
-}
-
-function convertDivision(params: DocxParam, isCommandEnd?: boolean) {
-  if (isCommandEnd) {
-    return;
-  }
-  const r = ["division", params.division, "", "", "", "tm"].join(_sp);
-  outputWd(r);
-}
-
-function convertDocNumber(params: DocxParam, isCommandEnd?: boolean) {
-  if (isCommandEnd) {
-    return;
-  }
-  const r = ["docNumber", params.docNumber, "", "", "", "tm"].join(_sp);
-  outputWd(r);
-}
-
-function convertProperty(params: DocxParam, isCommandEnd?: boolean) {
-  if (isCommandEnd) {
-    return;
-  }
-  const r = [
-    "property",
-    params.propertyKey,
-    params.propertyValue,
-    "",
-    "",
-    "tm",
-  ].join(_sp);
-  outputWd(r);
-}
-
-function convertCrossRef(params: DocxParam, isCommandEnd?: boolean) {
-  if (isCommandEnd) {
-    return;
-  }
-  const r = ["crossRef", params.crossRef, "", "", "", "tm"].join(_sp);
-  outputWd(r);
-}
-function convertClearContent(params: DocxParam, isCommandEnd?: boolean) {
-  if (isCommandEnd) {
-    return;
-  }
-  const r = ["clearContent", params.isClearContent, "", "", "", "tm"].join(_sp);
-  outputWd(r);
-}
-function convertDate(params: DocxParam, isCommandEnd?: boolean) {
-  if (isCommandEnd) {
-    return;
-  }
-  const r = ["date", params.date, "", "", "", "tm"].join(_sp);
-  outputWd(r);
-}
 
 function outputWd(wdText: string) {
   // if block exists, add all wdTexts to the block.
@@ -757,10 +633,10 @@ function outputWd(wdText: string) {
     return;
   }
   // do not duplicate new lines.
-  if (wdText.split(_sp)[0] === wd0Command.newLine) {
+  if (wdText.split(_sp)[0] === wdCommand.newLine) {
     if (
       wordDownLines.length > 0 &&
-      wordDownLines.slice(-1)[0].split(_sp)[0] === wd0Command.newLine
+      wordDownLines.slice(-1)[0].split(_sp)[0] === wdCommand.newLine
     ) {
       return;
     }
@@ -770,22 +646,22 @@ function outputWd(wdText: string) {
       line = wordDownLines[i];
       if (
         ![
-          wd0Command.indentMinus as string,
-          wd0Command.indentPlus as string,
+          wdCommand.indentMinus as string,
+          wdCommand.indentPlus as string,
         ].includes(line)
       ) {
         break;
       }
     }
 
-    if (line.split(_sp)[0] === wd0Command.newLine) {
+    if (line.split(_sp)[0] === wdCommand.newLine) {
       return;
     }
   }
 
   if (isAddWordSeparator(wordDownLines, wdText)) {
     // add space between words. but is not needed for japanese.
-    wordDownLines.push(["text", " ", "", "", "", "tm"].join(_sp));
+    wordDownLines.push([wdCommand.text, " ", "", "", "", "tm"].join(_sp));
   }
   wordDownLines.push(wdText);
 }
@@ -839,12 +715,6 @@ function resolveCommand(
   isCommandEnd?: boolean
 ) {
   switch (command) {
-    case wd0Command.title:
-      convertTitle(params, isCommandEnd);
-      break;
-    case wd0Command.subTitle:
-      convertSubTitle(params, isCommandEnd);
-      break;
     case wd0Command.heading:
       convertHeading(params, isCommandEnd);
       break;
@@ -908,18 +778,6 @@ function resolveCommand(
       }
       convertNewPage(params, isCommandEnd);
       break;
-    case wd0Command.pageSetup:
-      if (isCommandEnd) {
-        return;
-      }
-      convertPageSetup(params, isCommandEnd);
-      break;
-    case wd0Command.docxEngine:
-      if (isCommandEnd) {
-        return;
-      }
-      convertEngine(params, isCommandEnd);
-      break;
     case wd0Command.param:
       if (isCommandEnd) {
         return;
@@ -931,54 +789,6 @@ function resolveCommand(
         return;
       }
       convertPlaceholder(params, isCommandEnd);
-      break;
-    case wd0Command.author:
-      if (isCommandEnd) {
-        return;
-      }
-      convertAuthor(params, isCommandEnd);
-      break;
-    case wd0Command.division:
-      if (isCommandEnd) {
-        return;
-      }
-      convertDivision(params, isCommandEnd);
-      break;
-    case wd0Command.docNumber:
-      if (isCommandEnd) {
-        return;
-      }
-      convertDocNumber(params, isCommandEnd);
-      break;
-    case wd0Command.property:
-      if (isCommandEnd) {
-        return;
-      }
-      convertProperty(params, isCommandEnd);
-      break;
-    case wd0Command.crossRef:
-      if (isCommandEnd) {
-        return;
-      }
-      convertCrossRef(params, isCommandEnd);
-      break;
-    case wd0Command.clearContent:
-      if (isCommandEnd) {
-        return;
-      }
-      convertClearContent(params, isCommandEnd);
-      break;
-    case wd0Command.date:
-      if (isCommandEnd) {
-        return;
-      }
-      convertDate(params, isCommandEnd);
-      break;
-    case wd0Command.docxTemplate:
-      if (isCommandEnd) {
-        return;
-      }
-      convertTemplate(params, isCommandEnd);
       break;
     case wd0Command.toc:
       if (isCommandEnd) {

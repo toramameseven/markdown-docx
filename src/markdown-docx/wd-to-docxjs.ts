@@ -33,61 +33,10 @@ import {
   PageBreak,
 } from "docx";
 import { svg2imagePng } from "./tools/svg-png-image";
+import { WdCommand, wdCommand } from "./wd0-to-wd";
 
 const _sp = "\t";
-//
-const NodeType = {
-  non: "non",
-  section: "section",
-  heading: "heading",
-  OderList: "OderList",
-  NormalList: "NormalList",
-  math: "math",
-  note: "note",
-  warning: "warning",
 
-  // word down
-  author: "author",
-  date: "date",
-  division: "division",
-  docxEngine: "docxEngine",
-  docxTemplate: "docxTemplate",
-  pageSetup: "pageSetup",
-  toc: "toc",
-
-  //marked
-  title: "title",
-  subTitle: "subTitle",
-  paragraph: "paragraph",
-  list: "list",
-  listitem: "listitem",
-  code: "code",
-  blockquote: "blockquote",
-  table: "table",
-  tablerow: "tablerow",
-  tablecell: "tablecell",
-  text: "text",
-  image: "image",
-  link: "link",
-  html: "html",
-
-  crossRef: "crossRef",
-  property: "property",
-  clearContent: "clearContent",
-  docNumber: "docNumber",
-  indentPlus: "indentPlus",
-  indentMinus: "indentMinus",
-  endParagraph: "endParagraph",
-  newLine: "newLine",
-  newPage: "newPage",
-  htmlWdCommand: "htmlWdCommand",
-  hr: "hr",
-  // table
-  cols: "cols",
-  rowMerge: "rowMerge",
-  emptyMerge: "emptyMerge",
-} as const;
-type NodeType = (typeof NodeType)[keyof typeof NodeType];
 
 const DocStyle = {
   "1": "1",
@@ -105,6 +54,11 @@ const DocStyle = {
   Error: "Error",
 } as const;
 type DocStyle = (typeof DocStyle)[keyof typeof DocStyle];
+
+type DocumentInfo = {
+  placeholder: { [v: string]: string };
+  param: { [v: string]: string };
+};
 
 /**
  *
@@ -261,7 +215,7 @@ class TableJs {
 }
 
 class DocParagraph {
-  nodeType: NodeType;
+  nodeType: WdCommand;
   isFlush: boolean;
   indent: number;
   children: ParagraphChild[] = [];
@@ -270,7 +224,7 @@ class DocParagraph {
   refId: string = "";
 
   constructor(
-    nodeType: NodeType = NodeType.non,
+    nodeType: WdCommand = wdCommand.non,
     indent: number = 0,
     docStyle: DocStyle = DocStyle.Body,
     childe: ParagraphChild = new TextRun("")
@@ -343,18 +297,29 @@ export async function wdToDocxJs(
   let patches: (Paragraph | Table | TableOfContents)[] = [];
 
   const lines = (wd + "\nEndline").split(/\r?\n/);
-  let currentParagraph = new DocParagraph(NodeType.text);
-  let tableJs: TableJs|undefined = undefined;
-  //let insideTable = false;
+  let currentParagraph = new DocParagraph(wdCommand.text);
+  let tableJs: TableJs | undefined = undefined;
 
-  const documentInfo = {
-    title: "",
-    subTitle: "",
-    division: "",
-    date: "",
-    author: "",
-    docNumber: "",
-    crossRef: "[[$n $t (p.$p)]]",
+//  word commands
+// ---
+// cols
+// emptyMerge
+// export
+// import
+// newLine
+// newPage
+// rowMerge
+// toc
+// levelOffset
+// docxTemplate
+// param
+//  crossRef: "[[$n $t (p.$p)]]",
+// placeholder
+
+
+  const documentInfo: DocumentInfo = {
+    placeholder: {},
+    param: { crossRef: "[[$n $t (p.$p)]]" },
   };
 
   // patch parameter
@@ -411,7 +376,7 @@ export async function wdToDocxJs(
       patches.push(p);
       // reset paragraph. but keep the indent.
       currentParagraph = new DocParagraph(
-        NodeType.text,
+        wdCommand.text,
         currentParagraph.indent
       );
     }
@@ -427,11 +392,11 @@ export async function wdToDocxJs(
 
 // ############################################################
 
-function createListType(listType: NodeType, listOrder: number) {
-  if (listType === NodeType.NormalList) {
+function createListType(listType: WdCommand, listOrder: number) {
+  if (listType === wdCommand.NormalList) {
     return `nList${listOrder}` as DocStyle;
   }
-  if (listType === NodeType.OderList) {
+  if (listType === wdCommand.OderList) {
     return `numList${listOrder}` as DocStyle;
   }
   return DocStyle.Error;
@@ -440,7 +405,7 @@ function createListType(listType: NodeType, listOrder: number) {
 function resolveWordCommentsCommands(
   wdCommandList: string[],
   patches: (Paragraph | Table | TableOfContents)[],
-  documentInfo: { [v: string]: string },
+  documentInfo: DocumentInfo,
   patchInfo: { [v: string]: PatchInfo }
 ) {
   // table of contents
@@ -478,12 +443,19 @@ function resolveWordCommentsCommands(
     return true;
   } // placeholder words
 
-  // option
-  const documentInfoKeys = Object.keys(documentInfo);
-  if (documentInfoKeys.includes(wdCommandList[0])) {
-    documentInfo[wdCommandList[0]] = wdCommandList[1];
+  // param words
+  if (wdCommandList[0] === "param") {
+    documentInfo.param[wdCommandList[1]] = wdCommandList[2];
     return true;
-  } // option
+  } // param words
+
+  // dose not user option
+  // option
+  // const documentInfoKeys = Object.keys(documentInfo);
+  // if (documentInfoKeys.includes(wdCommandList[0])) {
+  //   documentInfo[wdCommandList[0]] = wdCommandList[1];
+  //   return true;
+  // } // option
 
   return false;
 }
@@ -493,16 +465,16 @@ async function resolveWordDownCommandEx(
   currentParagraph: DocParagraph,
   mdSourcePath: string,
   option: DocxOption,
-  documentInfo: { [v: string]: string }
+  documentInfo: DocumentInfo
 ) {
   const words = line.split(_sp);
   let current: DocParagraph;
-  const nodeType = words[0] as NodeType;
+  const nodeType = words[0] as WdCommand;
   let style: DocStyle;
   let child: ParagraphChild;
 
   switch (nodeType) {
-    case "section":
+    case wdCommand.section:
       // section 2  heading2(id)
       child = new Bookmark({
         id: words[2],
@@ -524,28 +496,28 @@ async function resolveWordDownCommandEx(
       current.refId = words[2];
       return current;
       break;
-    case "NormalList":
+    case wdCommand.NormalList:
       // OderList	1
       // text	Consectetur adipiscing elit
       // newLine	convertParagraph	tm
       style = createListType(nodeType, parseInt(words[1]));
       current = new DocParagraph(
-        NodeType.NormalList,
+        wdCommand.NormalList,
         currentParagraph.indent,
         style
       );
       return current;
       break;
-    case NodeType.OderList:
+    case wdCommand.OderList:
       style = createListType(nodeType, parseInt(words[1]));
       current = new DocParagraph(
-        NodeType.OderList,
+        wdCommand.OderList,
         currentParagraph.indent,
         style
       );
       return current;
       break;
-    case "code":
+    case wdCommand.code:
       child = new TextRun(words[1]);
       current = new DocParagraph(
         nodeType,
@@ -555,10 +527,10 @@ async function resolveWordDownCommandEx(
       );
       return current;
       break;
-    case NodeType.link:
+    case wdCommand.link:
       if (!words[3]) {
         // internal link
-        let children = resolveXref(words[1], documentInfo.crossRef);
+        let children = resolveXref(words[1], documentInfo.param.crossRef);
         currentParagraph.addChildren(children);
       } else {
         child = new ExternalHyperlink({
@@ -573,7 +545,7 @@ async function resolveWordDownCommandEx(
       }
       return currentParagraph;
       break;
-    case NodeType.image:
+    case wdCommand.image:
       child = await createImageChild(mdSourcePath, words[1], option);
       currentParagraph.addChild(child, true);
       return currentParagraph;
@@ -585,7 +557,7 @@ async function resolveWordDownCommandEx(
       if (admonition && admonition[3]) {
         s = admonition[3];
         const admonitionType = admonition[1];
-        currentParagraph.nodeType = admonitionType as NodeType;
+        currentParagraph.nodeType = admonitionType as WdCommand;
         currentParagraph.docStyle = resolveAdmonition(admonitionType);
       }
 
@@ -600,15 +572,15 @@ async function resolveWordDownCommandEx(
 
       return currentParagraph;
       break;
-    case "indentPlus":
+    case wdCommand.indentPlus:
       currentParagraph.addIndent();
       return currentParagraph;
       break;
-    case "indentMinus":
+    case wdCommand.indentMinus:
       currentParagraph.removeIndent();
       return currentParagraph;
       break;
-    case "newLine":
+    case wdCommand.newLine:
       if (words[1] === "convertHeading End") {
         child = new Bookmark({
           id: currentParagraph.refId,
@@ -628,7 +600,7 @@ async function resolveWordDownCommandEx(
         currentParagraph.isFlush = true;
       }
       return currentParagraph;
-    case "newPage":
+    case wdCommand.newPage:
       currentParagraph.addChild(new PageBreak());
       currentParagraph.isFlush = true;
       return currentParagraph;
@@ -767,7 +739,7 @@ export async function createDocxPatch(
   children: (Paragraph | Table | TableOfContents)[],
   docxTemplatePath: string,
   docxOutPath: string,
-  docInfo: { [v: string]: string },
+  docInfo: { placeholder: {}; param: {} },
   patchInfo: { [v: string]: PatchInfo }
 ) {
   const patchDoc = await patchDocument(fs.readFileSync(docxTemplatePath), {

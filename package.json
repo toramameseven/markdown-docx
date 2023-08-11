@@ -175,12 +175,6 @@
     "configuration": {
       "title": "markdown-docx",
       "properties": {
-        "markdown-docx.path.docxEngine": {
-          "type": "string",
-          "default": "",
-          "description": "docx engine. if you use your own, set full path.",
-          "order": 1
-        },
         "markdown-docx.path.docxTemplate": {
           "type": "string",
           "default": "",
@@ -193,30 +187,11 @@
           "description": "math extension. experimental feature.",
           "order": 3
         },
-        "markdown-docx.docxEngine.timeout": {
-          "type": "number",
-          "default": 60000,
-          "description": "create docx timeout(ms).default 60000 ms",
-          "order": 4
-        },
         "markdown-docx.docxEngine.debug": {
           "type": "boolean",
           "default": false,
           "description": "some debug feature.",
           "order": 5
-        },
-        "markdown-docx.docxEngine.logInterval": {
-          "type": "number",
-          "default": 10,
-          "description": "more than 1. 1: many, 10 few.",
-          "order": 6,
-          "minProperties": "1"
-        },
-        "markdown-docx.docxEngine.docxJs": {
-          "type": "boolean",
-          "default": true,
-          "description": "If on, DOCXJS is used for rendering.",
-          "order": 7
         },
         "markdown-docx.docxEngine.isOverWrite": {
           "type": "boolean",

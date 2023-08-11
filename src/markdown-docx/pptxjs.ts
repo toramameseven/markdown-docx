@@ -20,60 +20,62 @@ export type TextFrame = {
 };
 
 const _sp = "\t";
+
+export { wdCommand, WdCommand } from "./wd0-to-wd";
 //
-export const WdNodeType = {
-  non: "non",
-  section: "section",
-  heading: "heading",
-  OderList: "OderList",
-  NormalList: "NormalList",
-  math: "math",
-  note: "note",
-  warning: "warning",
+// export const wdCommand = {
+//   non: "non",
+//   section: "section",
+//   heading: "heading",
+//   OderList: "OderList",
+//   NormalList: "NormalList",
+//   math: "math",
+//   note: "note",
+//   warning: "warning",
 
-  // word down
-  author: "author",
-  date: "date",
-  division: "division",
-  docxEngine: "docxEngine",
-  docxTemplate: "docxTemplate",
-  pageSetup: "pageSetup",
-  toc: "toc",
+//   // word down
+//   author: "author",
+//   date: "date",
+//   division: "division",
+//   docxEngine: "docxEngine",
+//   docxTemplate: "docxTemplate",
+//   pageSetup: "pageSetup",
+//   toc: "toc",
 
-  //marked
-  title: "title",
-  subTitle: "subTitle",
-  paragraph: "paragraph",
-  list: "list",
-  listitem: "listitem",
-  code: "code",
-  blockquote: "blockquote",
-  table: "table",
-  tablerow: "tablerow",
-  tablecell: "tablecell",
-  text: "text",
-  image: "image",
-  link: "link",
-  html: "html",
+//   //marked
+//   title: "title",
+//   subTitle: "subTitle",
+//   paragraph: "paragraph",
+//   list: "list",
+//   listitem: "listitem",
+//   code: "code",
+//   blockquote: "blockquote",
+//   table: "table",
+//   tablerow: "tablerow",
+//   tablecell: "tablecell",
+//   text: "text",
+//   image: "image",
+//   link: "link",
+//   html: "html",
 
-  crossRef: "crossRef",
-  property: "property",
-  clearContent: "clearContent",
-  docNumber: "docNumber",
-  indentPlus: "indentPlus",
-  indentMinus: "indentMinus",
-  endParagraph: "endParagraph",
-  newLine: "newLine",
-  newPage: "newPage",
-  htmlWdCommand: "htmlWdCommand",
-  hr: "hr",
-  // table
-  cols: "cols",
-  rowMerge: "rowMerge",
-  emptyMerge: "emptyMerge",
-} as const;
+//   crossRef: "crossRef",
+//   property: "property",
+//   clearContent: "clearContent",
+//   docNumber: "docNumber",
+//   indentPlus: "indentPlus",
+//   indentMinus: "indentMinus",
+//   endParagraph: "endParagraph",
+//   newLine: "newLine",
+//   newPage: "newPage",
+//   htmlWdCommand: "htmlWdCommand",
+//   hr: "hr",
+//   // table
+//   cols: "cols",
+//   rowMerge: "rowMerge",
+//   emptyMerge: "emptyMerge",
+// } as const;
 
-export type WdNodeType = (typeof WdNodeType)[keyof typeof WdNodeType];
+// export type WdCommand = (typeof wdCommand)[keyof typeof wdCommand];
 
 export const DocxStyle = {
   "1": "1",
