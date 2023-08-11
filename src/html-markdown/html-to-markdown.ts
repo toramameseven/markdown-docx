@@ -51,7 +51,7 @@ function testme() {
 </ol>
   `;
 
-  console.log(htmlToMarkdown("", source));
+//  console.log(htmlToMarkdown("", source));
 }
 
 //testme();

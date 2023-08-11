@@ -641,7 +641,7 @@ function resolveXref(linkRef: string, refFormat: string = "[[$n $t p.$p]]") {
   const refItems = [];
   for (let i = 0; i < refFormat.length; i++) {
     let t = refFormat.slice(i, i + 2);
-    console.log(t);
+    //console.log(t);
     if (t.match(/\$n|\$p|\$t/)) {
       refItems.push(t);
       i++;

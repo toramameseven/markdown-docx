@@ -1,6 +1,9 @@
-
 import { getFileContents } from "./tools/tools-common";
-import { getWordDownCommand } from "./common";
+import { MessageType, getWordDownCommand } from "./common";
+
+import { ShowMessage } from "./common";
+
+let thisMessage: ShowMessage | undefined;
 
 const wordCommand = {
   title: "title",
@@ -17,7 +20,8 @@ type TableInfo = {
 
 export async function addTableSpanToMarkdown(
   mdFilePath: string,
-  mdBody: string
+  mdBody: string,
+  showMessage: ShowMessage | undefined
 ) {
   try {
     let body = mdBody;
@@ -29,8 +33,8 @@ export async function addTableSpanToMarkdown(
     let tableInfo: TableInfo = {
       emptyMerge: false,
       rowMergeList: [],
-      currentRow : -1,
-      levelOffset: 0
+      currentRow: -1,
+      levelOffset: 0,
     };
 
     let currentLine = "";
@@ -42,16 +46,15 @@ export async function addTableSpanToMarkdown(
         currentLine[0] === "|" &&
         (tableInfo.emptyMerge || tableInfo.rowMergeList.length)
       ) {
-
         // update current row
-        tableInfo = {...tableInfo, currentRow : (tableInfo.currentRow + 1)};
+        tableInfo = { ...tableInfo, currentRow: tableInfo.currentRow + 1 };
 
         // table merge
         let convertedLine = "|";
         const splitted = currentLine.split("|");
 
         let isMergeEntireRow: boolean = false;
-        if (tableInfo.rowMergeList.includes(tableInfo.currentRow)){
+        if (tableInfo.rowMergeList.includes(tableInfo.currentRow)) {
           isMergeEntireRow = true;
         }
 
@@ -68,23 +71,21 @@ export async function addTableSpanToMarkdown(
         lines[i] = convertedLine;
       } else {
         // outside table
-        if (tableInfo.currentRow> -1) {
+        if (tableInfo.currentRow > -1) {
           tableInfo = {
             ...tableInfo,
             emptyMerge: false,
             rowMergeList: [],
-            currentRow: -1
+            currentRow: -1,
           };
         }
       }
     }
-
-
     return lines.join("\n");
   } catch (error) {
-    console.log(error);
+    showMessage?.(MessageType.err, error, "addTableSpanToMarkdown", false);
   }
-  return "";
+  return mdBody;
 }
 
 function resolveHtmlCommentEx(content: string, tableInfo: TableInfo) {
@@ -108,11 +109,11 @@ function resolveHtmlCommentEx(content: string, tableInfo: TableInfo) {
           //[1,2], [4,5]
           const mList = params[0].split(",").map((x) => x.split("-"));
           const rowMergeList: number[] = [];
-          mList.forEach(x =>{
+          mList.forEach((x) => {
             let [start, end] = x;
             let startI = parseInt(start);
             let endI = parseInt(end);
-            for(let i = startI + 1; i < endI + 1; i++){
+            for (let i = startI + 1; i < endI + 1; i++) {
               rowMergeList.push(i);
             }
           });
@@ -149,7 +150,18 @@ cell(4,2) is not merged. (comment cell)
 | data4-1 | <!-- not merged -->     |
 `;
 
-  console.log(await addTableSpanToMarkdown("", md));
+  //console.log(await addTableSpanToMarkdown("", md));
 }
 
-//testThis();
+// testThis();
+
+// <!-- word emptyMerge -->
+// <!-- word rowMerge 2-4  -->
+
+// cell(4,2) is not merged. (comment cell)
+
+// | data1-1 | data1-2                 |
+// | ------- | ----------------------- |
+// | data2-1 | data2-2                 |
+// |          ^| data3-2                  ^|
+// | data4-1  ^| <!-- not merged -->      ^|

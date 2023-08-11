@@ -135,7 +135,7 @@ export async function wdToPptxJs(
     );
   } catch (e) {
     thisMessage?.(
-      MessageType.debug,
+      MessageType.err,
       `${functionName}:err read pptx settings.`,
       "wd-to-pptxJs",
       false

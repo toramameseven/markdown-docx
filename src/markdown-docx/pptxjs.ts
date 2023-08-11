@@ -395,9 +395,9 @@ export class TableJs {
           text: pCell[0] ? pCell : [{ text: "" }],
         };
 
-        console.log(
-          `${i}-${j}, ${pCell[0]}: ${this.mergedCells[i][j][0]}: ${this.mergedCells[i][j][1]}`
-        );
+        // console.log(
+        //   `${i}-${j}, ${pCell[0]}: ${this.mergedCells[i][j][0]}: ${this.mergedCells[i][j][1]}`
+        // );
 
         if (
           this.mergedCells[i][j][0] === -1 &&

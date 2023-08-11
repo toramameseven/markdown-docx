@@ -570,7 +570,7 @@ export async function markdownToWd0(
     marked.use(marked.getDefaults());
     marked.use(spanTable());
     marked.use({ walkTokens });
-    mdForMarked = await addTableSpanToMarkdown("", mdForMarked);
+    mdForMarked = await addTableSpanToMarkdown("", mdForMarked, showMessage);
   } else {
     marked.use(marked.getDefaults());
     marked.use({ walkTokens });

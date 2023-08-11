@@ -376,7 +376,12 @@ function getFrontMatterAndBody(
   try {
     frontMatterAndBody = fm(fileContents);
   } catch (e) {
-    console.log(e);
+    showMessage?.(
+      MessageType.err,
+      e,
+      "getFrontMatterAndBody",
+      false
+    );
     return { frontMatter, markdownBody };
   }
 
