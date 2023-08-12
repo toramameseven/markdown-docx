@@ -143,20 +143,19 @@ const htmlBlock = (content: string) => {
   }
 
   const usedHtml = /<br>|<sup>|<\/sup>|<sub>|<\/sub>|<!--.*/i;
+  const nonUsedHtml = /<!--\s+(word|ppt|oox).*/i;
 
-  // return createBlockCommand(blokType, params);
-
-  if (content.match(usedHtml)) {
-    // output inline
+  if (content.match(usedHtml) && !content.match(nonUsedHtml)) {
+    // output inlineF
     return content;
   }
   showMessage?.(
     MessageType.warn,
-    `next html is not allow: ${content}`,
+    `Next html is not allowed: ${content}`,
     source,
     false
   );
-  return `[[ Next html is not allow: ${content} ]]`;
+  return "";
 };
 
 function resolveHtmlComment(content: string) {

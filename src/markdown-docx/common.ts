@@ -17,6 +17,7 @@ export type DocxOption = {
   docxEngine?: string;
   docxTemplate?: string;
   mathExtension?: boolean;
+  isShowOutputTab?: boolean;
   isDebug?: boolean;
   logInterval?: number;
   isUseDocxJs?: boolean;
@@ -34,6 +35,7 @@ export function createDocxOption(option: DocxOption = {}) {
     docxTemplate: option.docxTemplate ?? "",
     mathExtension: option.mathExtension ?? true,
     isDebug: option.isDebug ?? false,
+    isShowOutputTab: option.isShowOutputTab ?? false,
     logInterval: option.logInterval ?? 10,
     isUseDocxJs: option.isUseDocxJs ?? true,
     isOverWrite: option.isOverWrite ?? false,

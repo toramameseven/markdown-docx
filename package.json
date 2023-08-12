@@ -193,6 +193,12 @@
           "description": "some debug feature.",
           "order": 5
         },
+        "markdown-docx.docxEngine.showOutputTab": {
+          "type": "boolean",
+          "default": false,
+          "description": "show output tab.",
+          "order": 6
+        },
         "markdown-docx.docxEngine.isOverWrite": {
           "type": "boolean",
           "default": false,

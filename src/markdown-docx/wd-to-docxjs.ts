@@ -37,7 +37,6 @@ import { WdCommand, wdCommand } from "./wd0-to-wd";
 
 const _sp = "\t";
 
-
 const DocStyle = {
   "1": "1",
   Body: "body",
@@ -300,22 +299,21 @@ export async function wdToDocxJs(
   let currentParagraph = new DocParagraph(wdCommand.text);
   let tableJs: TableJs | undefined = undefined;
 
-//  word commands
-// ---
-// cols
-// emptyMerge
-// export
-// import
-// newLine
-// newPage
-// rowMerge
-// toc
-// levelOffset
-// docxTemplate
-// param
-//  crossRef: "[[$n $t (p.$p)]]",
-// placeholder
-
+  //  word commands
+  // ---
+  // cols
+  // emptyMerge
+  // export
+  // import
+  // newLine
+  // newPage
+  // rowMerge
+  // toc
+  // levelOffset
+  // docxTemplate
+  // param
+  //  crossRef: "[[$n $t (p.$p)]]",
+  // placeholder
 
   const documentInfo: DocumentInfo = {
     placeholder: {},
@@ -350,7 +348,7 @@ export async function wdToDocxJs(
     }
 
     // html comment command <!-- word xxxx -->
-    const isResolveCommand = resolveWordCommentsCommands(
+    const isResolveCommand = resolveCommentCommand(
       wdCommandList,
       patches,
       documentInfo,
@@ -362,7 +360,7 @@ export async function wdToDocxJs(
     }
 
     // body commands
-    currentParagraph = await resolveWordDownCommandEx(
+    currentParagraph = await resolveWDCommandEx(
       lines[i],
       currentParagraph,
       mdSourcePath,
@@ -402,7 +400,7 @@ function createListType(listType: WdCommand, listOrder: number) {
   return DocStyle.Error;
 }
 
-function resolveWordCommentsCommands(
+function resolveCommentCommand(
   wdCommandList: string[],
   patches: (Paragraph | Table | TableOfContents)[],
   documentInfo: DocumentInfo,
@@ -460,7 +458,7 @@ function resolveWordCommentsCommands(
   return false;
 }
 
-async function resolveWordDownCommandEx(
+async function resolveWDCommandEx(
   line: string,
   currentParagraph: DocParagraph,
   mdSourcePath: string,
@@ -489,8 +487,7 @@ async function resolveWordDownCommandEx(
       current = new DocParagraph(
         nodeType,
         currentParagraph.indent,
-        `hh${hhHeader}` as DocStyle
-        // `${words[1]}` as DocStyle, // we do not know how this works.
+        `hh${hhHeader}` as DocStyle // `${words[1]}` as DocStyle, // we do not know how this works.
         //child
       );
       current.refId = words[2];

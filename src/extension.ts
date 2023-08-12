@@ -14,13 +14,11 @@ import {
   markdownToHtml,
   markdownToPptx,
   markdownToTextile,
-  
 } from "./markdown-docx/markdown-to-xxxx";
-import {wdToPptx} from "./markdown-docx/wd-to-pptxJs";
+import { wdToPptx } from "./markdown-docx/wd-to-pptxJs";
 import { createDocxTemplateFile } from "./markdown-docx/common";
 import { getWorkingDirectory } from "./common-vscode";
 import { textileToHtml } from "./markdown-docx/tools/toolsTextile";
-
 
 export let isDebug = false;
 
@@ -55,7 +53,10 @@ export function activate(context: vscode.ExtensionContext) {
 
   // explorer html to docx
   context.subscriptions.push(
-    vscode.commands.registerCommand("explorer.ExportHtmlMarkdown", exportMarkdownFromHtml)
+    vscode.commands.registerCommand(
+      "explorer.ExportHtmlMarkdown",
+      exportMarkdownFromHtml
+    )
   );
 
   //exportMarkdownEd
@@ -74,11 +75,17 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand("explorer.htmlToInlineHtml", exportInlineHtmlFromMarkdown)
+    vscode.commands.registerCommand(
+      "explorer.htmlToInlineHtml",
+      exportInlineHtmlFromMarkdown
+    )
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand("explorer.textileToMarkdown", exportMarkdownFromTextile)
+    vscode.commands.registerCommand(
+      "explorer.textileToMarkdown",
+      exportMarkdownFromTextile
+    )
   );
   //  main.createDocxTemplate
   context.subscriptions.push(
@@ -149,10 +156,15 @@ function exportMarkdownFromHtml(uriFile: vscode.Uri) {
 }
 
 function exportEdFromMarkdown(uriFile: vscode.Uri) {
+  resetAbortController();
   const thisOption = createDocxOptionExtension({
     ac,
     message: vscodeCommon.showMessage,
   });
+  
+  if (thisOption.isShowOutputTab) {
+    vscodeCommon.outputTab.show();
+  }
 
   try {
     vscodeCommon.updateStatusBar(true);
@@ -245,7 +257,6 @@ async function exportMarkdownFromTextile(uriFile: vscode.Uri) {
     vscodeCommon.updateStatusBar(true);
     const filePath = uriFile.fsPath;
     if (filePath.match(/\.textile$/i)) {
-
       const rHtml = textileToHtml(filePath, "");
 
       const r = htmlToMarkdown(filePath, rHtml);
@@ -274,7 +285,6 @@ async function exportDocxFromExplorer(uriFile: vscode.Uri) {
   }
 }
 
-
 /**
  * convert file(md, wd) to docx
  * @param uriFile
@@ -283,20 +293,26 @@ async function exportDocxFromExplorer(uriFile: vscode.Uri) {
 async function exportDocxFromExplorerCore(uriFile: vscode.Uri) {
   const filePath = uriFile.fsPath;
 
-  vscodeCommon.showMessage(
-    MessageType.info,
-    `convert docx from ${filePath}`,
-    "extension"
-  );
+
 
   resetAbortController();
   const thisOption = createDocxOptionExtension({
     ac,
     message: vscodeCommon.showMessage,
   });
+  
+  if (thisOption.isShowOutputTab) {
+    vscodeCommon.outputTab.show();
+  }
 
+  vscodeCommon.showMessage(
+    MessageType.info,
+    `convert docx from ${filePath}`,
+    "extension"
+  );
+
+  // wordDown
   if (filePath.match(/\.wd$/i)) {
-    // wordDown
     await wordDownToDocx(filePath, "", thisOption);
     return;
   }
@@ -372,23 +388,6 @@ async function exportDocxFromEditor(
   }
 }
 
-async function exportPptxFromEditor(
-  textEditor: {
-    document: { uri: { fsPath: any }; getText: (arg0: any) => any };
-    selection: any;
-  },
-  edit: any
-) {
-  try {
-    vscodeCommon.updateStatusBar(true);
-    await exportPptxFromEditorCore(textEditor, edit);
-  } catch (error) {
-    vscodeCommon.showMessage(MessageType.err, error, "extension");
-  } finally {
-    vscodeCommon.updateStatusBar(false);
-  }
-}
-
 /**
  * convert text(md, wd) to docx
  * @param textEditor
@@ -403,7 +402,16 @@ async function exportDocxFromEditorCore(
   // eslint-disable-next-line no-unused-vars
   edit: any
 ) {
-  vscodeCommon.outputTab.show();
+
+  resetAbortController();
+  const thisOption = createDocxOptionExtension({
+    ac,
+    message: vscodeCommon.showMessage,
+  });
+
+  if (thisOption.isShowOutputTab) {
+    vscodeCommon.outputTab.show();
+  }
 
   const filePath = textEditor.document.uri.fsPath;
   vscodeCommon.showMessage(
@@ -411,11 +419,6 @@ async function exportDocxFromEditorCore(
     `convert docx from ${filePath}`,
     "extension"
   );
-  resetAbortController();
-  const thisOption = createDocxOptionExtension({
-    ac,
-    message: vscodeCommon.showMessage,
-  });
 
   if (filePath.match(/\.wd$/i)) {
     // wordDown
@@ -434,6 +437,23 @@ async function exportDocxFromEditorCore(
   }
 }
 
+async function exportPptxFromEditor(
+  textEditor: {
+    document: { uri: { fsPath: any }; getText: (arg0: any) => any };
+    selection: any;
+  },
+  edit: any
+) {
+  try {
+    vscodeCommon.updateStatusBar(true);
+    await exportPptxFromEditorCore(textEditor, edit);
+  } catch (error) {
+    vscodeCommon.showMessage(MessageType.err, error, "extension");
+  } finally {
+    vscodeCommon.updateStatusBar(false);
+  }
+}
+
 async function exportPptxFromEditorCore(
   textEditor: {
     document: { uri: { fsPath: any }; getText: (arg0: any) => any };
@@ -442,7 +462,15 @@ async function exportPptxFromEditorCore(
   // eslint-disable-next-line no-unused-vars
   edit: any
 ) {
-  vscodeCommon.outputTab.show();
+  resetAbortController();
+  const thisOption = createDocxOptionExtension({
+    ac,
+    message: vscodeCommon.showMessage,
+  });
+
+  if (thisOption.isShowOutputTab) {
+    vscodeCommon.outputTab.show();
+  }
 
   const filePath = textEditor.document.uri.fsPath;
   vscodeCommon.showMessage(
@@ -450,11 +478,6 @@ async function exportPptxFromEditorCore(
     `convert pptx from ${filePath}`,
     "extension"
   );
-  resetAbortController();
-  const thisOption = createDocxOptionExtension({
-    ac,
-    message: vscodeCommon.showMessage,
-  });
 
   if (filePath.match(/\.wd$/i)) {
     // wordDown
@@ -476,16 +499,13 @@ async function exportPptxFromEditorCore(
 // This method is called when your extension is deactivated
 export function deactivate() {}
 
-
-function enableExperienceFeature(){
+function enableExperienceFeature() {
   vscode.commands.executeCommand(
     "setContext",
     "markdown-docx.isExperienceFeature",
     true
   );
 }
-
-
 
 async function createDocxTemplate() {
   try {
@@ -505,6 +525,7 @@ function createDocxOptionExtension(option: DocxOption) {
     docxEngine: getDocxEngine(),
     docxTemplate: getDocxTemplate(),
     mathExtension: getMathExtension(),
+    isShowOutputTab: getIsShowOutputTab(),
     isDebug: getDebug(),
     logInterval: getLogInterval(),
     isUseDocxJs: getUseDocxJs(),
@@ -557,6 +578,14 @@ function createDocxOptionExtension(option: DocxOption) {
         .getConfiguration("markdown-docx")
         .get<boolean>("docxEngine.mathExtension") ?? false;
     return mathExtension;
+  }
+
+  function getIsShowOutputTab() {
+    const isShowOutputTab =
+      vscode.workspace
+        .getConfiguration("markdown-docx")
+        .get<boolean>("docxEngine.showOutputTab") ?? false;
+    return isShowOutputTab;
   }
 
   // get docx convert timeout milliseconds.
