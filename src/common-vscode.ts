@@ -36,61 +36,40 @@ export function showMessage(
 ) {
   switch (msgType) {
     case MessageType.info:
-      showInfo(message, source, showNotification);
-      break;
     case MessageType.warn:
-      showWarn(message, source, showNotification);
-      break;
     case MessageType.debug:
-      showDebug(message, source, showNotification);
-      break;
     case MessageType.err:
+      showMessageCore(msgType, message, source, showNotification);
+      break;
     default:
-      showError(message, source, showNotification);
+      showMessageCore(MessageType.err, message, source, showNotification);
   }
 }
 
-function showInfo(message: unknown, source: string, showNotification = false) {
-  const messageOut = `[Info   - ${new Date().toLocaleTimeString()}] ${createMessage(
+function showMessageCore(msgType: MessageType, message: unknown, source: string, showNotification = false) {
+  const messageOut = `[${msgType}   - ${new Date().toLocaleTimeString()}] ${createMessage(
     message,
     source
   )}`;
   outputTab.appendLine(messageOut.trim());
   if (showNotification) {
-    vscode.window.showInformationMessage(messageOut);
-  }
-}
-
-function showWarn(message: unknown, source: string, showNotification = true) {
-  const messageOut = `[Warn   - ${new Date().toLocaleTimeString()}] ${createMessage(
-    message,
-    source
-  )}`;
-  outputTab.appendLine(messageOut.trim());
-  if (showNotification) {
-    vscode.window.showWarningMessage(messageOut);
-  }
-}
-
-function showDebug(message: unknown, source: string, showNotification = true) {
-  const messageOut = `[Debug  - ${new Date().toLocaleTimeString()}] ${createMessage(
-    message,
-    source
-  )}`;
-  outputTab.appendLine(messageOut.trim());
-  if (showNotification) {
-    vscode.window.showWarningMessage(messageOut);
-  }
-}
-
-function showError(message: unknown, source: string, showNotification = true) {
-  const messageOut = `[Error  - ${new Date().toLocaleTimeString()}] ${createMessage(
-    message,
-    source
-  )}`;
-  outputTab.appendLine(messageOut.trim());
-  if (showNotification) {
-    vscode.window.showErrorMessage(messageOut);
+    switch (msgType) {
+      case MessageType.info:
+        vscode.window.showInformationMessage(messageOut);
+        break;
+      case MessageType.warn:
+        vscode.window.showWarningMessage(messageOut);
+        break;
+      case MessageType.debug:
+        //
+        break;
+      case MessageType.err:
+        vscode.window.showErrorMessage(messageOut);
+        break;
+      default:
+        vscode.window.showErrorMessage(messageOut);
+        break;
+    }
   }
 }
 

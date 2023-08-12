@@ -26,10 +26,12 @@ export async function wordDownToDocx(
     __dirname,
     `../${templatesPath}/${docxTemplate001}`
   );
+
   const defaultTemplate2 = Path.resolve(
     __dirname,
     `../../${templatesPath}/${docxTemplate001}`
   );
+
   const template = await selectExistsPath(
     [
       getDocxTemplateFromWd(wdBody),
@@ -42,7 +44,7 @@ export async function wordDownToDocx(
 
   option.message?.(
     MessageType.info,
-    `docx docxTemplate: ${template ? template : "use inside"}`,
+    `Used docxTemplate: ${template ? template : "use inside"}`,
     "wd-to-docx",
     false
   );
@@ -69,7 +71,7 @@ export async function wordDownToDocx(
         MessageType.warn,
         `docx exists: ${outPath}.`,
         "wd-to-docx",
-        false
+        true
       );
       return;
     }
@@ -121,7 +123,7 @@ export async function wordDownToDocx(
 
 
 function getDocxTemplateFromWd(wd: string) {
-  const testMatch = wd.match(/^docxTemplate\t(?<docxTemplate>.*?)\t/im);
+  const testMatch = wd.match(/^param\tdocxTemplate\t(?<docxTemplate>.*?)\t/im);
   const docxTemplate = testMatch?.groups?.docxTemplate ?? "";
   return docxTemplate;
 }

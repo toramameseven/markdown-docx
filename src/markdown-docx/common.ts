@@ -49,10 +49,10 @@ export function createDocxOption(option: DocxOption = {}) {
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const MessageType = {
-  info: "info",
-  warn: "warn",
-  err: "err",
-  debug: "debug"
+  info: "Info",
+  warn: "Warn",
+  err: "Err",
+  debug: "Debug"
 } as const;
 
 export type MessageType = (typeof MessageType)[keyof typeof MessageType];

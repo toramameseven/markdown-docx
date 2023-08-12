@@ -299,22 +299,6 @@ export async function wdToDocxJs(
   let currentParagraph = new DocParagraph(wdCommand.text);
   let tableJs: TableJs | undefined = undefined;
 
-  //  word commands
-  // ---
-  // cols
-  // emptyMerge
-  // export
-  // import
-  // newLine
-  // newPage
-  // rowMerge
-  // toc
-  // levelOffset
-  // docxTemplate
-  // param
-  //  crossRef: "[[$n $t (p.$p)]]",
-  // placeholder
-
   const documentInfo: DocumentInfo = {
     placeholder: {},
     param: { crossRef: "[[$n $t (p.$p)]]" },
