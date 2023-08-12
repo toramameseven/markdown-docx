@@ -15,6 +15,7 @@ import {
   TextFrame,
   wdCommand,
   resolveEmphasis,
+  WdCommand,
 } from "./pptxjs";
 
 import { svg2imagePng } from "./tools/svg-png-image";
@@ -404,7 +405,7 @@ function getHeaderStyle(header: string) {
 async function resolveWordDownCommandEx(line: string, slide: PptSheet) {
   const functionName = "resolveWordDownCommandEx";
   const words = line.split(_sp);
-  const nodeType = words[0] as WdNodeType;
+  const nodeType = words[0] as WdCommand;
   let fontSize: number | undefined;
 
   thisMessage?.(
