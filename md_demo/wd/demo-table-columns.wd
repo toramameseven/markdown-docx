@@ -1,4 +1,4 @@
-docxTemplate	_yyy.docx				tm
+param	docxTemplate	_yyy.docx			tm
 section	2	table-column-width
 text	table column width
 newLine	convertHeading End	tm

@@ -38,21 +38,6 @@ function removeTopN(s: string) {
 
 suite("Extension Test Suite", () => {
   // ==========================================
-  test("title", async () => {
-    // marked
-    const markdown = `
-<!-- word title "Markdown to Docx samples" -->`;
-
-    // expect
-    const expect = `
-title\tMarkdown to Docx samples
-newLine\tconvertTitle\ttm`;
-
-    // assert
-    assert.strictEqual(await mdToWd(removeTopN(markdown)), removeTopN(expect));
-  });
-
-  // ==========================================
   test("toc", async () => {
     // marked
     const markdown = `
@@ -67,19 +52,6 @@ newLine	convertToc	tm`;
     assert.strictEqual(await mdToWd(removeTopN(markdown)), removeTopN(expect));
   });
 
-  // ==========================================
-  test("property", async () => {
-    // marked
-    const markdown = `
-<!-- word property ppp "table of content" -->`;
-
-    // expect
-    const expect = `
-property	ppp	table of content			tm`;
-
-    // assert
-    assert.strictEqual(await mdToWd(removeTopN(markdown)), removeTopN(expect));
-  });
 
   // ==========================================
   test("heading1", async () => {

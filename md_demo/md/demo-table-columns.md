@@ -1,5 +1,5 @@
 <!-- word export demo-table-columns.md-->
-<!-- word docxTemplate _yyy.docx -->
+<!-- word param docxTemplate _yyy.docx -->
 ## table column width
 
 markdown

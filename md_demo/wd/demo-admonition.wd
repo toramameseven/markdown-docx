@@ -1,4 +1,4 @@
-docxTemplate	_xxx.docx				tm
+param	docxTemplate	_xxx.docx			tm
 section	1	admonition
 text	Admonition
 newLine	convertHeading End	tm
