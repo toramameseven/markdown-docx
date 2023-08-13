@@ -21,7 +21,7 @@ export async function wordDownToDocx(
   if (wdBody === "") {
     wdBody = getFileContents(fileWd);
   }
-
+  
   const defaultTemplate = Path.resolve(
     __dirname,
     `../${templatesPath}/${docxTemplate001}`
@@ -45,7 +45,7 @@ export async function wordDownToDocx(
   option.message?.(
     MessageType.info,
     `Used docxTemplate: ${template ? template : "use inside"}`,
-    "wd-to-docx",
+    wordDownToDocx.name,
     false
   );
 
@@ -55,7 +55,7 @@ export async function wordDownToDocx(
       option.message?.(
         MessageType.warn,
         `docx template: no docx template is set.`,
-        "wd-to-docx",
+        wordDownToDocx.name,
         false
       );
       return;
@@ -70,7 +70,7 @@ export async function wordDownToDocx(
       option.message?.(
         MessageType.warn,
         `docx exists: ${outPath}.`,
-        "wd-to-docx",
+        wordDownToDocx.name,
         true
       );
       return;
@@ -79,7 +79,7 @@ export async function wordDownToDocx(
     option.message?.(
       MessageType.info,
       `create docx: ${outPath}.`,
-      "wd-to-docx",
+      wordDownToDocx.name,
       false
     );
 
@@ -90,7 +90,7 @@ export async function wordDownToDocx(
       option.message?.(
         MessageType.warn,
         `wdToDocxJs err: ${e}.`,
-        "wd-to-docx",
+        wordDownToDocx.name,
         false
       );
       return;
@@ -104,7 +104,7 @@ export async function wordDownToDocx(
     option.message?.(
       MessageType.info,
       `open docx: ${outPath}.`,
-      "wd-to-docx",
+      wordDownToDocx.name,
       false
     );
 
