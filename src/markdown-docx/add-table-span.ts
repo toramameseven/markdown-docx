@@ -136,32 +136,3 @@ function resolveHtmlCommentEx(content: string, tableInfo: TableInfo) {
   return tableInfo;
 }
 
-async function testThis() {
-  const md = `
-<!-- word emptyMerge -->
-<!-- word rowMerge 2-4  -->
-
-cell(4,2) is not merged. (comment cell)
-
-| data1-1 | data1-2                 |
-| ------- | ----------------------- |
-| data2-1 | data2-2                 |
-|         | data3-2                 |
-| data4-1 | <!-- not merged -->     |
-`;
-
-  //console.log(await addTableSpanToMarkdown("", md));
-}
-
-// testThis();
-
-// <!-- word emptyMerge -->
-// <!-- word rowMerge 2-4  -->
-
-// cell(4,2) is not merged. (comment cell)
-
-// | data1-1 | data1-2                 |
-// | ------- | ----------------------- |
-// | data2-1 | data2-2                 |
-// |          ^| data3-2                  ^|
-// | data4-1  ^| <!-- not merged -->      ^|

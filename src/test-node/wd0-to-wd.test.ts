@@ -6,6 +6,7 @@ import { markdownToWd } from "../../src/markdown-docx/markdown-to-xxxx";
 import path = require("path");
 import * as Fs from "fs";
 import { getFileContents } from "../markdown-docx/common";
+import { addTableSpanToMarkdown } from "../markdown-docx/add-table-span";
 //import { assert } from "chai";
 // You can import and use all API from the 'vscode' module
 // as well as import your extension to test it
@@ -15,10 +16,9 @@ import { getFileContents } from "../markdown-docx/common";
 async function mdToWd(marked: string) {
   const markdownBodyX = marked.replace(/@/g, "\\@");
 
-  const wd0 = (await markdownToWd0(markdownBodyX, "docx", { sanitize: false })).replace(
-    /(\r?\n)+/g,
-    "\n"
-  );
+  const wd0 = (
+    await markdownToWd0(markdownBodyX, "docx", { sanitize: false })
+  ).replace(/(\r?\n)+/g, "\n");
   // wd must vbCRLF
   const wd = wd0ToWd(wd0).replace("\r", "");
   return wd;
@@ -51,7 +51,6 @@ newLine	convertToc	tm`;
     // assert
     assert.strictEqual(await mdToWd(removeTopN(markdown)), removeTopN(expect));
   });
-
 
   // ==========================================
   test("heading1", async () => {
@@ -192,6 +191,43 @@ newLine	convertParagraph	tm`;
   });
 
   // ==========================================
+  test("addTableSpanToMarkdown", async () => {
+    // marked
+    const markdown = `
+<!-- word emptyMerge -->
+<!-- word rowMerge 2-4  -->
+
+cell(4,2) is not merged. (comment cell)
+
+| data1-1 | data1-2                 |
+| ------- | ----------------------- |
+| data2-1 | data2-2                 |
+|         | data3-2                 |
+| data4-1 | <!-- not merged -->     |
+`;
+
+    // expect
+    const expect = `
+<!-- word emptyMerge -->
+<!-- word rowMerge 2-4  -->
+
+cell(4,2) is not merged. (comment cell)
+
+| data1-1 | data1-2                 |
+| ------- | ----------------------- |
+| data2-1 | data2-2                 |
+|          ^| data3-2                  ^|
+| data4-1  ^| <!-- not merged -->      ^|
+`;
+
+    // assert
+    assert.strictEqual(
+      await addTableSpanToMarkdown("", removeTopN(markdown), undefined),
+      removeTopN(expect)
+    );
+  });
+
+  // ==========================================
   test("XXXXX", async () => {
     // marked
     const markdown = ``;
@@ -221,6 +257,9 @@ newLine	convertParagraph	tm`;
   //
 });
 
+/**
+ *
+ */
 suite("Demo Test Suite", () => {
   const r = path.resolve(__dirname, "../../md_demo/md");
 
@@ -238,7 +277,11 @@ suite("Demo Test Suite", () => {
     test(mdBaseName, async () => {
       // marked
       const mdFile = mdBaseName;
-      const mdPath = path.resolve(__dirname, "../../md_demo/md", mdFile + ".md");
+      const mdPath = path.resolve(
+        __dirname,
+        "../../md_demo/md",
+        mdFile + ".md"
+      );
       const wd = await mdFileToWd(mdPath);
 
       // expect

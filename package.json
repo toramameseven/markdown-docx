@@ -211,11 +211,17 @@
           "description": "word exe path.",
           "order": 9
         },
+        "markdown-docx.docxEngine.pptExePath": {
+          "type": "string",
+          "default": "",
+          "description": "ppt exe path.",
+          "order": 10
+        },
         "markdown-docx.docxEngine.isOpenWord": {
           "type": "boolean",
           "default": false,
           "description": "If true, open the word file.",
-          "order": 10
+          "order": 11
         }
       }
     }
