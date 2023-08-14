@@ -839,6 +839,8 @@ function resolveCommand(
         addNewLine("wd0NewLine");
       }
       break;
+    case wdCommand.export:
+      break;
     default:
       const r = params[0] ?? "";
       showMessage?.(

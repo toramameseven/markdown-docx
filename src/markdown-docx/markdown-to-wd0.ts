@@ -131,6 +131,7 @@ const htmlBlock = (content: string) => {
     // output inlineF
     return content;
   }
+
   showMessage?.(
     MessageType.warn,
     `Next html is not allowed: ${content}`,
@@ -138,6 +139,21 @@ const htmlBlock = (content: string) => {
     false
   );
   return "";
+};
+
+
+const documentInfoParams = [
+  "pptxSettings",
+  "position",
+  "dpi",
+  "docxTemplate",
+  "refFormat",
+  "tableWidth",
+  "levelOffset"
+] as const;
+type DocumentInfoParams = (typeof documentInfoParams)[number];
+const isDocumentInfoParams = (name: string): name is DocumentInfoParams => {
+  return documentInfoParams.some((value) => value === name);
 };
 
 function resolveHtmlComment(content: string) {
@@ -178,8 +194,9 @@ function resolveHtmlComment(content: string) {
           tocCaption,
         });
       case wordCommand.export:
-        // no operation
-        break;
+        return createBlockCommand(wordCommand.export, {
+          info: "export"
+        });
       case wordCommand.param:
       case wordCommand.placeholder:
           let r = "";
@@ -197,11 +214,18 @@ function resolveHtmlComment(content: string) {
         let defaultParam = "";
         let defaultParams =[command, ...params];
         for (let i = 1; i < defaultParams.length; i += 2) {
-          if (defaultParams[i - 1]) {
+          if (defaultParams[i - 1] && isDocumentInfoParams(defaultParams[i - 1])) {
             defaultParam += createBlockCommand("param", {
               key: defaultParams[i - 1],
               value: defaultParams[i],
             });
+          } else {
+            showMessage?.(
+              MessageType.warn,
+              `Next is not a parameter: ${defaultParams[i - 1]}`,
+              "markdown-to-wd0::resolveHtmlComment",
+              false
+            );
           }
         }
         return defaultParam;
@@ -447,7 +471,7 @@ function joinObjectToString(params: DocxParam) {
 
 export async function markdownToWd0(
   markdown: string,
-  convertType: "docx" | "excel" | "html" | "textile" | "htmlComment",
+  convertType: "docx" | "excel" | "html" | "textile" ,
   options?: Marked.MarkedOptions,
   messageFunction?: ShowMessage
 ) {
@@ -459,15 +483,7 @@ export async function markdownToWd0(
     excel: excelRenderer,
     html: null,
     textile: textileRenderer,
-    htmlComment: htmlCommandRenderer,
-  };
-
-  marked.use(marked.getDefaults());
-  const htmlCommand = marked(markdown, {
-    ...options,
-    renderer: htmlCommandRenderer,
-  });
-  console.log(htmlCommand);
+  } as const;
 
   const render = typeOfConvert[convertType];
   let markedOptions = { ...options };
@@ -640,44 +656,3 @@ const textileRenderer: Marked.Renderer = {
   options: {},
 };
 
-const htmlCommandRenderer: Marked.Renderer = {
-  // Block elements
-  heading: empty,
-
-  // normal paragraph
-  paragraph: empty,
-
-  list: empty,
-  listitem: empty,
-
-  // ``` or tab
-  code: empty,
-
-  // >
-  blockquote: empty,
-
-  table: empty,
-  tablerow: empty,
-  tablecell: empty,
-
-  html: htmlBlock,
-  hr: empty,
-  checkbox: empty,
-
-  // Inline elements
-  image: empty,
-  link: empty,
-  text: empty,
-  // `code`
-  codespan: empty,
-  // ** **
-  strong: empty,
-  // _ _
-  em: empty,
-  // <br>?
-  br: empty,
-  // ~~ ~~
-  del: empty,
-  // etc.
-  options: {},
-};

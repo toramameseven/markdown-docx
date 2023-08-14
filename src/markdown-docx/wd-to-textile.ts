@@ -121,8 +121,6 @@ function multibyteCharCount(str: string) {
   return len;
 }
 
-
-
 let showMessage: ShowMessage | undefined;
 
 const _sp = "\t";
@@ -155,7 +153,6 @@ function createBlock() {
 }
 
 function flushCommand(command: WdCommand = wdCommand.non, params = [""]) {
-  
   // code
   if (
     mdCode?.hasCode &&
@@ -170,7 +167,9 @@ function flushCommand(command: WdCommand = wdCommand.non, params = [""]) {
   if (markupCommand || textBuffer) {
     const previousCommand = getPreviousCommand(1);
     if (previousCommand && markupCommand === "") {
-      createLineBlank(`flushCommand exist previous:${previousCommand}, no markup Command`);
+      createLineBlank(
+        `flushCommand exist previous:${previousCommand}, no markup Command`
+      );
     }
     if (markupCommand) {
       textileLines.push(`${markupCommand} ${textBuffer}`);
@@ -353,6 +352,8 @@ function resolveCommand(command: WdCommand, params: string[]) {
       break;
     case wdCommand.tablecontentslist:
       convertTablecontentsList(params);
+      break;
+    case wdCommand.export:
       break;
     default:
       const r = params[0];

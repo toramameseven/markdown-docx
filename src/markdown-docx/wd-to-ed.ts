@@ -334,6 +334,8 @@ function resolveCommand(command: WdCommand, params: string[]) {
     case wdCommand.tablecontentslist:
       convertTablecontentsList(params);
       break;
+    case wdCommand.export:
+      break;
     default:
       const r = params[0];
       showMessage?.(
