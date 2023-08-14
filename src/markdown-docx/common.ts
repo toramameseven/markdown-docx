@@ -72,15 +72,15 @@ export type ShowMessage = (
 ) => void;
 
 export type UpdateStatusBar = (isRunning: boolean) => void;
-export const docxTemplate001 = "_template_001.docx";
+export const defaultTemplateDocx = "_with_cover.docx";
 export const templatesPath = "templates";
 
 export async function createDocxTemplateFile(wfFsPath: string) {
   const folderOut = wfFsPath;
-  const fileOut = path.resolve(folderOut, docxTemplate001);
+  const fileOut = path.resolve(folderOut, defaultTemplateDocx);
   if ((await dirExists(folderOut)) && !(await fileExists(fileOut))) {
     fs.copyFileSync(
-      path.resolve(__dirname, `../${templatesPath}/${docxTemplate001}`),
+      path.resolve(__dirname, `../${templatesPath}/${defaultTemplateDocx}`),
       fileOut
     );
   } else {

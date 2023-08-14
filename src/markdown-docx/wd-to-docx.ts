@@ -3,7 +3,7 @@ import {
   getFileContents,
   MessageType,
   fileExists,
-  docxTemplate001,
+  defaultTemplateDocx,
   templatesPath,
 } from "./common";
 
@@ -26,7 +26,7 @@ export async function wordDownToDocx(
   const templateInsideDocument = getDocxTemplateFromWd(wdBody);
 
   const template = await selectExistsPath(
-    [templateInsideDocument, option.docxTemplate ?? "", docxTemplate001],
+    [templateInsideDocument, option.docxTemplate ?? "", defaultTemplateDocx],
     [Path.dirname(fileWd), defaultTemplate, defaultTemplate2]
   );
 

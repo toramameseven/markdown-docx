@@ -5,7 +5,7 @@ This is the README **Markdown Docx**.
 This extension uses a docx binary file for the template. 
 If security check happens, you can download the template from this repo and set it as template in the settings.
 
-sone feature on version 0.0.1 are removed. sorry.
+some feature on version 0.0.1 are removed. sorry.
 
 ## Requirements
 
@@ -27,6 +27,13 @@ We do not use Microsoft Word at version 0.0.2.
 
 `<!-- word [command] parameters -->` is used for word command.
 
+
+* `<!-- word docxTemplate _no_cover.docx -->`
+  *  ` _no_cover.docx` is used for a docx template.
+
+* `<!-- word levelOffset 1 -- >`
+  * If your document start with `#`, set command `<!-- word levelOffset 1 -- >`.
+  * First `#` line is used for the document title.
 
 * `<!-- word toc 1 "table of contents" -->`
 
@@ -59,8 +66,9 @@ We do not use Microsoft Word at version 0.0.2.
 
 * `<!-- word tableWidth 90 -->`
 
-  you can set 10 to 100%
-  
+  we can not get the template document width, so you adjust the width manually.
+  you can set 10 to 100(%).
+
 * `<!-- word cols 1,2 -->`
 
   columns width are 1:2
@@ -129,12 +137,14 @@ like below
 
 It is better, set your language font.
 
-### copy template file
+### template files
 
-1. ctrl + shift + p  
-2. select **create a docx template**
+You can see the some template in the [markdown-docx site](https://github.com/toramameseven/markdown-docx) templates folder.
 
-You get a sample template. In this template, you see the placeholder described at next section.
+* _with_cover.docx (default template)
+* _no_cover.docx 
+
+In these template, you see the placeholder described at next section.
 
 ### place holder
 
@@ -146,6 +156,8 @@ Next place holders are used in the sample template.
   * `{{paragraphReplace}}
   * do not set this other information.
 
+  ![](./images/main_placeholder.png)
+
 * for cover
   * `{{title}}`
   * `{{subTitle}}`
@@ -153,6 +165,8 @@ Next place holders are used in the sample template.
   * `{{division}}`
   * `{{date}}`
   * `{{docNumber}}`
+
+  ![](./images/cover_placeholder.png)
 
 markdown  
 ```
