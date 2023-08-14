@@ -1,8 +1,15 @@
-import { DocxOption, MessageType, fileExists } from "./common";
+import {
+  DocxOption,
+  MessageType,
+  ShowMessage,
+  fileExists,
+  getFloat,
+} from "./common";
 import * as fs from "fs";
 import * as Path from "path";
 import * as imageSize from "image-size";
 const texToSvg = require("tex-to-svg");
+let showMessageThis: ShowMessage | undefined;
 
 import {
   Bookmark,
@@ -34,6 +41,7 @@ import {
 } from "docx";
 import { svg2imagePng } from "./tools/svg-png-image";
 import { WdCommand, wdCommand } from "./wd0-to-wd";
+import { OoxParameters } from "./markdown-to-wd0";
 
 const _sp = "\t";
 
@@ -54,9 +62,23 @@ const DocStyle = {
 } as const;
 type DocStyle = (typeof DocStyle)[keyof typeof DocStyle];
 
+// https://chaika.hatenablog.com/entry/2021/11/03/083000
+const documentInforParams = [
+  "pptxSettings",
+  "position",
+  "dpi",
+  "docxTemplate",
+  "refFormat",
+  "tableWidth",
+] as const;
+type DocumentInfoParams = (typeof documentInforParams)[number];
+const isDocumentInfoParams = (name: string): name is DocumentInfoParams => {
+  return documentInforParams.some((value) => value === name);
+};
+
 type DocumentInfo = {
   placeholder: { [v: string]: string };
-  param: { [v: string]: string };
+  param: { [v in DocumentInfoParams]?: string };
 };
 
 /**
@@ -145,7 +167,7 @@ class TableJs {
     }
   }
 
-  createTable() {
+  createTable(documentInfo: DocumentInfo) {
     let rows = new Array(this.rows);
     for (let i = 0; i < this.rows; i++) {
       rows[i] = new Array<TableCell | null>(this.columns);
@@ -192,6 +214,8 @@ class TableJs {
       return new TableRow({ children: rr });
     });
 
+    const tableWidth = getFloat(documentInfo.param.tableWidth, 20, 100);
+
     const tableJs = new Table({
       layout: TableLayoutType.FIXED,
       rows: tableRaws,
@@ -201,7 +225,7 @@ class TableJs {
       //   type: WidthType.AUTO,
       // },
       width: {
-        size: 95,
+        size: tableWidth,
         type: WidthType.PERCENTAGE,
       },
     });
@@ -293,6 +317,7 @@ export async function wdToDocxJs(
   mdSourcePath: string,
   option: DocxOption
 ): Promise<void> {
+  option.message && (showMessageThis = option.message);
   let patches: (Paragraph | Table | TableOfContents)[] = [];
 
   const lines = (wd + "\nEndline").split(/\r?\n/);
@@ -301,7 +326,7 @@ export async function wdToDocxJs(
 
   const documentInfo: DocumentInfo = {
     placeholder: {},
-    param: { crossRef: "[[$n $t (p.$p)]]" },
+    param: { refFormat: "[[$n $t (p.$p)]]" },
   };
 
   // patch parameter
@@ -326,7 +351,7 @@ export async function wdToDocxJs(
     } else {
       // in not table command, create table.
       if (tableJs) {
-        patches.push(tableJs.createTable());
+        patches.push(tableJs.createTable(documentInfo));
         tableJs = undefined;
       }
     }
@@ -427,17 +452,20 @@ function resolveCommentCommand(
 
   // param words
   if (wdCommandList[0] === "param") {
-    documentInfo.param[wdCommandList[1]] = wdCommandList[2];
-    return true;
+    // todo error
+    if (isDocumentInfoParams(wdCommandList[1])) {
+      documentInfo.param[wdCommandList[1] as DocumentInfoParams] =
+        wdCommandList[2];
+      return true;
+    } else {
+      showMessageThis?.(
+        MessageType.warn,
+        `Next is not a parameter: ${wdCommandList[1]}`,
+        resolveCommentCommand.name,
+        false
+      );
+    }
   } // param words
-
-  // dose not user option
-  // option
-  // const documentInfoKeys = Object.keys(documentInfo);
-  // if (documentInfoKeys.includes(wdCommandList[0])) {
-  //   documentInfo[wdCommandList[0]] = wdCommandList[1];
-  //   return true;
-  // } // option
 
   return false;
 }
@@ -511,7 +539,7 @@ async function resolveWDCommandEx(
     case wdCommand.link:
       if (!words[3]) {
         // internal link
-        let children = resolveXref(words[1], documentInfo.param.crossRef);
+        let children = resolveXref(words[1], documentInfo.param.refFormat);
         currentParagraph.addChildren(children);
       } else {
         child = new ExternalHyperlink({

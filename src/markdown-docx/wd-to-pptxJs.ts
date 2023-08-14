@@ -347,7 +347,6 @@ function resolveCommentCommand(
   wdCommandList2: string[],
   documentInfo: DocumentInfo
 ) {
-  const functionName = "resolveWordCommentsCommands";
   if (wdCommandList[0] === "placeholder") {
     documentInfo.placeholder[wdCommandList[1]] = wdCommandList[2];
     return true;
@@ -403,14 +402,13 @@ function getHeaderStyle(header: string) {
  * @returns
  */
 async function resolveWordDownCommandEx(line: string, slide: PptSheet) {
-  const functionName = "resolveWordDownCommandEx";
   const words = line.split(_sp);
   const nodeType = words[0] as WdCommand;
   let fontSize: number | undefined;
 
   thisMessage?.(
     MessageType.debug,
-    `${functionName}: ${nodeType}:${words[1]}`,
+    `${resolveWordDownCommandEx.name}: ${nodeType}:${words[1]}`,
     "wd-to-pptxJs",
     false
   );

@@ -23,29 +23,17 @@ let listInfos: ListInfo[] = [
 ];
 
 export const wdCommand = {
-  non:"non",
-  newLine:"newLine",
-  section:"section",
-  listitem:"listitem",
-  indentPlus:"indentPlus",
-  code:"code",
-  hr:"hr",
-  image:"image",
-  text:"text",
-  link:"link",
-  newPage:"newPage",
-  param:"param",
-  placeholder:"placeholder",
-  toc:"toc",
-  list:"list",
-  indentMinus:"indentMinus",
-  tableCreate:"tableCreate",
-  tableWidthInfo:"tableWidthInfo",
-  tableMarge:"tableMarge",
-  tablecontents:"tablecontents",
-  tablecontentslist:"tablecontentslist",
-  OderList:"OderList",
-  NormalList:"NormalList",
+  ...wd0Command,
+  section: "section",
+  indentPlus: "indentPlus",
+  indentMinus: "indentMinus",
+  tableCreate: "tableCreate",
+  tableWidthInfo: "tableWidthInfo",
+  tableMarge: "tableMarge",
+  tablecontents: "tablecontents",
+  tablecontentslist: "tablecontentslist",
+  OderList: "OderList",
+  NormalList: "NormalList",
 } as const;
 export type WdCommand = (typeof wdCommand)[keyof typeof wdCommand];
 
@@ -137,7 +125,9 @@ class Table implements BaseBlock {
     const commands: string[] = [];
     const commandContents: string[] = [];
     const commandMergeInfos: string[] = [];
-    commands.push(`${wdCommand.tableCreate}\t${this.rowCount}\t${this.columnCount}`);
+    commands.push(
+      `${wdCommand.tableCreate}\t${this.rowCount}\t${this.columnCount}`
+    );
 
     // <!-- word cols 1,4  -->
     // tableWidthInfo = 1,4
@@ -244,9 +234,9 @@ class Table implements BaseBlock {
         const end = parseInt(rows[1]) - 1;
         if (start < end) {
           commandMergeInfos.push(
-            `${wdCommand.tableMarge}\t${start}\t${j}\t${end}\t${j}\t${this.rows[start][
-              j
-            ].blockList.join("")}`
+            `${wdCommand.tableMarge}\t${start}\t${j}\t${end}\t${j}\t${this.rows[
+              start
+            ][j].blockList.join("")}`
           );
         }
       }
@@ -263,11 +253,16 @@ class Table implements BaseBlock {
           `${wdCommand.tablecontents}\t${i}\t${j}\tnext\t${this.rows[i][j].align}`
         );
         const tableCellCommands = blockList.map(
-          (i) => `${wdCommand.tablecontentslist}\t${i.trim().replace(/<!--.*?-->/g, "")}`
+          (i) =>
+            `${wdCommand.tablecontentslist}\t${i
+              .trim()
+              .replace(/<!--.*?-->/g, "")}`
           //(i) => `tablecontentslist\t${i}`
         );
         // detect end paragraph without newline
-        tableCellCommands.push(`${wdCommand.tablecontentslist}\tendParagraph\t\ttm`);
+        tableCellCommands.push(
+          `${wdCommand.tablecontentslist}\tendParagraph\t\ttm`
+        );
         commandContents.push(...tableCellCommands);
       }
     }
@@ -548,7 +543,13 @@ function convertImage(params: DocxParam, isCommandEnd?: boolean) {
     return;
   }
   //href images/main_window2.png, text caption sss, title image title
-  const r = [wdCommand.image, params.href, params.text, params.title, "tm"].join(_sp);
+  const r = [
+    wdCommand.image,
+    params.href,
+    params.text,
+    params.title,
+    "tm",
+  ].join(_sp);
   outputWd(r);
 }
 
@@ -597,14 +598,22 @@ function convertLink(params: DocxParam, isCommandEnd?: boolean) {
   if (isCommandEnd) {
     return;
   }
-  const r = [wdCommand.link, params.href, params.title, params.text, "tm"].join(_sp);
+  const r = [wdCommand.link, params.href, params.title, params.text, "tm"].join(
+    _sp
+  );
   outputWd(r);
 }
 function convertNewPage(params: DocxParam, isCommandEnd?: boolean) {
   if (isCommandEnd) {
     return;
   }
-  const r = [wdCommand.newPage, params.href, params.title, params.text, "tm"].join(_sp);
+  const r = [
+    wdCommand.newPage,
+    params.href,
+    params.title,
+    params.text,
+    "tm",
+  ].join(_sp);
   outputWd(r);
 }
 
@@ -620,11 +629,35 @@ function convertPlaceholder(params: DocxParam, isCommandEnd?: boolean) {
   if (isCommandEnd) {
     return;
   }
-  const r = [wdCommand.placeholder, params.key, params.value, "", "", "tm"].join(_sp);
+  const r = [
+    wdCommand.placeholder,
+    params.key,
+    params.value,
+    "",
+    "",
+    "tm",
+  ].join(_sp);
   outputWd(r);
 }
 
-
+function convertWdKeyValue(
+  wdCmd: WdCommand,
+  params: DocxParam,
+  isCommandEnd?: boolean
+) {
+  if (isCommandEnd) {
+    return;
+  }
+  const r = [
+    wdCmd,
+    params.key,
+    params.value,
+    "",
+    "",
+    "tm",
+  ].join(_sp);
+  outputWd(r);
+}
 
 function outputWd(wdText: string) {
   // if block exists, add all wdTexts to the block.

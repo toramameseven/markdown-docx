@@ -330,4 +330,33 @@ export function vbsSpawn(
   });
 }
 
+/**
+ * 
+ * @param input 
+ * @param min 
+ * @param max 
+ * @returns min < r < max, if error, return max
+ */
+export function getFloat(input: string| number | undefined, min: number, max: number){
+  let current = Number.NaN;
+  if (typeof input === 'string'){
+    current = parseFloat(input);
+  }
+  if (typeof input === 'number'){
+    current = input;
+  }
+
+  if (Number.isNaN(current)){
+    current = max;
+  }
+
+  if (current < min){
+    current = min;
+  }
+  if (current > max){
+    current = max;
+  }
+  return current;
+}
+
 

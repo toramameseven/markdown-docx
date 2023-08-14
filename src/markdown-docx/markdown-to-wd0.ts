@@ -24,6 +24,7 @@ const markedCommand = {
   table: "table",
   tablerow: "tablerow",
   tablecell: "tablecell",
+  html: "html",
   text: "text",
   image: "image",
   link: "link",
@@ -32,6 +33,7 @@ const markedCommand = {
   em: "em",
   del: "~~",
   non: "non",
+  hr: "hr",
 } as const;
 // type MarkedCommand = typeof markedCommand[keyof typeof markedCommand];
 
@@ -43,42 +45,22 @@ const wordCommand = {
   newLine: "newLine",
   toc: "toc",
   export: "export",
-  param: "param",  // pptxSettings, position, dpi, docxTemplate, crossRef
   placeholder: "placeholder",
+  param: "param",
 } as const;
 
-export const wd0Command = {
-  // marked
-  heading: "heading",
-  paragraph: "paragraph",
-  list: "list",
-  listitem: "listitem",
-  code: "code",
-  blockquote: "blockquote",
-  table: "table",
-  tablerow: "tablerow",
-  tablecell: "tablecell",
-  text: "text",
-  image: "image",
-  link: "link",
-  html: "html",
-  non: "non",
-  indentPlus: "indentPlus",
-  indentMinus: "indentMinus",
-  endParagraph: "endParagraph",
-  newLine: "newLine",
-  newPage: "newPage",
-  htmlWdCommand: "htmlWdCommand",
-  hr: "hr",
+const ooxParameters ={
+  pptxSettings:"pptxSettings",
+  position:"position",
+  dpi:"dpi",
+  docxTemplate:"docxTemplate",
+  refFormat:"refFormat"
+} as const;
+export type OoxParameters = (typeof ooxParameters)[keyof typeof ooxParameters];
 
-  // word down
-  param: "param",
-  placeholder: "placeholder",
-  toc: "toc",
-  // table
-  cols: "cols",
-  rowMerge: "rowMerge",
-  emptyMerge: "emptyMerge",
+export const wd0Command = {
+  ...markedCommand,
+  ...wordCommand,
 } as const;
 export type Wd0Command = (typeof wd0Command)[keyof typeof wd0Command];
 
@@ -159,16 +141,10 @@ const htmlBlock = (content: string) => {
 };
 
 function resolveHtmlComment(content: string) {
-  // const testMatch = content.match(/<!--(?<name>.*)-->/i);
-  // const command = testMatch?.groups?.name ?? "";
-  // const params = command.trim().split(" ");
-
-  const r = parseHtmlComment(content);
-
-  // wordDown commands
-  if (r) {
-    const { command, params } = r;
-    //if (params.length > 1 && params[0] === wordCommand.word) {
+  const commandParams = parseHtmlComment(content);
+  if (commandParams) {
+    // <!-- word command param1 param2 param3 -->
+    const { command, params } = commandParams;
     switch (command) {
       case wordCommand.cols:
         if (params.length) {
@@ -201,29 +177,34 @@ function resolveHtmlComment(content: string) {
           tocTo,
           tocCaption,
         });
-      case wordCommand.param:
-      case wordCommand.placeholder:
-        let r = "";
-        for (let i = 1; i < params.length; i += 2) {
-          if (params[i - 1]) {
-            r += createBlockCommand(command, {
-              key: params[i - 1],
-              value: params[i],
-            });
-          }
-        }
-        return r;
       case wordCommand.export:
         // no operation
         break;
+      case wordCommand.param:
+      case wordCommand.placeholder:
+          let r = "";
+          for (let i = 1; i < params.length; i += 2) {
+            if (params[i - 1]) {
+              r += createBlockCommand(command, {
+                key: params[i - 1],
+                value: params[i],
+              });
+            }
+          }
+          return r;
       default:
-        showMessage?.(
-          MessageType.warn,
-          `No word command: ${command}`,
-          source,
-          false
-        );
-        break;
+        // todo error parameters
+        let defaultParam = "";
+        let defaultParams =[command, ...params];
+        for (let i = 1; i < defaultParams.length; i += 2) {
+          if (defaultParams[i - 1]) {
+            defaultParam += createBlockCommand("param", {
+              key: defaultParams[i - 1],
+              value: defaultParams[i],
+            });
+          }
+        }
+        return defaultParam;
     }
   }
 }
@@ -320,9 +301,7 @@ function splitBlockContents(blockContents: string) {
         return _newline + s + _newline;
       } else {
         // only text
-        return (
-          `\n${wd0Command.text}\t${wd0Command.text}\t` + s + _newline
-        );
+        return `\n${wd0Command.text}\t${wd0Command.text}\t` + s + _newline;
       }
     });
   return lines;
@@ -468,7 +447,7 @@ function joinObjectToString(params: DocxParam) {
 
 export async function markdownToWd0(
   markdown: string,
-  convertType: "docx" | "excel" | "html" | "textile",
+  convertType: "docx" | "excel" | "html" | "textile" | "htmlComment",
   options?: Marked.MarkedOptions,
   messageFunction?: ShowMessage
 ) {
@@ -480,10 +459,17 @@ export async function markdownToWd0(
     excel: excelRenderer,
     html: null,
     textile: textileRenderer,
+    htmlComment: htmlCommandRenderer,
   };
 
-  const render = typeOfConvert[convertType];
+  marked.use(marked.getDefaults());
+  const htmlCommand = marked(markdown, {
+    ...options,
+    renderer: htmlCommandRenderer,
+  });
+  console.log(htmlCommand);
 
+  const render = typeOfConvert[convertType];
   let markedOptions = { ...options };
   if (render) {
     markedOptions = { ...markedOptions, renderer: render };
@@ -650,6 +636,48 @@ const textileRenderer: Marked.Renderer = {
   br: newline,
   // ~~ ~~
   del: inlineEx(markedCommand.del),
+  // etc.
+  options: {},
+};
+
+const htmlCommandRenderer: Marked.Renderer = {
+  // Block elements
+  heading: empty,
+
+  // normal paragraph
+  paragraph: empty,
+
+  list: empty,
+  listitem: empty,
+
+  // ``` or tab
+  code: empty,
+
+  // >
+  blockquote: empty,
+
+  table: empty,
+  tablerow: empty,
+  tablecell: empty,
+
+  html: htmlBlock,
+  hr: empty,
+  checkbox: empty,
+
+  // Inline elements
+  image: empty,
+  link: empty,
+  text: empty,
+  // `code`
+  codespan: empty,
+  // ** **
+  strong: empty,
+  // _ _
+  em: empty,
+  // <br>?
+  br: empty,
+  // ~~ ~~
+  del: empty,
   // etc.
   options: {},
 };
