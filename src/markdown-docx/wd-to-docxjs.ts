@@ -3,6 +3,7 @@ import {
   MessageType,
   ShowMessage,
   fileExists,
+  getDocxDocTitleFromWd,
   getFloat,
 } from "./common";
 import * as fs from "fs";
@@ -41,12 +42,19 @@ import {
 } from "docx";
 import { svg2imagePng } from "./tools/svg-png-image";
 import { WdCommand, wdCommand } from "./wd0-to-wd";
-import { OoxParameters } from "./markdown-to-wd0";
+// import { OoxParameters } from "./markdown-to-wd0";
 
 const _sp = "\t";
 
 const DocStyle = {
   "1": "1",
+  hh0:"hh0",
+  hh1:"hh1",
+  hh2:"hh2",
+  hh3:"hh3",
+  hh4:"hh4",
+  hh5:"hh5",
+  hh6:"hh6",
   Body: "body",
   Body1: "body1",
   nList1: "nList1",
@@ -72,10 +80,6 @@ const documentInforParams = [
   "tableWidth",
 ] as const;
 type DocumentInfoParams = (typeof documentInforParams)[number];
-const isDocumentInfoParams = (name: string): name is DocumentInfoParams => {
-  return documentInforParams.some((value) => value === name);
-};
-
 type DocumentInfo = {
   placeholder: { [v: string]: string };
   param: { [v in DocumentInfoParams]?: string };
@@ -318,20 +322,25 @@ export async function wdToDocxJs(
   option: DocxOption
 ): Promise<void> {
   option.message && (showMessageThis = option.message);
+
+  // for placeholder
   let patches: (Paragraph | Table | TableOfContents)[] = [];
+
+  // get tile from heading 1
+  const title = getDocxDocTitleFromWd(wd);
 
   const lines = (wd + "\nEndline").split(/\r?\n/);
   let currentParagraph = new DocParagraph(wdCommand.text);
   let tableJs: TableJs | undefined = undefined;
 
   const documentInfo: DocumentInfo = {
-    placeholder: {},
+    placeholder: { title },
     param: { refFormat: "[[$n $t (p.$p)]]" },
   };
 
   // patch parameter
-  const patchInfo = {};
-
+  
+  const patchInfo:{ [v: string]: PatchInfo } = {};
   for (let i = 0; i < lines.length; i++) {
     const wdCommandList = lines[i].split(_sp);
 
@@ -387,7 +396,16 @@ export async function wdToDocxJs(
         currentParagraph.indent
       );
     }
+  } // end for
+
+  if (title) {
+    patchInfo["title"] = {
+      type: PatchType.PARAGRAPH,
+      children: [new TextRun(title)],
+    };
   }
+
+  // apply to placeholders
   await createDocxPatch(
     patches,
     docxTemplatePath,
@@ -442,29 +460,18 @@ function resolveCommentCommand(
 
   // placeholder words
   if (wdCommandList[0] === "placeholder") {
-    (patchInfo[wdCommandList[1]] = {
+    patchInfo[wdCommandList[1]] = {
       type: PatchType.PARAGRAPH,
       children: [new TextRun(wdCommandList[2])],
-    }),
-      wdCommandList[2];
+    };
     return true;
   } // placeholder words
 
   // param words
   if (wdCommandList[0] === "param") {
-    // todo error
-    if (isDocumentInfoParams(wdCommandList[1])) {
-      documentInfo.param[wdCommandList[1] as DocumentInfoParams] =
-        wdCommandList[2];
-      return true;
-    } else {
-      showMessageThis?.(
-        MessageType.warn,
-        `Next is not a parameter: ${wdCommandList[1]}`,
-        "resolveCommentCommand",
-        false
-      );
-    }
+    documentInfo.param[wdCommandList[1] as DocumentInfoParams] =
+      wdCommandList[2];
+    return true;
   } // param words
 
   return false;
@@ -485,12 +492,6 @@ async function resolveWDCommandEx(
 
   switch (nodeType) {
     case wdCommand.section:
-      // section 2  heading2(id)
-      child = new Bookmark({
-        id: words[2],
-        //children: resolveEmphasis(words[2]),
-        children: [],
-      });
       // ## hh1
       // ### hh2
       // ###### hh5
@@ -500,7 +501,6 @@ async function resolveWDCommandEx(
         nodeType,
         currentParagraph.indent,
         `hh${hhHeader}` as DocStyle // `${words[1]}` as DocStyle, // we do not know how this works.
-        //child
       );
       current.refId = words[2];
       return current;
@@ -591,6 +591,13 @@ async function resolveWDCommandEx(
       break;
     case wdCommand.newLine:
       if (words[1] === "convertHeading End") {
+        if (currentParagraph.docStyle === 'hh0'){
+          current = new DocParagraph(
+            wdCommand.text,
+            0
+          );
+          return current;
+        }
         child = new Bookmark({
           id: currentParagraph.refId,
           children: currentParagraph.children,

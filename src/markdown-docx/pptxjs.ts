@@ -23,8 +23,7 @@ const _sp = "\t";
 
 export { wdCommand, WdCommand } from "./wd0-to-wd";
 
-
-export const DocxStyle = {
+export const docxStyle = {
   "1": "1",
   Body: "body",
   Body1: "body1",
@@ -39,20 +38,20 @@ export const DocxStyle = {
   warning1: "warn1",
   Error: "Error",
 } as const;
-export type DocxStyle = (typeof DocxStyle)[keyof typeof DocxStyle];
+export type DocxStyle = (typeof docxStyle)[keyof typeof docxStyle];
 
 export type TableProps = {
   tableRows: pptxGen.TableRow[];
   options?: pptxGen.TableProps;
 };
 
-export const SheetObjectType = {
+export const sheetObjectType = {
   text: "text",
   table: "table",
   image: "image",
 } as const;
 export type SheetObjectType =
-  (typeof SheetObjectType)[keyof typeof SheetObjectType];
+  (typeof sheetObjectType)[keyof typeof sheetObjectType];
 
 export type SheetObject = {
   type: SheetObjectType;
@@ -198,10 +197,10 @@ export class PptParagraph {
     return r;
   }
 
-  clear(){
+  clear() {
     this.children = [];
     this.isFlush = false;
-    this.currentFontSize = this.defaultFontSize;    
+    this.currentFontSize = this.defaultFontSize;
   }
 
   addIndent() {
@@ -385,8 +384,6 @@ export class TableJs {
     return [r2 - r1 + 1, c2 - c1 + 1];
   }
 }
-
-
 
 export function getPositionPCT(position: string) {
   const positions = position.split(",");

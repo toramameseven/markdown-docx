@@ -8,7 +8,7 @@ import * as imageSize from "image-size";
 const TeXToSVG = require("tex-to-svg");
 import {
   PptParagraph,
-  DocxStyle,
+  docxStyle,
   PptSheet,
   PptStyle,
   TableJs,
@@ -16,6 +16,7 @@ import {
   wdCommand,
   resolveEmphasis,
   WdCommand,
+  DocxStyle,
 } from "./pptxjs";
 
 import { svg2imagePng } from "./tools/svg-png-image";
@@ -596,13 +597,13 @@ async function resolveWordDownCommandEx(line: string, slide: PptSheet) {
  * @returns
  */
 function resolveAdmonition(s: string) {
-  let admonition: DocxStyle = DocxStyle.note1;
+  let admonition: DocxStyle = docxStyle.note1;
   switch (s.toLocaleLowerCase()) {
     case "note":
-      admonition = DocxStyle.note1;
+      admonition = docxStyle.note1;
       break;
     case "warning":
-      admonition = DocxStyle.warning1;
+      admonition = docxStyle.warning1;
       break;
     default:
       //

@@ -2,7 +2,6 @@
   "word front all": {
     "prefix": "word properties",
     "body": [
-      "<!-- word placeholder title ${1:title} -->",
       "<!-- word placeholder subTitle ${2:subTitle} -->",
       "<!-- word placeholder author ${3:author} -->",
       "<!-- word placeholder division ${4:division} -->",
@@ -21,18 +20,9 @@
     "prefix": "word rowMerge",
     "body": ["<!-- word rowMerge $1-$2, -->"]
   },
-  "table position": {
-    "prefix": "word tablePos",
-    "body": ["<!-- word tablePos $1,$2,$3,$4 -->"]
-  },
   "table emptyMerge": {
     "prefix": "word emptyMerge",
     "body": ["<!-- word emptyMerge -->"]
-  },
-  "word property": {
-    "prefix": "word property",
-    "body": ["<!-- word property $1 $2 -->$0"],
-    "description": "word property"
   },
   "newPage": {
     "prefix": "word newPage",
@@ -44,9 +34,9 @@
     "body": ["<!-- word import $1.md-->"],
     "description": "word import"
   },
-  "cross reference": {
-    "prefix": "word crossRef",
-    "body": ["<!-- word crossRef \"[[\\$n \\$t (p.\\$p)]]\" -->"]
+  "cross reference format": {
+    "prefix": "word refFormat",
+    "body": ["<!-- word refFormat \"[[\\$n \\$t (p.\\$p)]]\" -->"]
   },
   "docx docxTemplate": {
     "prefix": "word docxTemplate",
@@ -54,6 +44,10 @@
   },
   "pptx settings": {
     "prefix": "pptx settings",
-    "body": ["<!-- word param pptxSettings ${1:pptxSettings} -->"]
+    "body": ["<!-- ppt pptxSettings ${1:pptxSettings} -->"]
+  },
+  "pptx position": {
+    "prefix": "pptx position",
+    "body": ["<!-- ppt position ${1:x},${2:y},${3:w},${4:h}-->"]
   }
 }

@@ -49,12 +49,12 @@ const wordCommand = {
   param: "param",
 } as const;
 
-const ooxParameters ={
-  pptxSettings:"pptxSettings",
-  position:"position",
-  dpi:"dpi",
-  docxTemplate:"docxTemplate",
-  refFormat:"refFormat"
+const ooxParameters = {
+  pptxSettings: "pptxSettings",
+  position: "position",
+  dpi: "dpi",
+  docxTemplate: "docxTemplate",
+  refFormat: "refFormat",
 } as const;
 export type OoxParameters = (typeof ooxParameters)[keyof typeof ooxParameters];
 
@@ -141,7 +141,6 @@ const htmlBlock = (content: string) => {
   return "";
 };
 
-
 const documentInfoParams = [
   "pptxSettings",
   "position",
@@ -149,7 +148,7 @@ const documentInfoParams = [
   "docxTemplate",
   "refFormat",
   "tableWidth",
-  "levelOffset"
+  "levelOffset",
 ] as const;
 type DocumentInfoParams = (typeof documentInfoParams)[number];
 const isDocumentInfoParams = (name: string): name is DocumentInfoParams => {
@@ -195,26 +194,29 @@ function resolveHtmlComment(content: string) {
         });
       case wordCommand.export:
         return createBlockCommand(wordCommand.export, {
-          info: "export"
+          info: "export",
         });
       case wordCommand.param:
       case wordCommand.placeholder:
-          let r = "";
-          for (let i = 1; i < params.length; i += 2) {
-            if (params[i - 1]) {
-              r += createBlockCommand(command, {
-                key: params[i - 1],
-                value: params[i],
-              });
-            }
+        let r = "";
+        for (let i = 1; i < params.length; i += 2) {
+          if (params[i - 1]) {
+            r += createBlockCommand(command, {
+              key: params[i - 1],
+              value: params[i],
+            });
           }
-          return r;
+        }
+        return r;
       default:
         // todo error parameters
         let defaultParam = "";
-        let defaultParams =[command, ...params];
+        let defaultParams = [command, ...params];
         for (let i = 1; i < defaultParams.length; i += 2) {
-          if (defaultParams[i - 1] && isDocumentInfoParams(defaultParams[i - 1])) {
+          if (
+            defaultParams[i - 1] &&
+            isDocumentInfoParams(defaultParams[i - 1])
+          ) {
             defaultParam += createBlockCommand("param", {
               key: defaultParams[i - 1],
               value: defaultParams[i],
@@ -471,7 +473,7 @@ function joinObjectToString(params: DocxParam) {
 
 export async function markdownToWd0(
   markdown: string,
-  convertType: "docx" | "excel" | "html" | "textile" ,
+  convertType: "docx" | "excel" | "html" | "textile",
   options?: Marked.MarkedOptions,
   messageFunction?: ShowMessage
 ) {
@@ -655,4 +657,3 @@ const textileRenderer: Marked.Renderer = {
   // etc.
   options: {},
 };
-

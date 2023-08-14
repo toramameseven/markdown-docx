@@ -17,7 +17,6 @@ import { wdToTextile } from "./wd-to-textile";
 import { createInlineHtml } from "./tools/createInlineHtml";
 import { wdToPptx } from "./wd-to-pptxJs";
 
-
 /**message function */
 let showMessage: ShowMessage;
 
@@ -133,8 +132,7 @@ export async function markdownToTextile(
       option.isDebug
     );
 
-
-    const edBody = wdToTextile(r.wdBody,showMessage);
+    const edBody = wdToTextile(r.wdBody, showMessage);
 
     Fs.writeFileSync(fileEd, edBody);
   } catch (ex) {
@@ -209,13 +207,13 @@ export async function markdownToHtml(
       startLine,
       option.isDebug
     );
-    
-    let rr = '';
-    if (isInclude){
+
+    let rr = "";
+    if (isInclude) {
       rr = await createInlineHtml(pathMarkdown, r.wdBody);
     }
 
-    const outHtml = rr ? rr: r.wdBody;
+    const outHtml = rr ? rr : r.wdBody;
     Fs.writeFileSync(fileHtml, outHtml);
 
     return fileHtml;
@@ -234,7 +232,10 @@ export async function textileToMarkdown(
 ) {
   option.message && (showMessage = option.message);
   const dirPath = Path.dirname(pathMarkdown);
-  const fileNameTextile = Path.basename(pathMarkdown).replace(/\.textile$/i, "");
+  const fileNameTextile = Path.basename(pathMarkdown).replace(
+    /\.textile$/i,
+    ""
+  );
   const fileHtml = await createPath(dirPath, fileNameTextile, "html", true);
 
   try {
@@ -252,13 +253,13 @@ export async function textileToMarkdown(
       startLine,
       option.isDebug
     );
-    
-    let rr = '';
-    if (isInclude){
+
+    let rr = "";
+    if (isInclude) {
       rr = await createInlineHtml(pathMarkdown, r.wdBody);
     }
 
-    const outHtml = rr ? rr: r.wdBody;
+    const outHtml = rr ? rr : r.wdBody;
     Fs.writeFileSync(fileHtml, outHtml);
 
     return fileHtml;
@@ -266,7 +267,6 @@ export async function textileToMarkdown(
     throw ex;
   }
 }
-
 
 //creating wd file for test
 export async function markdownToWd(
@@ -311,12 +311,14 @@ export async function markdownToWd(
     const markdownBodyXX = markdownBodyX.replace(/\s{2,}\n/g, "\n\n");
 
     // create wd0
-    const wd0 =(await markdownToWd0(
-      markdownBodyXX,
-      convertType,
-      { sanitize: false },
-      showMessage
-    )).replace(/(\r?\n)+/g, "\n");
+    const wd0 = (
+      await markdownToWd0(
+        markdownBodyXX,
+        convertType,
+        { sanitize: false },
+        showMessage
+      )
+    ).replace(/(\r?\n)+/g, "\n");
 
     if (convertType === "html") {
       return { wdPath: fileWd, wdBody: wd0 };
@@ -329,7 +331,7 @@ export async function markdownToWd(
     // output wd0 file.
     isDebug && Fs.writeFileSync(fileWd0, wd0);
     // output wd file.
-    (isDebug || isSaveWd)  &&   Fs.writeFileSync(fileWd, wd);
+    (isDebug || isSaveWd) && Fs.writeFileSync(fileWd, wd);
 
     return { wdPath: fileWd, wdBody: wd };
   } catch (ex) {
@@ -356,12 +358,7 @@ function getFrontMatterAndBody(
   try {
     frontMatterAndBody = fm(fileContents);
   } catch (e) {
-    showMessage?.(
-      MessageType.err,
-      e,
-      "getFrontMatterAndBody",
-      false
-    );
+    showMessage?.(MessageType.err, e, "getFrontMatterAndBody", false);
     return { frontMatter, markdownBody };
   }
 
@@ -382,4 +379,3 @@ function getFrontMatterAndBody(
   }
   return { frontMatter, markdownBody };
 }
-

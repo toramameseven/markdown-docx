@@ -26,11 +26,7 @@ export async function wordDownToDocx(
   const templateInsideDocument = getDocxTemplateFromWd(wdBody);
 
   const template = await selectExistsPath(
-    [
-      templateInsideDocument,
-      option.docxTemplate ?? "",
-      docxTemplate001,
-    ],
+    [templateInsideDocument, option.docxTemplate ?? "", docxTemplate001],
     [Path.dirname(fileWd), defaultTemplate, defaultTemplate2]
   );
 
@@ -118,3 +114,5 @@ function getDocxTemplateFromWd(wd: string) {
   const docxTemplate = testMatch?.groups?.docxTemplate ?? "";
   return docxTemplate;
 }
+
+

@@ -133,4 +133,3 @@ function resolveHtmlCommentEx(content: string, tableInfo: TableInfo) {
   }
   return tableInfo;
 }
-

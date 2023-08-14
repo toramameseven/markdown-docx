@@ -2,10 +2,10 @@ import path = require("path");
 import * as Fs from "fs";
 import Encoding = require("encoding-japanese");
 import * as fs from "fs";
-import * as iconv from "iconv-lite";
-import { spawn } from "child_process";
+// import * as iconv from "iconv-lite";
+// import { spawn } from "child_process";
 
-const FOLDER_VBS = "vbs";
+//const FOLDER_VBS = "vbs";
 
 // front matter is not used
 export type XFrontMatter = {
@@ -52,18 +52,17 @@ export const MessageType = {
   info: "Info",
   warn: "Warn",
   err: "Err",
-  debug: "Debug"
+  debug: "Debug",
 } as const;
 
 export type MessageType = (typeof MessageType)[keyof typeof MessageType];
 
 export type MessageProp = {
-  msgType: MessageType,
-  message: unknown,
-  source: string,
-  showNotification?: boolean
+  msgType: MessageType;
+  message: unknown;
+  source: string;
+  showNotification?: boolean;
 };
-
 
 export type ShowMessage = (
   msgType: MessageType,
@@ -76,13 +75,10 @@ export type UpdateStatusBar = (isRunning: boolean) => void;
 export const docxTemplate001 = "_template_001.docx";
 export const templatesPath = "templates";
 
-export async function createDocxTemplateFile(wfFsPath:string) {
-  const folderOut =wfFsPath;
+export async function createDocxTemplateFile(wfFsPath: string) {
+  const folderOut = wfFsPath;
   const fileOut = path.resolve(folderOut, docxTemplate001);
-  if (
-    (await dirExists(folderOut)) &&
-    !(await fileExists(fileOut))
-  ) {
+  if ((await dirExists(folderOut)) && !(await fileExists(fileOut))) {
     fs.copyFileSync(
       path.resolve(__dirname, `../${templatesPath}/${docxTemplate001}`),
       fileOut
@@ -100,7 +96,7 @@ export function getFileContents(filePath: string) {
     to: "UNICODE",
     type: "string",
   });
-  
+
   // bom
   if (fileContents.charCodeAt(0) === 0xfeff) {
     fileContents = fileContents.substring(1);
@@ -158,11 +154,11 @@ export function getWordDownMergeCommand(wd: string) {
 
 /**
  * create uniq path
- * @param dir 
- * @param name 
- * @param ext 
- * @param isSame 
- * @returns 
+ * @param dir
+ * @param name
+ * @param ext
+ * @param isSame
+ * @returns
  */
 export async function createPath(
   dir: string,
@@ -203,9 +199,9 @@ export async function dirExists(filepath: string) {
 
 /**
  * remove pathFolder
- * @param pathFolder 
+ * @param pathFolder
  * @param option  option: { force: true }
- * @returns 
+ * @returns
  */
 export async function rmDirIfExist(pathFolder: string, option: {}) {
   try {
@@ -222,7 +218,7 @@ export async function rmDirIfExist(pathFolder: string, option: {}) {
 
 /**
  * remove pathFile
- * @param pathFile 
+ * @param pathFile
  * @param option option: { force: true }
  * @returns void
  */
@@ -331,32 +327,41 @@ export async function rmFileIfExist(pathFile: string, option: { force: true }) {
 // }
 
 /**
- * 
- * @param input 
- * @param min 
- * @param max 
+ *
+ * @param input
+ * @param min
+ * @param max
  * @returns min < r < max, if error, return max
  */
-export function getFloat(input: string| number | undefined, min: number, max: number){
+export function getFloat(
+  input: string | number | undefined,
+  min: number,
+  max: number
+) {
   let current = Number.NaN;
-  if (typeof input === 'string'){
+  if (typeof input === "string") {
     current = parseFloat(input);
   }
-  if (typeof input === 'number'){
+  if (typeof input === "number") {
     current = input;
   }
 
-  if (Number.isNaN(current)){
+  if (Number.isNaN(current)) {
     current = max;
   }
 
-  if (current < min){
+  if (current < min) {
     current = min;
   }
-  if (current > max){
+  if (current > max) {
     current = max;
   }
   return current;
 }
 
 
+export function getDocxDocTitleFromWd(wd: string) {
+  const testMatch = wd.match(/^section\t1\t.*$[^]^text\t(?<title>.*?)$/im);
+  const title = testMatch?.groups?.title ?? "";
+  return title;
+}
