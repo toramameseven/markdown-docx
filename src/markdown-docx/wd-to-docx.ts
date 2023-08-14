@@ -22,9 +22,7 @@ export async function wordDownToDocx(
 
   // search template
   const defaultTemplate = Path.resolve(__dirname, `../${templatesPath}`);
-
   const defaultTemplate2 = Path.resolve(__dirname, `../../${templatesPath}`);
-
   const templateInsideDocument = getDocxTemplateFromWd(wdBody);
 
   const template = await selectExistsPath(
@@ -49,7 +47,7 @@ export async function wordDownToDocx(
       MessageType.warn,
       `docx template: no docx template is set.`,
       "wd-to-docx",
-      false
+      true
     );
     return;
   }

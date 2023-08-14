@@ -53,26 +53,10 @@ export async function markdownToDocx(
       selection,
       "docx",
       startLine,
-      option.isDebug,
-      !option.isUseDocxJs
+      option.isDebug
     );
 
-    // get template and engine from the body text. engine is only for vba(vbs).
-    // only vbs mode // const docxEngineInsideWdBody = getDocxEngine(wdBody);
-    //const templateInsideWdBody = getDocxTemplate(wdBody);
     fileWd = wdPath;
-
-    // get docx docxEngine and docxTemplate in a wd file or options.
-    // does not use vbs rendering
-    // option.docxEngine = docxEngineInsideWdBody
-    //   ? docxEngineInsideWdBody
-    //   : option.docxEngine;
-
-    // option.docxTemplate = templateInsideWdBody
-    //   ? templateInsideWdBody
-    //   : option.docxTemplate;
-
-    //create docx (docxJs or vbs)
     await wordDownToDocx(fileWd, wdBody, option);
   } catch (ex) {
     throw ex;
@@ -149,8 +133,6 @@ export async function markdownToTextile(
       option.isDebug
     );
 
-    // wdToEd(wdBody, option);
-    //const edBody = htmlToTextile("", r.wdBody);
 
     const edBody = wdToTextile(r.wdBody,showMessage);
 
@@ -169,7 +151,7 @@ export async function markdownToPptx(
 ) {
   option.message && (showMessage = option.message);
   let fileWd = "";
-  // convert markdown to docx
+
   try {
     showMessage?.(
       MessageType.info,
@@ -212,7 +194,6 @@ export async function markdownToHtml(
   const fileNameMd = Path.basename(pathMarkdown);
   const fileHtml = await createPath(dirPath, fileNameMd, "html", true);
 
-  // convert markdown to docx
   try {
     showMessage?.(
       MessageType.info,
@@ -256,7 +237,6 @@ export async function textileToMarkdown(
   const fileNameTextile = Path.basename(pathMarkdown).replace(/\.textile$/i, "");
   const fileHtml = await createPath(dirPath, fileNameTextile, "html", true);
 
-  // convert markdown to docx
   try {
     showMessage?.(
       MessageType.info,
@@ -403,15 +383,3 @@ function getFrontMatterAndBody(
   return { frontMatter, markdownBody };
 }
 
-// does not use vbs
-// function getDocxEngine(wd: string) {
-//   const testMatch = wd.match(/^docxEngine\t(?<docxEngine>.*)\t/i);
-//   const docxEngine = testMatch?.groups?.docxEngine ?? "";
-//   return docxEngine;
-// }
-
-function getDocxTemplate(wd: string) {
-  const testMatch = wd.match(/^param\tdocxTemplate\t(?<docxTemplate>.*)\t/im);
-  const docxTemplate = testMatch?.groups?.docxTemplate ?? "";
-  return docxTemplate;
-}
