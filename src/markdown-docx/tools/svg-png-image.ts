@@ -22,7 +22,7 @@ export async function svg2imagePng(svg: string) {
   }
 
   /** @type {Uint8Array} */
-  const png = await svg2png(svg, {
+  const png: Uint8Array = await svg2png(svg, {
     // scale: 2, // optional
     // width: 400, // optional
     // height: 400, // optional
