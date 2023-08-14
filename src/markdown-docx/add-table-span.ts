@@ -3,8 +3,6 @@ import { MessageType, getWordDownCommand } from "./common";
 
 import { ShowMessage } from "./common";
 
-let thisMessage: ShowMessage | undefined;
-
 const wordCommand = {
   title: "title",
   rowMerge: "rowMerge",

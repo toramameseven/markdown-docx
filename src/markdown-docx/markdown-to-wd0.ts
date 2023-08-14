@@ -254,16 +254,16 @@ export function slugify(header: string, alowDuplicate = false) {
     .replace(/\-+$/, ""); // Replace trailing hyphen
 
   if (alowDuplicate === false) {
-    r = createNotDuplicateId(r, r);
+    r = createUniqId(r, r);
   }
 
   return r;
 }
 
-function createNotDuplicateId(id: string, originalId: string, index = 0) {
+function createUniqId(id: string, originalId: string, index = 0) {
   let testId = id;
   if (idMap.has(testId)) {
-    testId = createNotDuplicateId(
+    testId = createUniqId(
       originalId + "-" + (index + 1).toString(),
       originalId,
       index + 1
