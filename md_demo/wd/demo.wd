@@ -7,6 +7,7 @@ placeholder	docNumber	XXXX-0004			tm
 newLine	wd0NewLine	tm
 toc	3	toc caption	tm
 newLine	convertToc	tm
+param	levelOffset	0			tm
 section	2	title-subtitle-and-table-of-content
 text	title subtitle and table of content
 newLine	convertHeading End	tm

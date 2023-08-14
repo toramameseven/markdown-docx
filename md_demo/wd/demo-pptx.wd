@@ -10,3 +10,7 @@ text	slide1
 newLine	convertHeading End	tm
 image	./markdown2docx.png			tm
 newLine	convertParagraph	tm
+param	position	50,50,50,50			tm
+param	dpi	50			tm
+image	./markdown2docx.png			tm
+newLine	convertParagraph	tm

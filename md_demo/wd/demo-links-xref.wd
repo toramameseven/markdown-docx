@@ -1,3 +1,5 @@
+param	refFormat	[[$n $t ppp.$p]]			tm
+param	docxTemplate	_xxx.docx			tm
 section	2	cross-reference-in-a-docx
 text	cross reference in a docx
 newLine	convertHeading End	tm

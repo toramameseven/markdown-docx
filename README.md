@@ -46,9 +46,9 @@ We do not use Microsoft Word at version 0.0.2.
 
   `{{key}}` in a docx file is replaced to `the value`.
 
-* `<!-- word crossRef "[[$n $t (p.$p)]]" -->`
+* `<!-- word refFormat [$n $t (p.$p)]]" -->`
 
-  cross reference format  
+  reference format  
   * `$n`: section number
   * `$t`: text
   * `$p`: page
@@ -57,6 +57,10 @@ We do not use Microsoft Word at version 0.0.2.
 
 ###### table
 
+* `<!-- word tableWidth 90 -->`
+
+  you can set 10 to 100%
+  
 * `<!-- word cols 1,2 -->`
 
   columns width are 1:2
@@ -68,6 +72,8 @@ We do not use Microsoft Word at version 0.0.2.
 * `<!-- word emptyMerge -->`
   
   empty cells are merged. only row direction.
+
+
 
 ## sample markdown file
 
@@ -217,8 +223,7 @@ And we use some useful articles below.
 * [marked-extended-tables](https://github.com/calculuschild/marked-extended-tables) is for merged table.
 * To Slugify, we use Mr. Sato 's code (https://qiita.com/satokaz/items/64582da4640898c4bf42)
 * [node-html-markdown](https://github.com/crosstype/node-html-markdown)'s code is used, for converting html to markdown.
-* [koukimura's page](https://koukimra.com/) is used to resize pictures.
-* [minnano macro page](https://www.wordvbalab.com/) is used for emphasis styles.
+
 
 ## Release Notes
 

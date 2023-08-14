@@ -1,3 +1,4 @@
+param	tableWidth	50			tm
 section	1	tables
 text	Tables
 newLine	convertHeading End	tm
