@@ -141,7 +141,6 @@ function createLineEx(command: string, picture: string, text: string) {
 }
 
 function createLineBlank(info: string, isForce = false) {
-  //console.log(`${createLineBlank.name}==> ${info}`);
   if (
     (textileLines.length &&
       textileLines[textileLines.length - 1].trim() !== "") ||

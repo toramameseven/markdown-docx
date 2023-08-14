@@ -408,7 +408,7 @@ async function resolveWordDownCommandEx(line: string, slide: PptSheet) {
 
   thisMessage?.(
     MessageType.debug,
-    `${resolveWordDownCommandEx.name}: ${nodeType}:${words[1]}`,
+    `resolveWordDownCommandEx: ${nodeType}:${words[1]}`,
     "wd-to-pptxJs",
     false
   );

@@ -137,7 +137,6 @@ function createLine(command: string, picture: string, text: string) {
 }
 
 function createLineBlank(info: string, isForce = false) {
-  //console.log(`${createLineBlank.name}==> ${info}`);
   if (
     (excelLines.length && excelLines[excelLines.length - 1].trim() !== "") ||
     isForce

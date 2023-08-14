@@ -461,7 +461,7 @@ function resolveCommentCommand(
       showMessageThis?.(
         MessageType.warn,
         `Next is not a parameter: ${wdCommandList[1]}`,
-        resolveCommentCommand.name,
+        "resolveCommentCommand",
         false
       );
     }
