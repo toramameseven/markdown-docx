@@ -115,11 +115,9 @@ export async function wdToPptxJs(
   const settingPath = await selectExistsPath(
     [
       documentInfo.param.pptxSettings ?? "",
-      Path.resolve(wdDirFullPath, documentInfo.param.pptxSettings ?? ""),
-      "../templates/master-settings.js",
-      "../../templates/master-settings.js",
+      "/master-settings.js",
     ],
-    __dirname
+    [wdDirFullPath, __dirname, "../templates", "../../templates"]
   );
 
   try {
@@ -317,7 +315,7 @@ export async function wdToPptxJs(
       "C:\\Program Files (x86)\\Microsoft Office\\root\\Office16\\POWERPNT.EXE",
       "C:\\Program Files\\Microsoft Office\\root\\Office16\\POWERPNT.EXE",
     ],
-    ""
+    [""]
   );
 
   runCommand(pptExe, r);

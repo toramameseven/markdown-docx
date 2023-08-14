@@ -59,7 +59,7 @@ export async function markdownToDocx(
 
     // get template and engine from the body text. engine is only for vba(vbs).
     // only vbs mode // const docxEngineInsideWdBody = getDocxEngine(wdBody);
-    const templateInsideWdBody = getDocxTemplate(wdBody);
+    //const templateInsideWdBody = getDocxTemplate(wdBody);
     fileWd = wdPath;
 
     // get docx docxEngine and docxTemplate in a wd file or options.
@@ -68,9 +68,9 @@ export async function markdownToDocx(
     //   ? docxEngineInsideWdBody
     //   : option.docxEngine;
 
-    option.docxTemplate = templateInsideWdBody
-      ? templateInsideWdBody
-      : option.docxTemplate;
+    // option.docxTemplate = templateInsideWdBody
+    //   ? templateInsideWdBody
+    //   : option.docxTemplate;
 
     //create docx (docxJs or vbs)
     await wordDownToDocx(fileWd, wdBody, option);
@@ -411,7 +411,7 @@ function getFrontMatterAndBody(
 // }
 
 function getDocxTemplate(wd: string) {
-  const testMatch = wd.match(/^docxTemplate\t(?<docxTemplate>.*)\t/im);
+  const testMatch = wd.match(/^param\tdocxTemplate\t(?<docxTemplate>.*)\t/im);
   const docxTemplate = testMatch?.groups?.docxTemplate ?? "";
   return docxTemplate;
 }

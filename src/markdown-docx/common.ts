@@ -239,96 +239,96 @@ export async function rmFileIfExist(pathFile: string, option: { force: true }) {
   }
 }
 
-function s2u(sb: Buffer) {
-  // todo for non japanese language
-  //const vbsEncode = vscode.workspace.getConfiguration("vbecm").get<string>("vbsEncode") || "windows-31j";
-  // https://github.com/ashtuchkin/iconv-lite/wiki/Use-Buffers-when-decoding
-  return iconv.decode(sb, "windows-31j");
+// function s2u(sb: Buffer) {
+//   // todo for non japanese language
+//   //const vbsEncode = vscode.workspace.getConfiguration("vbecm").get<string>("vbsEncode") || "windows-31j";
+//   // https://github.com/ashtuchkin/iconv-lite/wiki/Use-Buffers-when-decoding
+//   return iconv.decode(sb, "windows-31j");
 
-  // if japanese, select below
-  // const r = Encoding.convert(sb, {
-  //   to: "UNICODE",
-  //   type: "string",
-  // });
-  // return r;
-}
+//   // if japanese, select below
+//   // const r = Encoding.convert(sb, {
+//   //   to: "UNICODE",
+//   //   type: "string",
+//   // });
+//   // return r;
+// }
 
-export type VbsSpawn = typeof vbsSpawn;
-export function vbsSpawn(
-  script: string,
-  timeout: number,
-  param: string[],
-  ac?: AbortController,
-  showMessage?: ShowMessage
-) {
-  return new Promise<number>(async (resolve, reject) => {
-    const { signal } = ac ?? new AbortController();
+// export type VbsSpawn = typeof vbsSpawn;
+// export function vbsSpawn(
+//   script: string,
+//   timeout: number,
+//   param: string[],
+//   ac?: AbortController,
+//   showMessage?: ShowMessage
+// ) {
+//   return new Promise<number>(async (resolve, reject) => {
+//     const { signal } = ac ?? new AbortController();
 
-    let scriptPath = "";
-    if (await fileExists(script)) {
-      // optional docxEngine
-      scriptPath = script;
-    } else {
-      const rootFolder = path.dirname(__dirname);
-      // rootFolder is differ between debug and release
-      // for release
-      let vbsPath = path.resolve(rootFolder, FOLDER_VBS);
-      if (!(await dirExists(vbsPath))) {
-        // for debug
-        vbsPath = path.resolve(rootFolder, "..", FOLDER_VBS);
-      }
-      scriptPath = path.resolve(vbsPath, "wordDownToDocx.vbs");
-    }
+//     let scriptPath = "";
+//     if (await fileExists(script)) {
+//       // optional docxEngine
+//       scriptPath = script;
+//     } else {
+//       const rootFolder = path.dirname(__dirname);
+//       // rootFolder is differ between debug and release
+//       // for release
+//       let vbsPath = path.resolve(rootFolder, FOLDER_VBS);
+//       if (!(await dirExists(vbsPath))) {
+//         // for debug
+//         vbsPath = path.resolve(rootFolder, "..", FOLDER_VBS);
+//       }
+//       scriptPath = path.resolve(vbsPath, "wordDownToDocx.vbs");
+//     }
 
-    if (!(await fileExists(scriptPath))) {
-      return reject(9991);
-    }
+//     if (!(await fileExists(scriptPath))) {
+//       return reject(9991);
+//     }
 
-    const p = spawn("cscript.exe", ["//Nologo", scriptPath, ...param], {
-      timeout: timeout,
-      signal,
-    });
+//     const p = spawn("cscript.exe", ["//Nologo", scriptPath, ...param], {
+//       timeout: timeout,
+//       signal,
+//     });
 
-    p.stdout.on("data", (data) => {
-      const r = s2u(data);
-      r.split("\n")
-        .filter((d) => d.trim())
-        .forEach((d) => showMessage?.(MessageType.info, d, "vbs"));
-    });
-    p.stderr.on("data", (data) => {
-      const r = s2u(data as Buffer);
-      r.split("\n")
-        .filter((d) => d.trim())
-        .forEach((d) => showMessage?.(MessageType.err, d, "vbs"));
-    });
-    p.on("close", (code) => {
-      const r = code ?? 9999;
-      if (r === 0) {
-        showMessage?.(MessageType.info, "complete!!", "vbs");
-      } else if (ac?.signal.aborted) {
-        showMessage?.(MessageType.info, "convert is aborted.", "common");
-      } else {
-        showMessage?.(
-          MessageType.err,
-          `some error happens. code: ${r} killed? : ${p.killed}`,
-          "vbs"
-        );
-        return reject(r);
-      }
-      return resolve(r);
-    });
+//     p.stdout.on("data", (data) => {
+//       const r = s2u(data);
+//       r.split("\n")
+//         .filter((d) => d.trim())
+//         .forEach((d) => showMessage?.(MessageType.info, d, "vbs"));
+//     });
+//     p.stderr.on("data", (data) => {
+//       const r = s2u(data as Buffer);
+//       r.split("\n")
+//         .filter((d) => d.trim())
+//         .forEach((d) => showMessage?.(MessageType.err, d, "vbs"));
+//     });
+//     p.on("close", (code) => {
+//       const r = code ?? 9999;
+//       if (r === 0) {
+//         showMessage?.(MessageType.info, "complete!!", "vbs");
+//       } else if (ac?.signal.aborted) {
+//         showMessage?.(MessageType.info, "convert is aborted.", "common");
+//       } else {
+//         showMessage?.(
+//           MessageType.err,
+//           `some error happens. code: ${r} killed? : ${p.killed}`,
+//           "vbs"
+//         );
+//         return reject(r);
+//       }
+//       return resolve(r);
+//     });
 
-    const cleanup = () => {
-      showMessage?.(MessageType.info, `spawn kill pid: ${p.pid}`, "common");
-      p.kill();
-    };
+//     const cleanup = () => {
+//       showMessage?.(MessageType.info, `spawn kill pid: ${p.pid}`, "common");
+//       p.kill();
+//     };
 
-    // for windows, they do not work. may be
-    p.on("SIGINT", cleanup);
-    p.on("SIGTERM", cleanup);
-    p.on("SIGQUIT", cleanup);
-  });
-}
+//     // for windows, they do not work. may be
+//     p.on("SIGINT", cleanup);
+//     p.on("SIGTERM", cleanup);
+//     p.on("SIGQUIT", cleanup);
+//   });
+// }
 
 /**
  * 

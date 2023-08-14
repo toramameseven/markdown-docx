@@ -24,7 +24,7 @@ export function getFileContents(filePath: string) {
     to: "UNICODE",
     type: "string",
   });
-  
+
   // bom
   if (fileContents.charCodeAt(0) === 0xfeff) {
     fileContents = fileContents.substring(1);
@@ -35,19 +35,18 @@ export function getFileContents(filePath: string) {
   return lines.join("\n");
 }
 
-export async function selectExistsPath(children: string[], pathAbsolute: string) {
-  for (let i = 0; i < children.length; i++) {
-    let filePath = children[i];
+export async function selectExistsPath(paths: string[], dirs: string[]) {
+  for (let i = 0; i < paths.length; i++) {
+    let filePath = paths[i];
     if (await fileExists(filePath)) {
       return filePath;
     }
-    filePath = path.resolve(pathAbsolute, filePath);
-    if (await fileExists(filePath)) {
-      return filePath;
+    for (let j = 0; j < dirs.length; j++) {
+      let filePathEx = path.resolve(dirs[j], filePath);
+      if (await fileExists(filePathEx)) {
+        return filePathEx;
+      }
     }
   }
   return "";
 }
-
-
-

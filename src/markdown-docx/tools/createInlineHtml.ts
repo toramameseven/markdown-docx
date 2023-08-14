@@ -13,7 +13,10 @@ export async function createInlineHtml(htmlPath: string, htmlBody: string) {
       rootpath: path.dirname(htmlPath),
     });
 
-    const htmlTemplatePath = await selectExistsPath(["../../templates/sample.html", "../templates/sample.html"], __dirname);
+    const htmlTemplatePath = await selectExistsPath(
+      ["../../templates/sample.html", "../templates/sample.html"],
+      [__dirname]
+    );
 
     let sampleHtml = getFileContents(htmlTemplatePath);
 
@@ -22,6 +25,6 @@ export async function createInlineHtml(htmlPath: string, htmlBody: string) {
     return outHtml;
   } catch (error) {
     console.log(error);
-  } 
+  }
   return "";
 }

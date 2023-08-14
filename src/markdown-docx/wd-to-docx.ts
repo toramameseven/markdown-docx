@@ -21,15 +21,9 @@ export async function wordDownToDocx(
   }
 
   // search template
-  const defaultTemplate = Path.resolve(
-    __dirname,
-    `../${templatesPath}/${docxTemplate001}`
-  );
+  const defaultTemplate = Path.resolve(__dirname, `../${templatesPath}`);
 
-  const defaultTemplate2 = Path.resolve(
-    __dirname,
-    `../../${templatesPath}/${docxTemplate001}`
-  );
+  const defaultTemplate2 = Path.resolve(__dirname, `../../${templatesPath}`);
 
   const templateInsideDocument = getDocxTemplateFromWd(wdBody);
 
@@ -37,10 +31,9 @@ export async function wordDownToDocx(
     [
       templateInsideDocument,
       option.docxTemplate ?? "",
-      defaultTemplate,
-      defaultTemplate2,
+      docxTemplate001,
     ],
-    Path.dirname(fileWd)
+    [Path.dirname(fileWd), defaultTemplate, defaultTemplate2]
   );
 
   option.message?.(
@@ -116,7 +109,7 @@ export async function wordDownToDocx(
       "C:\\Program Files (x86)\\Microsoft Office\\root\\Office16\\WINWORD.EXE",
       "C:\\Program Files\\Microsoft Office\\root\\Office16\\WINWORD.EXE",
     ],
-    ""
+    [""]
   );
   runCommand(wordExe, outPath);
   return;
