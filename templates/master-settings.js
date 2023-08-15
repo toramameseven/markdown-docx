@@ -16,21 +16,47 @@ let imageLogo = {
 };
 
 // common
-const mainFontFace = { fontFace: "Meiryo" };
+// FYI: use `headFontFace` and/or `bodyFontFace` to set the default font for the entire presentation (including slide Masters)
+// const headFontFace = { headFontFace: "Meiryo" };
+const headFontFace = { headFontFace: "Arial" };
+const bodyFontFace = { bodyFontFace: "Arial" };
+// pptx.theme = { bodyFontFace: "Arial" };
+const layout = "LAYOUT_WIDE";
+const backgroundColor = { color: "E3E3E3", transparency: 50 };
+const mainColor = { color: "568FAC" };
+const subColor = { color: "5495A8" };
+const mainFontFace = { fontFace: "Arial" };
 const mainFontSize = { fontSize: 18 };
-
+const mainFontColor = { color: "0F0F0F" };
+const subFontColor = { color: "0F0F0F" };
+const mainLineSpacing = 0;
+const fontBaseHeading = {
+  ...mainFontFace,
+  ...mainFontColor,
+  lineSpacing: mainLineSpacing,
+};
+const fontBase = {
+  ...mainFontFace,
+  ...mainFontColor,
+  lineSpacing: mainLineSpacing,
+};
+const tableHeaderColor = "000000";
+const tableHeaderFillColor = "FFFFFF";
 // header testPropsOption
-const h1 = { ...mainFontFace, fontSize: 48 };
-const h2 = { ...mainFontFace, fontSize: 42 };
-const h3 = { ...mainFontFace, fontSize: 36 };
-const h4 = { ...mainFontFace, fontSize: 30 };
-const h5 = { ...mainFontFace, fontSize: 24 };
-const h6 = { ...mainFontFace, ...mainFontSize };
-const body = { ...mainFontFace, ...mainFontSize };
+const h1 = { ...fontBaseHeading, fontSize: 48, lineSpacing: 0 };
+const h2 = { ...fontBaseHeading, fontSize: 42, lineSpacing: 0 };
+const h3 = { ...fontBaseHeading, fontSize: 36, lineSpacing: 0 };
+const h4 = { ...fontBaseHeading, fontSize: 30, lineSpacing: 0 };
+const h5 = { ...fontBaseHeading, fontSize: 24, lineSpacing: 0 };
+const h6 = { ...fontBaseHeading, ...mainFontSize, lineSpacing: mainLineSpacing  };
+const body = { ...fontBaseHeading, ...mainFontSize, lineSpacing: mainLineSpacing };
+const code = { ...fontBase, ...mainFontSize, highlight: "FFFF00" , lineSpacing: mainLineSpacing };
+const codeSpan = { ...fontBase, ...mainFontSize, highlight: "FFFF00" , lineSpacing: mainLineSpacing };
 
 // TITLE_SLIDE
 const titleSlide = {
   title: "TITLE_SLIDE",
+  background: backgroundColor,
   //background: objBkg,
   //background: { color: "46e0e0", transparency: 50 },
   //bkgd: objBkg, // TEST: @deprecated
@@ -69,9 +95,8 @@ const titleSlide = {
           margin: 0,
           align: "middle",
           valign: "middle",
-          color: "404040",
           fontSize: 18,
-          ...mainFontFace,
+          ...fontBase,
         },
         text: "", // USAGE: Leave blank to have powerpoint substitute default placeholder text (ex: "Click to add title")
       },
@@ -92,7 +117,7 @@ const titleSlide = {
           align: "center",
           valign: "middle",
           margin: 0,
-          ...mainFontFace,
+          ...fontBase,
         },
       },
     },
@@ -102,7 +127,7 @@ const titleSlide = {
 // MASTER_SLIDE (MASTER_PLACEHOLDER)
 const masterSlide = {
   title: "MASTER_SLIDE",
-  background: { color: "46e0e0", transparency: 50 },
+  background: backgroundColor,
   margin: [0.5, 0.25, 1.0, 0.25],
   slideNumber: {
     x: 0.6,
@@ -110,7 +135,7 @@ const masterSlide = {
     color: "FFFFFF",
     fontSize: 10,
     bold: true,
-    ...mainFontFace,
+    ...fontBase,
   },
   objects: [
     //{ 'image': { x:11.45, y:5.95, w:1.67, h:0.75, data:STARLABS_LOGO_SM } },
@@ -133,8 +158,8 @@ const masterSlide = {
           align: "center",
           valign: "middle",
           color: "FFFFFF",
-          fontSize: 12,
-          ...mainFontFace,
+          fontSize: 18,
+          ...fontBase,
         },
         text: "S.T.A.R. Laboratories - Confidential",
       },
@@ -153,7 +178,7 @@ const masterSlide = {
           valign: "top",
           color: "404040",
           fontSize: 18,
-          ...mainFontFace,
+          ...fontBase,
         },
         text: "", // USAGE: Leave blank to have powerpoint substitute default placeholder text (ex: "Click to add title")
       },
@@ -191,5 +216,10 @@ module.exports = {
   h5,
   h6,
   body,
+  code,
+  codeSpan,
   tableProps,
+  layout,
+  bodyFontFace,
+  headFontFace
 };

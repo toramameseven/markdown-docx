@@ -11,7 +11,14 @@ export type PptStyle = {
   h5: PptxGenJS.TextPropsOptions;
   h6: PptxGenJS.TextPropsOptions;
   body: PptxGenJS.TextPropsOptions;
+  code: PptxGenJS.TextPropsOptions;
+  codeSpan: PptxGenJS.TextPropsOptions;
   tableProps: PptxGenJS.TableProps;
+  tableHeaderColor: string;
+  tableHeaderFillColor: string;
+  layout: string;
+  bodyFontFace: PptxGenJS.TableCellProps;
+  headFontFace: PptxGenJS.ThemeProps;
 };
 
 export type TextFrame = {
@@ -74,7 +81,10 @@ export class PptSheet {
   constructor(pptx: PptxGenJS, pptStyle: PptStyle) {
     this.pptx = pptx;
     this.pptStyle = pptStyle;
-    this.pptxParagraph = new PptParagraph(pptStyle.body.fontSize ?? 18);
+    this.pptxParagraph = new PptParagraph(
+      pptStyle.body.fontSize ?? 0,
+      pptStyle.body.lineSpacing ?? 0
+    );
   }
 
   addTitleSlide(documentInfo: { [v: string]: string }) {
@@ -176,12 +186,16 @@ export class PptParagraph {
   isNewSheet: boolean = false;
   defaultFontSize: number = 18;
   currentFontSize: number = 18;
+  defaultLineSpacing: number = 0;
+  currentLineSpacing: number = 0;
   insideSlideTitle: boolean = false;
   insideDocumentTitle: boolean = false;
 
-  constructor(defaultFontSize: number) {
+  constructor(defaultFontSize: number, defaultLineSpacing: number) {
     this.defaultFontSize = defaultFontSize;
     this.currentFontSize = defaultFontSize;
+    this.defaultLineSpacing = defaultLineSpacing;
+    this.currentLineSpacing = defaultLineSpacing;
   }
 
   createTextPropsArray(): PptxGenJS.TextProps[] {
@@ -194,6 +208,7 @@ export class PptParagraph {
     this.children = [];
     this.isFlush = false;
     this.currentFontSize = this.defaultFontSize;
+    this.currentLineSpacing = this.defaultLineSpacing;
     return r;
   }
 
@@ -201,6 +216,7 @@ export class PptParagraph {
     this.children = [];
     this.isFlush = false;
     this.currentFontSize = this.defaultFontSize;
+    this.currentLineSpacing = this.defaultLineSpacing;
   }
 
   addIndent() {
@@ -260,7 +276,7 @@ export class TableJs {
     this.tablePosition = getPositionPCT("10,10,80,80");
   }
 
-  doTableCommand(line: string) {
+  doTableCommand(line: string, pptStyle: PptStyle) {
     const words = line.split(_sp);
     switch (words[0]) {
       case "tableWidthInfo":
@@ -290,7 +306,9 @@ export class TableJs {
           //   })
           // );
         } else {
-          this.cells[this.row][this.column].push(...resolveEmphasis(words[2]));
+          this.cells[this.row][this.column].push(
+            ...resolveEmphasis(words[2], pptStyle)
+          );
           return;
         }
         break;
@@ -353,9 +371,11 @@ export class TableJs {
         ) {
           //rows[i][j] = null;
         } else {
+          const fillColor = i === 0 ? "676767" : "F7F7F7";
+          const textColor = i === 0 ? "F7F7F7" : "676767";
           rows[i].push({
             ...tCell,
-            options: { rowspan, colspan, valign: "middle" },
+            options: { rowspan, colspan, valign: "middle", color: textColor , fill:{color: fillColor} },
           });
         }
       }
@@ -400,7 +420,7 @@ export function getPositionPCT(position: string) {
  * @param source
  * @returns
  */
-export function resolveEmphasis(source: string) {
+export function resolveEmphasis(source: string, pptStyle: PptStyle) {
   let rg = /<(|\/)sub>|<(|\/)sup>|<(|\/)codespan>|<(|\/)i>|<(|\/)b>|<(|\/)~~>/g;
 
   let indexBefore = 0;
@@ -429,7 +449,7 @@ export function resolveEmphasis(source: string) {
 
     if (tag === "codespan") {
       if (isOn) {
-        options = { ...options, highlight: "FF88CC" };
+        options = { ...options, highlight: "FF88CC", ...pptStyle.codeSpan };
       } else {
         options = { ...options, highlight: "" };
       }

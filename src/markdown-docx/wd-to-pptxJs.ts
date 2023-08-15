@@ -40,7 +40,14 @@ let pptStyle: PptStyle = {
   h5: {},
   h6: {},
   body: {},
+  code: {},
+  codeSpan: {},
   tableProps: {},
+  layout:"",
+  headFontFace: {},
+  bodyFontFace: {},
+  tableHeaderColor: "000000",
+  tableHeaderFillColor: "FFFFFF"
 };
 
 // for delete the require cache.
@@ -114,13 +121,21 @@ export async function wdToPptxJs(
 
   // get ppt settings
   const settingPath = await selectExistsPath(
-    [
-      documentInfo.param.pptxSettings ?? "",
-      "/master-settings.js",
-    ],
-    [wdDirFullPath, __dirname, "../templates", "../../templates"]
+    [documentInfo.param.pptxSettings ?? "", "master-settings.js"],
+    [wdDirFullPath, `${__dirname}/../templates`, `${__dirname}/../../templates`]
   );
 
+  if (!settingPath) {
+    option.message?.(
+      MessageType.warn,
+      `ppt settings: no setting is set.`,
+      "wd-to-pptxJs",
+      true
+    );
+    return;
+  }
+
+  // get pptStyle 
   try {
     if (pptxSettingsFilePath === settingPath) {
       delete require.cache[pptxSettingsFilePath];
@@ -146,12 +161,12 @@ export async function wdToPptxJs(
   // initialize pptx
   let pptx: PptxGenJS = new pptxGen();
 
-  pptx.theme = { headFontFace: "Arial Light" };
-  pptx.theme = { bodyFontFace: "Arial" };
+  pptx.theme = {...pptx.theme, ...pptStyle.headFontFace, ...pptStyle.bodyFontFace}; // { headFontFace: "Arial Light" };
+
 
   // FYI: use `headFontFace` and/or `bodyFontFace` to set the default font for the entire presentation (including slide Masters)
   // pptx.theme = { bodyFontFace: "Arial" };
-  pptx.layout = "LAYOUT_WIDE";
+  pptx.layout = pptStyle.layout; //"LAYOUT_WIDE";
 
   // create master slide, some bugs in the slide number.
   createMasterSlides(pptx);
@@ -175,6 +190,7 @@ export async function wdToPptxJs(
 
   // working table
   let tableJs: TableJs | undefined = undefined;
+
   // document information
   documentInfo.param.position = "";
 
@@ -199,7 +215,7 @@ export async function wdToPptxJs(
 
     // table command
     if (wdCommandList[0].includes("table")) {
-      tableJs!.doTableCommand(lines[i]);
+      tableJs!.doTableCommand(lines[i], pptStyle);
     } else {
       // in not table command, create table.
       if (tableJs) {
@@ -359,7 +375,7 @@ function resolveCommentCommand(
     }
     return true;
   }
-  
+
   // not comment command
   if (wdCommandList[0] === "section" && wdCommandList[1] === "1") {
     documentInfo.placeholder["title"] = wdCommandList2[1];
@@ -426,7 +442,7 @@ async function resolveWordDownCommandEx(line: string, slide: PptSheet) {
         }
         slide.pptxParagraph.insideSlideTitle = true;
       }
-
+      // slide document title
       if (words[1] === "1") {
         slide.pptxParagraph.insideDocumentTitle = true;
       }
@@ -439,6 +455,7 @@ async function resolveWordDownCommandEx(line: string, slide: PptSheet) {
       });
 
       slide.pptxParagraph.currentFontSize = currentStyle.fontSize ?? 32;
+      slide.pptxParagraph.currentLineSpacing = currentStyle.lineSpacing ?? 0;
       break;
     case "NormalList":
       // OderList	1
@@ -489,6 +506,7 @@ async function resolveWordDownCommandEx(line: string, slide: PptSheet) {
           //color: pptx.SchemeColor.accent5,
           highlight: "FFFF00",
           ...pptStyle.body,
+          ...pptStyle.code,
         },
       });
       break;
@@ -541,12 +559,13 @@ async function resolveWordDownCommandEx(line: string, slide: PptSheet) {
       //   resolveEmphasis(s).forEach((x) => nodes.addChild(x));
       // }
 
-      resolveEmphasis(s).forEach((x) =>
+      resolveEmphasis(s, pptStyle).forEach((x) =>
         slide.pptxParagraph.addChild({
           text: x.text,
           options: {
             ...x.options,
             fontSize: slide.pptxParagraph.currentFontSize,
+            lineSpacing: slide.pptxParagraph.currentLineSpacing,
             valign: "top",
           },
         })
@@ -725,7 +744,7 @@ function createImageChild(
   imageAlt: string,
   pptx: pptxGen,
   pos: { [k: string]: string } = {},
-  dpi: number = 96,
+  dpi: number = 96
 ) {
   const imagePath = Path.resolve(mdSourcePath, imagePathR);
 
@@ -745,7 +764,10 @@ function createImageChild(
 
   const maxOutputSizeInch = Math.min(frameWidth, frameHeight);
 
-  if (imageWidthInch > maxOutputSizeInch || imageHeightInch > maxOutputSizeInch) {
+  if (
+    imageWidthInch > maxOutputSizeInch ||
+    imageHeightInch > maxOutputSizeInch
+  ) {
     const r = maxOutputSizeInch / Math.max(imageWidthInch, imageHeightInch);
     imageWidthInch *= r;
     imageHeightInch *= r;
@@ -754,7 +776,7 @@ function createImageChild(
   let positions = {};
 
   if (pos.x && pos.y) {
-    positions = { x: pos.x, y: pos.y, h: imageHeightInch, w: imageWidthInch};
+    positions = { x: pos.x, y: pos.y, h: imageHeightInch, w: imageWidthInch };
   }
 
   return { path: imagePath, ...positions };
