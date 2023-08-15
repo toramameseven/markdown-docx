@@ -1,4 +1,3 @@
-placeholder	title	sample document			tm
 placeholder	subTitle	sample document subTitle			tm
 placeholder	division	divisionXXX			tm
 placeholder	date	dateXXX			tm
@@ -8,6 +7,10 @@ newLine	wd0NewLine	tm
 toc	3	toc caption	tm
 newLine	convertToc	tm
 param	levelOffset	0			tm
+param	tableWidth	90			tm
+section	1	this-is-sample-document
+text	this is sample document
+newLine	convertHeading End	tm
 section	2	title-subtitle-and-table-of-content
 text	title subtitle and table of content
 newLine	convertHeading End	tm
@@ -50,8 +53,6 @@ code	###### Heading5
 newLine	convertCode	tm
 code	
 newLine	convertCode	tm
-code	####### Heading6
-newLine	convertCode	tm
 text	result
 newLine	convertParagraph	tm
 section	3	heading2
@@ -66,8 +67,6 @@ newLine	convertHeading End	tm
 section	6	heading5
 text	Heading5
 newLine	convertHeading End	tm
-text	####### Heading6
-newLine	convertParagraph	tm
 section	2	horizontal-rules
 text	Horizontal Rules
 newLine	convertHeading End	tm
@@ -83,11 +82,8 @@ code
 newLine	convertCode	tm
 code	***
 newLine	convertCode	tm
-text	result
+text	Horizontal Rules does not work.
 newLine	convertParagraph	tm
-hr	
-hr	
-hr	
 section	2	br
 text	BR
 newLine	convertHeading End	tm
