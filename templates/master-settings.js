@@ -197,13 +197,14 @@ const tableProps = {
   y: "30%",
   w: "100%",
   rowH: 0.75,
-  fill: { color: "F7F7F7" },
+  fill: backgroundColor,
   color: "000000",
   valign: "middle",
   align: "center",
   border: { type: "solid", pt: 1, color: "000000" },
   ...mainFontFace,
   ...mainFontSize,
+  ...mainFontColor,
 };
 
 module.exports = {
