@@ -12,4 +12,6 @@ vbs/**
 others/**
 md_demo/**
 node_modules/**
+license-report-config.json
+buildme.js
 
