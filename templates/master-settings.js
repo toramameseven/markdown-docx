@@ -1,9 +1,13 @@
+/**
+ * modified next package samples.  [DOCX](https://docx.js.org/#/)
+ */
+
 // images
-let objBkg = {
+let imageBack = {
   path: "C:\\starlabs_bkgd.jpg",
 };
 
-let objImg = {
+let imageLogo = {
   path: "C:\\starlabs_logo.png",
   x: 4.6,
   y: 3.5,
@@ -13,7 +17,7 @@ let objImg = {
 
 // common
 const mainFontFace = { fontFace: "Meiryo" };
-const mainFontSize = {fontSize: 18 };
+const mainFontSize = { fontSize: 18 };
 
 // header testPropsOption
 const h1 = { ...mainFontFace, fontSize: 48 };
@@ -88,7 +92,7 @@ const titleSlide = {
           align: "center",
           valign: "middle",
           margin: 0,
-          ...mainFontFace
+          ...mainFontFace,
         },
       },
     },
@@ -106,7 +110,7 @@ const masterSlide = {
     color: "FFFFFF",
     fontSize: 10,
     bold: true,
-    ...mainFontFace
+    ...mainFontFace,
   },
   objects: [
     //{ 'image': { x:11.45, y:5.95, w:1.67, h:0.75, data:STARLABS_LOGO_SM } },
@@ -130,7 +134,7 @@ const masterSlide = {
           valign: "middle",
           color: "FFFFFF",
           fontSize: 12,
-          ...mainFontFace
+          ...mainFontFace,
         },
         text: "S.T.A.R. Laboratories - Confidential",
       },
@@ -149,7 +153,7 @@ const masterSlide = {
           valign: "top",
           color: "404040",
           fontSize: 18,
-          ...mainFontFace
+          ...mainFontFace,
         },
         text: "", // USAGE: Leave blank to have powerpoint substitute default placeholder text (ex: "Click to add title")
       },
@@ -174,7 +178,7 @@ const tableProps = {
   align: "center",
   border: { type: "solid", pt: 1, color: "000000" },
   ...mainFontFace,
-  ...mainFontSize
+  ...mainFontSize,
 };
 
 module.exports = {
