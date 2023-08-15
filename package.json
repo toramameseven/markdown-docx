@@ -56,22 +56,22 @@
         "title": "Convert html to md"
       },
       {
-        "enablement": "markdown-docx.isExperienceFeature",
+        "enablement": "markdown-docx.isExperimentFeature",
         "command": "explorer.mdToEd",
         "title": "Convert me to ed"
       },
       {
-        "enablement": "markdown-docx.isExperienceFeature",
+        "enablement": "markdown-docx.isExperimentFeature",
         "command": "explorer.mdToTextile",
         "title": "Convert me to textile"
       },
       {
-        "enablement": "markdown-docx.isExperienceFeature",
+        "enablement": "markdown-docx.isExperimentFeature",
         "command": "explorer.mdToPptx",
         "title": "Convert me to pptx"
       },
       {
-        "enablement": "markdown-docx.isExperienceFeature",
+        "enablement": "markdown-docx.isExperimentFeature",
         "command": "explorer.mdToHtml",
         "title": "Convert me to Html"
       },
@@ -81,17 +81,17 @@
         "title": "Convert to Docx"
       },
       {
-        "enablement": "markdown-docx.isExperienceFeature",
+        "enablement": "markdown-docx.isExperimentFeature",
         "command": "editor.ExportPptx",
         "title": "Convert to Pptx"
       },
       {
-        "enablement": "markdown-docx.isExperienceFeature",
+        "enablement": "markdown-docx.isExperimentFeature",
         "command": "editor.ExportHtmlDocx",
         "title": "Convert html to md"
       },
       {
-        "enablement": "markdown-docx.isExperienceFeature",
+        "enablement": "markdown-docx.isExperimentFeature",
         "command": "explorer.textileToMarkdown",
         "title": "Convert textile to md"
       },
@@ -101,7 +101,7 @@
         "title": "stop signal"
       },
       {
-        "enablement": "markdown-docx.isExperienceFeature",
+        "enablement": "markdown-docx.isExperimentFeature",
         "command": "explorer.htmlToInlineHtml",
         "title": "Convert html to inlineHtml"
       }
@@ -114,37 +114,37 @@
           "group": "myGroup@1"
         },
         {
-          "when": "resourceExtname =~ /\\.wd$|\\.md$/i && !markdown-docx.isRunning && markdown-docx.isExperienceFeature",
+          "when": "resourceExtname =~ /\\.wd$|\\.md$/i && !markdown-docx.isRunning && markdown-docx.isExperimentFeature",
           "command": "explorer.mdToPptx",
           "group": "myGroup@1"
         },
         {
-          "when": "resourceExtname =~ /\\.html$/i && !markdown-docx.isRunning && markdown-docx.isExperienceFeature",
+          "when": "resourceExtname =~ /\\.html$/i && !markdown-docx.isRunning && markdown-docx.isExperimentFeature",
           "command": "explorer.ExportHtmlMarkdown",
           "group": "myGroup@1"
         },
         {
-          "when": "resourceExtname =~ /\\.md$/i && !markdown-docx.isRunning && markdown-docx.isExperienceFeature",
+          "when": "resourceExtname =~ /\\.md$/i && !markdown-docx.isRunning && markdown-docx.isExperimentFeature",
           "command": "explorer.mdToEd",
           "group": "myGroup@1"
         },
         {
-          "when": "resourceExtname =~ /\\.md$/i && !markdown-docx.isRunning && markdown-docx.isExperienceFeature",
+          "when": "resourceExtname =~ /\\.md$/i && !markdown-docx.isRunning && markdown-docx.isExperimentFeature",
           "command": "explorer.mdToTextile",
           "group": "myGroup@1"
         },
         {
-          "when": "resourceExtname =~ /\\.md$/i && !markdown-docx.isRunning && markdown-docx.isExperienceFeature",
+          "when": "resourceExtname =~ /\\.md$/i && !markdown-docx.isRunning && markdown-docx.isExperimentFeature",
           "command": "explorer.mdToHtml",
           "group": "myGroup@1"
         },
         {
-          "when": "resourceExtname =~ /\\.md$/i && !markdown-docx.isRunning && markdown-docx.isExperienceFeature",
+          "when": "resourceExtname =~ /\\.md$/i && !markdown-docx.isRunning && markdown-docx.isExperimentFeature",
           "command": "explorer.htmlToInlineHtml",
           "group": "myGroup@1"
         },
         {
-          "when": "resourceExtname =~ /\\.textile$/i && !markdown-docx.isRunning && markdown-docx.isExperienceFeature",
+          "when": "resourceExtname =~ /\\.textile$/i && !markdown-docx.isRunning && markdown-docx.isExperimentFeature",
           "command": "explorer.textileToMarkdown",
           "group": "myGroup@1"
         }
@@ -161,7 +161,7 @@
           "group": "myGroup@1"
         },
         {
-          "when": "resourceExtname =~ /\\.html$/i && !markdown-docx.isRunning && markdown-docx.isExperienceFeature",
+          "when": "resourceExtname =~ /\\.html$/i && !markdown-docx.isRunning && markdown-docx.isExperimentFeature",
           "command": "editor.ExportHtmlDocx",
           "group": "myGroup@1"
         },

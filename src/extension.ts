@@ -125,8 +125,9 @@ export function activate(context: vscode.ExtensionContext) {
       ac.abort();
     })
   );
-
-  enableExperienceFeature();
+  
+  // this feature is only experiment!!
+  // enableExperimentFeature();
 
   vscodeCommon.showMessage(
     MessageType.info,
@@ -499,10 +500,10 @@ async function exportPptxFromEditorCore(
 // This method is called when your extension is deactivated
 export function deactivate() {}
 
-function enableExperienceFeature() {
+function enableExperimentFeature() {
   vscode.commands.executeCommand(
     "setContext",
-    "markdown-docx.isExperienceFeature",
+    "markdown-docx.isExperimentFeature",
     true
   );
 }
