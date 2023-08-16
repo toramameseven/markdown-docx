@@ -1,5 +1,5 @@
 /**
- * modified next package samples.  [DOCX](https://docx.js.org/#/)
+ * modified next package samples.  [PptxGenJS](https://gitbrent.github.io/PptxGenJS/)
  */
 
 // images
