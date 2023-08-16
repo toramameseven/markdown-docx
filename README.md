@@ -141,8 +141,8 @@ It is better, set your language font.
 
 You can see the some template in the [markdown-docx site](https://github.com/toramameseven/markdown-docx) templates folder.
 
-* _with_cover.docx (default template)
-* _no_cover.docx 
+* _with_cover.docx
+* _no_cover.docx (default template)
 
 In these template, you see the placeholder described at next section.
 

@@ -156,7 +156,7 @@
           "group": "myGroup@1"
         },
         {
-          "when": "resourceExtname =~ /\\.wd$|\\.md$/i && !markdown-docx.isRunning",
+          "when": "resourceExtname =~ /\\.wd$|\\.md$/i && !markdown-docx.isRunning && markdown-docx.isExperimentFeature",
           "command": "editor.ExportPptx",
           "group": "myGroup@1"
         },

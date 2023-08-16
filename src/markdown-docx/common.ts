@@ -72,7 +72,7 @@ export type ShowMessage = (
 ) => void;
 
 export type UpdateStatusBar = (isRunning: boolean) => void;
-export const defaultTemplateDocx = "_with_cover.docx";
+export const defaultTemplateDocx = "_no_cover.docx";
 export const templatesPath = "templates";
 
 export async function createDocxTemplateFile(wfFsPath: string) {
