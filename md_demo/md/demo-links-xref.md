@@ -1,4 +1,6 @@
 <!-- word export demo-links-xref.md-->
+<!-- word refFormat "[[$n $t ppp.$p]]" -->
+<!-- word docxTemplate _xxx.docx -->
 ## cross reference in a docx
 
 markdown

@@ -1,5 +1,6 @@
-section	1	Indented code	indented-code
-newLine	convertHeading	tm
+section	1	indented-code
+text	Indented code
+newLine	convertHeading End	tm
 text	markdown
 newLine	convertParagraph	tm
 code	    // Some comments

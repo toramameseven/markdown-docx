@@ -5,10 +5,13 @@ This is the README **Markdown Docx**.
 This extension uses a docx binary file for the template. 
 If security check happens, you can download the template from this repo and set it as template in the settings.
 
+some feature on version 0.0.1 are removed. sorry.
+
 ## Requirements
 
 * Windows 10
-* Microsoft Word
+
+We do not use Microsoft Word at version 0.0.2.
 
 ## Features
 
@@ -20,61 +23,65 @@ If security check happens, you can download the template from this repo and set 
   
 ## Extensions for word
 
-##### general
+###### general
 
 `<!-- word [command] parameters -->` is used for word command.
 
-* `<!-- word title Title -->`
 
-    add title
+* `<!-- word docxTemplate _no_cover.docx -->`
+  *  ` _no_cover.docx` is used for a docx template.
 
-* `<!-- word subTitle SubTitle -->`
-  
-    add sub title
-* `<!-- word author Author -->`
+* `<!-- word levelOffset 1 -- >`
+  * If your document start with `#`, set command `<!-- word levelOffset 1 -- >`.
+  * First `#` line is used for the document title.
 
-    add author
-* `<!-- word division Division -->`
-
-    add division
-* `<!-- word date Date -->`
-
-    add Date
 * `<!-- word toc 1 "table of contents" -->`
 
-    * add toc
-    * 1: levels of toc.
-    * table of contents: toc caption
+  * add toc
+  * 1: levels of toc.
+  * table of contents: toc caption
 
 * `<!-- word import imported.md-->`
 
   imported.md will be imported.
 
-* `<!-- word pageSetup wdOrientationLandscape wdSizeA4 -->`
-  
-    page setup sample. landscape and a4 size.
-
-* `<!-- word pageSetup wdOrientationPortrait wdSizeA3 -->`
-
-    page setup sample. portrait and a3 size
-
 * `<!-- word newPage -->`
 
-    insert new page
+  insert new page
 
-##### table
+* `<!-- word placeHolder "key" "the value" -->`
+
+  `{{key}}` in a docx file is replaced to `the value`.
+
+* `<!-- word refFormat [$n $t (p.$p)]]" -->`
+
+  reference format  
+  * `$n`: section number
+  * `$t`: text
+  * `$p`: page
+  
+  `[[1.1 this section (p.10)]]`
+
+###### table
+
+* `<!-- word tableWidth 90 -->`
+
+  we can not get the template document width, so you adjust the width manually.
+  you can set 10 to 100(%).
 
 * `<!-- word cols 1,2 -->`
 
-    columns width are 1:2
+  columns width are 1:2
 
 * `<!-- word rowMerge 1-4,5-6 -->`
 
-    rows 1-4 and 5-6 are merged.
+  rows 1-4 and 5-6 are merged.
 
 * `<!-- word emptyMerge -->`
   
-    empty cells are merged. only row direction.
+  empty cells are merged. only row direction.
+
+
 
 ## sample markdown file
 
@@ -84,28 +91,32 @@ You can see the sample file in the [markdown-docx site](https://github.com/toram
 
 ### markdown docx
 
-* markdown-docx.path.docxEngine
-
-    Set your original docx rendering vbs.
-
 * markdown-docx.path.docxTemplate
 
-    Set your original docx file for template.
+  Set your original docx file for template.
 
 * markdown-docx.docxEngine.mathExtension
    
-   If set true, `$x+1$` type math is rendered.
+  If set true, `$x+1$` type math is rendered.
 
-* markdown-docx.docxEngine.timeout
+* markdown-docx.docxEngine.debug  
 
-    60000 ms is default. docx rendering is so slow, you can set bigger value.
+  some debug option is enabled.  
 
-* markdown-docx.docxEngine.debug
-   
-    some debug option is enabled.
+  * intermediate files *.wd0, *.wd are not deleted.
 
-    * intermediate files *.wd0, *.wd are not deleted.
-  
+* markdown-docx.docxEngine.isOverWrite
+
+  if true, markdown-docx overwrites the word file.  
+
+* markdown-docx.docxEngine.wordExePath
+
+  set the full path of the word exe, if you want to open it.
+
+* markdown-docx.docxEngine.isOpenWord
+
+  If true, open the word file. 
+
 ### markdown vscode settings
 
 like below
@@ -126,44 +137,88 @@ like below
 
 It is better, set your language font.
 
-##### styles
+### template files
+
+You can see the some template in the [markdown-docx site](https://github.com/toramameseven/markdown-docx) templates folder.
+
+* _with_cover.docx
+* _no_cover.docx (default template)
+
+In these template, you see the placeholder described at next section.
+
+### place holder
+
+[DOCX](https://docx.js.org/#/) type place folder is used.
+
+Next place holders are used in the sample template.
+
+* main content
+  * `{{paragraphReplace}}
+  * do not set this other information.
+
+  ![](./images/main_placeholder.png)
+
+* for cover
+  * `{{title}}`
+  * `{{subTitle}}`
+  * `{{author}}`
+  * `{{division}}`
+  * `{{date}}`
+  * `{{docNumber}}`
+
+  ![](./images/cover_placeholder.png)
+
+markdown  
+```
+<!-- word placeholder title "sample document" -->
+```
+
+docx template
+```
+{{title}}
+```
+
+`{{title}}` is replaced to "sample document".
+
+
+### styles
 
 next styles are created.
 
-* author1
-* blockA
+* hh1 to hh4
+    * `##` to `######`
+    * If your document start with `#`, set command `<!-- word levelOffset 1 -- >`.
+* wdHeading5
+    * `######`, `#######`
 * body1
 * body2
 * body3
-* BodyTitle
 * code
+    * `\``
 * codespan
-* date1
-* division1
+    * "```"
 * nList1
 * nList2
 * nList3
-* note1
 * numList1
 * numList2
 * numList3
 * picture1
-* styleN
+* note1
 * warn1
-* wdHeading5
 
-### user properties
+* styleN: table style
 
-* dNumber
-  * number is displayed at header.
-* dDivision
-* dDate
-* dAuthor
+* blockA
 
 ## Known Issues
 
-* Inline Images do not work.
+* Inline math does not work.
 * HTML does not work.
+* Block quote does no work.
+* The indent of table of contents is not good.
+
+## vbs rendering does not support
 
 ## How to package
 
@@ -175,18 +230,23 @@ next styles are created.
 
 We thank for the wonderful npm packages.
 
+[Packages](usedModules.md)
+
+some feature are not active now.
+
 And we use some useful articles below. 
-
-* [Marked](https://www.npmjs.com/package/marked) is a very useful package for this extension.
 * [markdown-to-txt](https://www.npmjs.com/package/markdown-to-txt) tells us how to use **Marked**.
-* [koukimura's page](https://koukimra.com/) is used to resize pictures.
-* [minnano macro page](https://www.wordvbalab.com/) is used for emphasis styles.
+* [marked-extended-tables](https://github.com/calculuschild/marked-extended-tables) is for merged table.
 * To Slugify, we use Mr. Sato 's code (https://qiita.com/satokaz/items/64582da4640898c4bf42)
-
+* [node-html-markdown](https://github.com/crosstype/node-html-markdown)'s code is used, for converting html to markdown.
 
 
 ## Release Notes
 
+* 0.0.2
+  * use [DOCX](https://docx.js.org/#/) for creating word files.
+  * we do not support the vbs rendering on version `0.0.2`.
+    
 * 0.0.1
   * first Release.
 

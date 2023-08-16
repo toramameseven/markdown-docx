@@ -1,5 +1,6 @@
-section	1	Images	images
-newLine	convertHeading	tm
+section	1	images
+text	Images
+newLine	convertHeading End	tm
 text	markdown
 newLine	convertParagraph	tm
 code	![logo](./markdown2docx.png)

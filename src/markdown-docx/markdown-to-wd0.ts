@@ -1,7 +1,13 @@
+import type { marked as Marked } from "marked";
 import { marked } from "marked";
 import { unescape } from "lodash";
-import { getWordDownCommand, MessageType, ShowMessage } from "./common";
-import { info } from "console";
+import {
+  getWordDownCommand as parseHtmlComment,
+  MessageType,
+  ShowMessage,
+} from "./common";
+import { addTableSpanToMarkdown } from "./add-table-span";
+import { spanTable } from "./marked-extended-tables";
 
 const source = "markdown-to-wd";
 let showMessage: ShowMessage | undefined;
@@ -18,6 +24,7 @@ const markedCommand = {
   table: "table",
   tablerow: "tablerow",
   tablecell: "tablecell",
+  html: "html",
   text: "text",
   image: "image",
   link: "link",
@@ -26,36 +33,36 @@ const markedCommand = {
   em: "em",
   del: "~~",
   non: "non",
+  hr: "hr",
 } as const;
-
-//type MarkedCommand = typeof markedCommand[keyof typeof markedCommand];
+// type MarkedCommand = typeof markedCommand[keyof typeof markedCommand];
 
 const wordCommand = {
-  word: "word",
-  title: "title",
-  subTitle: "subTitle",
-  date: "date",
-  docNumber: "docNumber",
-  author: "author",
-  division: "division",
   cols: "cols",
   rowMerge: "rowMerge",
   emptyMerge: "emptyMerge",
   newPage: "newPage",
   newLine: "newLine",
-  pageSetup: "pageSetup",
-  wdOrientationLandscape: "wdOrientationLandscape",
-  wdOrientationPortrait: "wdOrientationPortrait",
-  wdSizeA4: "wdSizeA4",
-  wdSizeA3: "wdSizeA3",
   toc: "toc",
   export: "export",
-  docxEngine: "docxEngine",
-  docxTemplate: "docxTemplate",
-  property: "property",
-  clearContent: "clearContent",
-  crossRef: "crossRef",
+  placeholder: "placeholder",
+  param: "param",
 } as const;
+
+const ooxParameters = {
+  pptxSettings: "pptxSettings",
+  position: "position",
+  dpi: "dpi",
+  docxTemplate: "docxTemplate",
+  refFormat: "refFormat",
+} as const;
+export type OoxParameters = (typeof ooxParameters)[keyof typeof ooxParameters];
+
+export const wd0Command = {
+  ...markedCommand,
+  ...wordCommand,
+} as const;
+export type Wd0Command = (typeof wd0Command)[keyof typeof wd0Command];
 
 const _sp = "\t";
 const _newline = "\n";
@@ -67,12 +74,24 @@ const inline = (inlineType: string) => (content: string) => {
   }
   return content;
 };
+
+// inline for *emphasis*
+const inlineEx = (inlineType: string) => (content: string) => {
+  if (inlineType) {
+    return `${inlineType}${content}${inlineType}`;
+  }
+  return content;
+};
+
 // hr
 const hr = () => "\nhr\n";
+
 // newline
 const newline = () => _newline;
+
 //empty
 const empty = () => "";
+
 // block
 const block = (blokType: string) => (content: string) => {
   const params = {
@@ -80,181 +99,144 @@ const block = (blokType: string) => (content: string) => {
   };
   return createBlockCommand(blokType, params);
 };
+
 // block quote
+/* does note use
 const blockQuote = (blokType: string) => (content: string) => {
   const params = {
     text: content,
   };
   return createBlockCommand(blokType, params);
 };
+*/
 
 //
 const htmlBlock = (content: string) => {
   // word down command is a html comment. <!--
-  const wd0 = getWordCommand(content);
+  const wd0 = resolveHtmlComment(content);
   if (wd0) {
     return wd0;
   }
 
   if (content.match(/<br>/i)) {
-    return createBlockCommand(wordCommand.newLine, {
+    return createBlockCommand(wd0Command.newLine, {
       info: "info new line",
     });
   }
 
   const usedHtml = /<br>|<sup>|<\/sup>|<sub>|<\/sub>|<!--.*/i;
+  const nonUsedHtml = /<!--\s+(word|ppt|oox).*/i;
 
-  // return createBlockCommand(blokType, params);
-
-  if (content.match(usedHtml)) {
-    // output inline
+  if (content.match(usedHtml) && !content.match(nonUsedHtml)) {
+    // output inlineF
     return content;
   }
+
   showMessage?.(
     MessageType.warn,
-    `next html is not allow: ${content}`,
+    `Next html is not allowed: ${content}`,
     source,
     false
   );
-  return `[[ Next html is not allow: ${content} ]]`;
+  return "";
 };
 
-function getWordCommand(content: string) {
-  // const testMatch = content.match(/<!--(?<name>.*)-->/i);
-  // const command = testMatch?.groups?.name ?? "";
-  // const params = command.trim().split(" ");
+const documentInfoParams = [
+  "pptxSettings",
+  "position",
+  "dpi",
+  "docxTemplate",
+  "refFormat",
+  "tableWidth",
+  "levelOffset",
+] as const;
+type DocumentInfoParams = (typeof documentInfoParams)[number];
+const isDocumentInfoParams = (name: string): name is DocumentInfoParams => {
+  return documentInfoParams.some((value) => value === name);
+};
 
-  const r = getWordDownCommand(content);
-
-  // wordDown commands
-  if (r) {
-    const { command, params } = r;
-    //if (params.length > 1 && params[0] === wordCommand.word) {
+function resolveHtmlComment(content: string) {
+  const commandParams = parseHtmlComment(content);
+  if (commandParams) {
+    // <!-- word command param1 param2 param3 -->
+    const { command, params } = commandParams;
     switch (command) {
       case wordCommand.cols:
         if (params.length) {
-          return createBlockCommand(wordCommand.cols, { cols: params[0] });
+          return createBlockCommand(wd0Command.cols, { cols: params[0] });
         }
         break;
       case wordCommand.rowMerge:
         if (params.length) {
-          return createBlockCommand(wordCommand.rowMerge, {
+          return createBlockCommand(wd0Command.rowMerge, {
             rowMerge: params[0],
           });
         }
         break;
       case wordCommand.emptyMerge:
-        return createBlockCommand(wordCommand.emptyMerge, { emptyMerge: "1" });
+        return createBlockCommand(wd0Command.emptyMerge, { emptyMerge: "1" });
 
       case wordCommand.newPage:
-        return createBlockCommand(wordCommand.newPage, {
+        return createBlockCommand(wd0Command.newPage, {
           info: "info new page",
         });
       case wordCommand.newLine:
-        return createBlockCommand(wordCommand.newLine, {
+        return createBlockCommand(wd0Command.newLine, {
           info: "info new line",
         });
-      case wordCommand.pageSetup:
-        //if (params[0] === wordCommand.wdOrientationLandscape || params[0] === wordCommand.wdOrientationPortrait) {
-        return createBlockCommand(wordCommand.pageSetup, {
-          orientation: params[0],
-          pagesize: params[1],
-        });
-        //}
-        break;
       case wordCommand.toc:
         // default toc is to 3 heading level
         const tocTo = params[0] ? params[0] : "3";
         const tocCaption = params[1] ?? "table of contents";
-        return createBlockCommand(wordCommand.toc, {
+        return createBlockCommand(wd0Command.toc, {
           tocTo,
           tocCaption,
         });
-      case wordCommand.property:
-        const propertyKey = params[0];
-        const propertyValue = params[1];
-        if (!propertyKey) {
-          return;
-        }
-        return createBlockCommand(wordCommand.property, {
-          propertyKey,
-          propertyValue,
-        });
-      case wordCommand.crossRef:
-        const crossRef = params[0];
-        return createBlockCommand(wordCommand.crossRef, {
-          crossRef,
-        });
-      case wordCommand.clearContent:
-        const isClearContent = params[0] ?? false;
-        return createBlockCommand(command, {
-          isClearContent,
-        });
-      case wordCommand.title:
-        // default ''
-        const title = params[0];
-        return createBlockCommand(wordCommand.title, {
-          title,
-        });
-      case wordCommand.subTitle:
-        // default ''
-        const subTitle = params[0];
-        return createBlockCommand(wordCommand.subTitle, {
-          subTitle,
-        });
-      case wordCommand.author:
-        // default ''
-        const author = params[0];
-        return createBlockCommand(wordCommand.author, {
-          author,
-        });
-      case wordCommand.docNumber:
-        // default ''
-        const docNumber = params[0];
-        return createBlockCommand(wordCommand.docNumber, {
-          docNumber,
-        });
-      case wordCommand.date:
-        // default ''
-        const date = params[0];
-        return createBlockCommand(wordCommand.date, {
-          date,
-        });
-      case wordCommand.division:
-        // default ''
-        const division = params[0];
-        return createBlockCommand(wordCommand.division, {
-          division,
-        });
-      case wordCommand.docxEngine:
-        // default ''
-        const docxEngine = params[0] ? params[0] : "";
-        return createBlockCommand(wordCommand.docxEngine, {
-          docxEngine,
-        });
-      case wordCommand.docxTemplate:
-        // default ''
-        const docxTemplate = params[0] ? params[0] : "";
-        return createBlockCommand(wordCommand.docxTemplate, {
-          docxTemplate,
-        });
       case wordCommand.export:
-        // no operation
-        break;
+        return createBlockCommand(wordCommand.export, {
+          info: "export",
+        });
+      case wordCommand.param:
+      case wordCommand.placeholder:
+        let r = "";
+        for (let i = 1; i < params.length; i += 2) {
+          if (params[i - 1]) {
+            r += createBlockCommand(command, {
+              key: params[i - 1],
+              value: params[i],
+            });
+          }
+        }
+        return r;
       default:
-        showMessage?.(
-          MessageType.warn,
-          `No word command: ${command}`,
-          source,
-          false
-        );
-        break;
+        // todo error parameters
+        let defaultParam = "";
+        let defaultParams = [command, ...params];
+        for (let i = 1; i < defaultParams.length; i += 2) {
+          if (
+            defaultParams[i - 1] &&
+            isDocumentInfoParams(defaultParams[i - 1])
+          ) {
+            defaultParam += createBlockCommand("param", {
+              key: defaultParams[i - 1],
+              value: defaultParams[i],
+            });
+          } else {
+            showMessage?.(
+              MessageType.warn,
+              `Next is not a parameter: ${defaultParams[i - 1]}`,
+              "markdown-to-wd0::resolveHtmlComment",
+              false
+            );
+          }
+        }
+        return defaultParam;
     }
   }
 }
 
 export function getWordTitle(wd: string) {
-  const r = getWordDownCommand(wd);
+  const r = parseHtmlComment(wd);
   const title = r?.command === "title" ? r.params[0] : "no title";
   return title;
 }
@@ -267,23 +249,23 @@ export function slugify(header: string, alowDuplicate = false) {
     .trim()
     .toLowerCase()
     .replace(
-      /[\]\[\!\"\#\$\%\&\'\(\)\*\+\,\.\/\:\;\<\=\>\?\@\\\^\_\{\|\}\~]/g,
+      /[\]\[\!\"\#\$\%\&\'\(\)\*\+\,\.\/\:\;\<\=\>\?\@\\\^\_\{\|\}\~＠＃＄％＾＆＊（）＿＋－＝｛｝”’＜＞［］「」・、。～]/g,
       ""
     )
     .replace(/\s+/g, "-") // Replace spaces with hyphens
     .replace(/\-+$/, ""); // Replace trailing hyphen
 
   if (alowDuplicate === false) {
-    r = createNotDuplicateId(r, r);
+    r = createUniqId(r, r);
   }
 
   return r;
 }
 
-function createNotDuplicateId(id: string, originalId: string, index = 0) {
+function createUniqId(id: string, originalId: string, index = 0) {
   let testId = id;
   if (idMap.has(testId)) {
-    testId = createNotDuplicateId(
+    testId = createUniqId(
       originalId + "-" + (index + 1).toString(),
       originalId,
       index + 1
@@ -293,15 +275,13 @@ function createNotDuplicateId(id: string, originalId: string, index = 0) {
   return testId;
 }
 
-//
+// -----------------------------------
+
 const blockHeading = (content: string, index: number) => {
-  //title
+  //title for asciidoc type
   const isAdocTypeTitle = false;
   if (index === 1 && isAdocTypeTitle) {
-    return createBlockCommand(wordCommand.title, {
-      title: content,
-      subTitle: "",
-    });
+    //TODO // title
   }
 
   // heading offset
@@ -326,12 +306,14 @@ const blockHeading = (content: string, index: number) => {
   let idTitle = (r && r[4]) ?? title;
   idTitle = slugify(idTitle);
 
+  const lines = splitBlockContents(content);
   const headings = {
     index: (index - headingOffset).toString(),
-    title: title,
+    //title: title,
     idTitle,
+    text: lines.join(_newline),
   };
-  return createBlockCommand(markedCommand.heading, headings);
+  return createBlockCommand(wd0Command.heading, headings);
 };
 
 function splitBlockContents(blockContents: string) {
@@ -345,9 +327,7 @@ function splitBlockContents(blockContents: string) {
         return _newline + s + _newline;
       } else {
         // only text
-        return (
-          `\n${markedCommand.text}\t${markedCommand.text}\t` + s + _newline
-        );
+        return `\n${wd0Command.text}\t${wd0Command.text}\t` + s + _newline;
       }
     });
   return lines;
@@ -362,7 +342,7 @@ function splitCodeBlockContents(blockContents: string) {
       return _newline + s + _newline;
     } else {
       // only text
-      return `\n${markedCommand.text}\t${markedCommand.text}\t` + s + _newline;
+      return `\n${wd0Command.text}\t${wd0Command.text}\t` + s + _newline;
     }
   });
   return lines;
@@ -386,7 +366,7 @@ const blockList = (body: string, ordered: boolean, start: number) => {
     start: start.toString(),
     body: body,
   };
-  return createBlockCommand(markedCommand.list, params);
+  return createBlockCommand(wd0Command.list, params);
 };
 
 const blockListItem = (content: string, task: boolean, checked: boolean) => {
@@ -396,7 +376,7 @@ const blockListItem = (content: string, task: boolean, checked: boolean) => {
     checked: checked ? "1" : "0",
     text: lines.join(_newline),
   };
-  return createBlockCommand(markedCommand.listitem, params);
+  return createBlockCommand(wd0Command.listitem, params);
 };
 
 // [text] (href "title")
@@ -417,7 +397,7 @@ const blockTable = (header: string, body: string) => {
     header,
     body,
   };
-  return createBlockCommandTable(markedCommand.table, params);
+  return createBlockCommandTable(wd0Command.table, params);
 };
 
 const blockTableCell = (
@@ -433,7 +413,7 @@ const blockTableCell = (
     align: flags.align?.toString() ?? "left",
     content: lines.join(_newline),
   };
-  return createBlockCommand(markedCommand.tablecell, params);
+  return createBlockCommand(wd0Command.tablecell, params);
 };
 
 const blockLink = (
@@ -460,7 +440,7 @@ const blockLink = (
     title: title ?? "",
     text: content,
   };
-  return createBlockCommand(markedCommand.link, params);
+  return createBlockCommand(wd0Command.link, params);
 };
 
 //type DocCommand = { command: string; params: DocxParam; isBlock: boolean };
@@ -491,8 +471,62 @@ function joinObjectToString(params: DocxParam) {
   return r.join(_sp);
 }
 
-//main render
-const docxRenderer: marked.Renderer = {
+export async function markdownToWd0(
+  markdown: string,
+  convertType: "docx" | "excel" | "html" | "textile",
+  options?: Marked.MarkedOptions,
+  messageFunction?: ShowMessage
+) {
+  idMap.clear();
+  showMessage = messageFunction;
+
+  const typeOfConvert = {
+    docx: docxRenderer,
+    excel: excelRenderer,
+    html: null,
+    textile: textileRenderer,
+  } as const;
+
+  const render = typeOfConvert[convertType];
+  let markedOptions = { ...options };
+  if (render) {
+    markedOptions = { ...markedOptions, renderer: render };
+  }
+
+  // get markdown levelOffset
+  const offsetMatch = markdown.match(
+    /<!--\s+(oox|word|ppt)\s+levelOffset\s+(?<name>.*)\s+-->/i
+  );
+  let levelOffset = parseInt(offsetMatch?.groups?.name ?? "0");
+  levelOffset = Number.isNaN(levelOffset) ? 0 : levelOffset;
+
+  const walkTokens = (token: any) => {
+    if (token.type === "heading") {
+      token.depth += levelOffset;
+    }
+  };
+
+  // https://marked.js.org/
+  let mdForMarked = markdown;
+  if (convertType === "html") {
+    marked.use(marked.getDefaults());
+    marked.use(spanTable());
+    marked.use({ walkTokens });
+    mdForMarked = await addTableSpanToMarkdown("", mdForMarked, showMessage);
+  } else {
+    marked.use(marked.getDefaults());
+    marked.use({ walkTokens });
+  }
+
+  const unmarked = marked(mdForMarked, markedOptions);
+  const toOutput = convertType === "html" ? unmarked : unescape(unmarked);
+  return toOutput.trim();
+}
+
+/**
+ * docx renderer
+ */
+const docxRenderer: Marked.Renderer = {
   // Block elements
   heading: blockHeading,
 
@@ -534,15 +568,92 @@ const docxRenderer: marked.Renderer = {
   options: {},
 };
 
-export function markdownToWd0(
-  markdown: string,
-  options?: marked.MarkedOptions,
-  messageFunction?: ShowMessage
-): string {
-  idMap.clear();
-  showMessage = messageFunction;
-  const unmarked = marked(markdown, { ...options, renderer: docxRenderer });
-  const unescaped = unescape(unmarked);
-  const trimmed = unescaped.trim();
-  return trimmed;
-}
+/**
+ * excel Renderer
+ */
+const excelRenderer: Marked.Renderer = {
+  // Block elements
+  heading: blockHeading,
+
+  // normal paragraph
+  paragraph: blockParagraph(markedCommand.paragraph),
+
+  list: blockList,
+  listitem: blockListItem,
+
+  // ``` or tab
+  code: blockParagraph(markedCommand.code, true),
+
+  // >
+  blockquote: block(markedCommand.blockquote),
+
+  table: blockTable,
+  tablerow: block(markedCommand.tablerow),
+  tablecell: blockTableCell,
+
+  html: htmlBlock,
+  hr: hr,
+  checkbox: empty,
+
+  // Inline elements
+  image: blockImage(markedCommand.image),
+  link: blockLink,
+  text: inlineEx(""),
+  // `code`
+  codespan: inlineEx("`"),
+  // ** **
+  strong: inlineEx("**"),
+  // _ _
+  em: inlineEx("_"),
+  // <br>?
+  br: newline,
+  // ~~ ~~
+  del: inlineEx(markedCommand.del),
+  // etc.
+  options: {},
+};
+
+/**
+ * textile Renderer
+ */
+const textileRenderer: Marked.Renderer = {
+  // Block elements
+  heading: blockHeading,
+
+  // normal paragraph
+  paragraph: blockParagraph(markedCommand.paragraph),
+
+  list: blockList,
+  listitem: blockListItem,
+
+  // ``` or tab
+  code: blockParagraph(markedCommand.code, true),
+
+  // >
+  blockquote: block(markedCommand.blockquote),
+
+  table: blockTable,
+  tablerow: block(markedCommand.tablerow),
+  tablecell: blockTableCell,
+
+  html: htmlBlock,
+  hr: hr,
+  checkbox: empty,
+
+  // Inline elements
+  image: blockImage(markedCommand.image),
+  link: blockLink,
+  text: inlineEx(""),
+  // `code`
+  codespan: inlineEx("`"),
+  // ** **
+  strong: inlineEx("**"),
+  // _ _
+  em: inlineEx("_"),
+  // <br>?
+  br: newline,
+  // ~~ ~~
+  del: inlineEx(markedCommand.del),
+  // etc.
+  options: {},
+};

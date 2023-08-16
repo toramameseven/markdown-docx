@@ -1,0 +1,9 @@
+{
+    "output": "markdown",
+    "fields": [
+        "name",
+        "licenseType",
+        "link",
+        "author"
+      ]
+  }

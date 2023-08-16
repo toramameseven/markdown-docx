@@ -1,4 +1,5 @@
 <!-- word export demo-admonition.md-->
+<!-- word param docxTemplate _xxx.docx -->
 # Admonition
 
 markdown

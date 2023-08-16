@@ -1,55 +1,118 @@
-import { vbsSpawn } from "./common";
-import { DocxOption, getFileContents, MessageType } from "./common";
+import {
+  DocxOption,
+  getFileContents,
+  MessageType,
+  fileExists,
+  defaultTemplateDocx,
+  templatesPath,
+} from "./common";
 
-export async function wordDownToDocx(fileWd: string, option: DocxOption) {
-  // get docxEngine and docxTemplate
-  const wdBody = getFileContents(fileWd);
-  const docxEngineInsideBody = getDocxEngineFromWd(wdBody);
-  const templateInsideBody = getDocxTemplateFromWd(wdBody);
+import { wdToDocxJs } from "./wd-to-docxjs";
+import * as Path from "path";
+import { runCommand, selectExistsPath } from "./tools/tools-common";
 
-  const thisEngine = docxEngineInsideBody
-    ? docxEngineInsideBody
-    : option.docxEngine;
-  const thisTemplate = templateInsideBody
-    ? templateInsideBody
-    : option.docxTemplate;
+export async function wordDownToDocx(
+  fileWd: string,
+  wdBody: string,
+  option: DocxOption
+) {
+  if (wdBody === "") {
+    wdBody = getFileContents(fileWd);
+  }
 
-  //docxEngine options
+  // search template
+  const defaultTemplate = Path.resolve(__dirname, `../${templatesPath}`);
+  const defaultTemplate2 = Path.resolve(__dirname, `../../${templatesPath}`);
+  const templateInsideDocument = getDocxTemplateFromWd(wdBody);
+
+  const template = await selectExistsPath(
+    [templateInsideDocument, option.docxTemplate ?? "", defaultTemplateDocx],
+    [Path.dirname(fileWd), defaultTemplate, defaultTemplate2]
+  );
+
   option.message?.(
     MessageType.info,
-    `docx docxEngine: ${thisEngine ?? "use inside"}`,
-    "main",
-    false
-  );
-  option.message?.(
-    MessageType.info,
-    `docx docxTemplate: ${thisTemplate ?? "use inside"}`,
-    "main",
+    `Used docxTemplate: ${template ? template : "use inside"}`,
+    "wd-to-docx",
     false
   );
 
-  return await vbsSpawn(
-    option.docxEngine ?? "wordDownToDocx.vbs",
-    option.timeOut ?? 600000,
+  // create docx from docxJs
+  if (!template) {
+    option.message?.(
+      MessageType.warn,
+      `docx template: no docx template is set.`,
+      "wd-to-docx",
+      true
+    );
+    return;
+  }
+
+  // create path for output
+  const outPath = Path.resolve(
+    Path.dirname(fileWd),
+    Path.basename(fileWd) + ".docx"
+  ); //"C:\\home\\docx_temp\\___output.docx";
+
+  // file existence test
+  if (!option.isOverWrite && (await fileExists(outPath))) {
+    option.message?.(
+      MessageType.warn,
+      `docx exists: ${outPath}.`,
+      "wd-to-docx",
+      true
+    );
+    return;
+  }
+
+  option.message?.(
+    MessageType.info,
+    `create docx: ${outPath}.`,
+    "wd-to-docx",
+    false
+  );
+
+  // render
+  try {
+    await wdToDocxJs(wdBody, template, outPath, Path.dirname(fileWd), option);
+  } catch (e) {
+    option.message?.(
+      MessageType.warn,
+      `wdToDocxJs err: ${e}.`,
+      "wd-to-docx",
+      false
+    );
+    return;
+  }
+
+  // open the docx file
+  if (!option.isOpenWord) {
+    return;
+  }
+
+  option.message?.(
+    MessageType.info,
+    `open docx: ${outPath}.`,
+    "wd-to-docx",
+    false
+  );
+
+  const wordExe = await selectExistsPath(
     [
-      fileWd,
-      option.docxTemplate ?? "",
-      option.mathExtension ? "1" : "0",
-      option.isDebug ? "1" : "0",
+      option.wordPath ?? "",
+      "C:\\Program Files (x86)\\Microsoft Office\\root\\Office16\\WINWORD.EXE",
+      "C:\\Program Files\\Microsoft Office\\root\\Office16\\WINWORD.EXE",
     ],
-    option.ac,
-    option.message
+    [""]
   );
-}
-
-function getDocxEngineFromWd(wd: string) {
-  const testMatch = wd.match(/^docxEngine\t(?<docxEngine>.*)\t/i);
-  const docxEngine = testMatch?.groups?.docxEngine ?? "";
-  return docxEngine;
+  runCommand(wordExe, outPath);
+  return;
 }
 
 function getDocxTemplateFromWd(wd: string) {
-  const testMatch = wd.match(/^docxTemplate\t(?<docxTemplate>.*)\t/im);
+  const testMatch = wd.match(/^param\tdocxTemplate\t(?<docxTemplate>.*?)\t/im);
   const docxTemplate = testMatch?.groups?.docxTemplate ?? "";
   return docxTemplate;
 }
+
+

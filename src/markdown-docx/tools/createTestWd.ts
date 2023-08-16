@@ -1,4 +1,4 @@
-import { markdownToWd } from "../../src/markdown-docx/markdown-to-docx";
+import { markdownToWd } from "../markdown-to-xxxx";
 import path = require("path");
 import * as Fs from "fs";
 
@@ -11,7 +11,7 @@ async function createTestWd() {
       .forEach(async (file) => {
         const baseName = path.basename(file).replace(/\.md$/i, "");
         const mdPath = path.resolve(__dirname, pathDemoMd, baseName + ".md");
-        const r = await markdownToWd(mdPath, "", 0, false, false);
+        const r = await markdownToWd(mdPath, "", "docx", 0, false);
         Fs.copyFileSync(
           r.wdPath,
           path.resolve(__dirname, pathDemoMd, "wd", baseName + ".wd")

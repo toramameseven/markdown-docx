@@ -1,5 +1,6 @@
-section	2	Right aligned and rows merge	right-aligned-and-rows-merge
-newLine	convertHeading	tm
+section	2	right-aligned-and-rows-merge
+text	Right aligned and rows merge
+newLine	convertHeading End	tm
 text	markdown
 newLine	convertParagraph	tm
 code	<!-- word cols 1,3 -->
@@ -48,8 +49,9 @@ tableMarge	2	0	3	0	text	data3-1
 tableMarge	2	1	3	1	text	data3-2
 text	NOTE: aligned is not worked
 newLine	convertParagraph	tm
-section	2	table with new line	table-with-new-line
-newLine	convertHeading	tm
+section	2	table-with-new-line
+text	table with new line
+newLine	convertHeading End	tm
 text	markdown
 newLine	convertParagraph	tm
 code	| data1-1 | data1-2                 |
@@ -65,7 +67,7 @@ newLine	convertCode	tm
 text	result
 newLine	convertParagraph	tm
 tableCreate	4	2
-tableWidthInfo	1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+tableWidthInfo	6.5,7.5
 tablecontents	0	0	next	left
 tablecontentslist	text	data1-1
 tablecontentslist	endParagraph		tm
@@ -94,5 +96,6 @@ tablecontentslist	text	data4-2
 tablecontentslist	endParagraph		tm
 text	NOTE: does not work
 newLine	convertParagraph	tm
-section	1	Links	links
-newLine	convertHeading	tm
+section	1	links
+text	Links
+newLine	convertHeading End	tm

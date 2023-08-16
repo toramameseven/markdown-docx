@@ -1,5 +1,6 @@
-section	1	Emphasis	emphasis
-newLine	convertHeading	tm
+section	1	emphasis
+text	Emphasis
+newLine	convertHeading End	tm
 text	markdown
 newLine	convertParagraph	tm
 code	**This is bold text**

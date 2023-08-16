@@ -2,30 +2,30 @@ import * as assert from "assert";
 import { markdownToWd0 } from "../markdown-docx/markdown-to-wd0";
 import { wd0ToDocx as wd0ToWd } from "../markdown-docx/wd0-to-wd";
 import { suite, test } from "mocha";
-import { markdownToWd } from "../../src/markdown-docx/markdown-to-docx";
+import { markdownToWd } from "../../src/markdown-docx/markdown-to-xxxx";
 import path = require("path");
 import * as Fs from "fs";
 import { getFileContents } from "../markdown-docx/common";
+import { addTableSpanToMarkdown } from "../markdown-docx/add-table-span";
 //import { assert } from "chai";
 // You can import and use all API from the 'vscode' module
 // as well as import your extension to test it
 //import * as vscode from "vscode";
 // import * as myExtension from '../../extension';
 
-function mdToWd(marked: string) {
+async function mdToWd(marked: string) {
   const markdownBodyX = marked.replace(/@/g, "\\@");
 
-  const wd0 = markdownToWd0(markdownBodyX, { sanitize: false }).replace(
-    /(\r?\n)+/g,
-    "\n"
-  );
+  const wd0 = (
+    await markdownToWd0(markdownBodyX, "docx", { sanitize: false })
+  ).replace(/(\r?\n)+/g, "\n");
   // wd must vbCRLF
   const wd = wd0ToWd(wd0).replace("\r", "");
   return wd;
 }
 
 async function mdFileToWd(file: string) {
-  const r = await markdownToWd(file, "", 0, false, true);
+  const r = await markdownToWd(file, "", "docx", 0, false, true);
   return r.wdBody;
 }
 
@@ -38,22 +38,7 @@ function removeTopN(s: string) {
 
 suite("Extension Test Suite", () => {
   // ==========================================
-  test("title", () => {
-    // marked
-    const markdown = `
-<!-- word title "Markdown to Docx samples" -->`;
-
-    // expect
-    const expect = `
-title\tMarkdown to Docx samples
-newLine\tconvertTitle\ttm`;
-
-    // assert
-    assert.strictEqual(mdToWd(removeTopN(markdown)), removeTopN(expect));
-  });
-
-  // ==========================================
-  test("toc", () => {
+  test("toc", async () => {
     // marked
     const markdown = `
 <!-- word toc 1 "table of content"-->`;
@@ -64,25 +49,11 @@ toc	1	table of content	tm
 newLine	convertToc	tm`;
 
     // assert
-    assert.strictEqual(mdToWd(removeTopN(markdown)), removeTopN(expect));
+    assert.strictEqual(await mdToWd(removeTopN(markdown)), removeTopN(expect));
   });
 
   // ==========================================
-  test("property", () => {
-    // marked
-    const markdown = `
-<!-- word property ppp "table of content" -->`;
-
-    // expect
-    const expect = `
-property	ppp	table of content			tm`;
-
-    // assert
-    assert.strictEqual(mdToWd(removeTopN(markdown)), removeTopN(expect));
-  });
-
-  // ==========================================
-  test("heading1", () => {
+  test("heading1", async () => {
     // marked
     const markdown = `
 # heading1`;
@@ -91,15 +62,16 @@ property	ppp	table of content			tm`;
     // command title    idTitle
     // section heading1 heading1 (if no id, same to title)
     const expect = `
-section	1	heading1	heading1
-newLine	convertHeading	tm`;
+section\t1\theading1
+text\theading1
+newLine\tconvertHeading End\ttm`;
 
     // assert
-    assert.strictEqual(mdToWd(removeTopN(markdown)), removeTopN(expect));
+    assert.strictEqual(await mdToWd(removeTopN(markdown)), removeTopN(expect));
   });
 
   // ==========================================
-  test("heading6", () => {
+  test("heading6", async () => {
     // marked
     const markdown = `
 ###### heading6`;
@@ -108,15 +80,16 @@ newLine	convertHeading	tm`;
     // command title    idTitle
     // section heading1 heading1 (if no id, same to title)
     const expect = `
-section	6	heading6	heading6
-newLine	convertHeading	tm`;
+section\t6\theading6
+text\theading6
+newLine\tconvertHeading End\ttm`;
 
     // assert
-    assert.strictEqual(mdToWd(removeTopN(markdown)), removeTopN(expect));
+    assert.strictEqual(await mdToWd(removeTopN(markdown)), removeTopN(expect));
   });
 
   // ==========================================
-  test("hr", () => {
+  test("hr", async () => {
     // marked
     const markdown = `
 ___
@@ -132,11 +105,11 @@ hr
 hr	`;
 
     // assert
-    assert.strictEqual(mdToWd(removeTopN(markdown)), removeTopN(expect));
+    assert.strictEqual(await mdToWd(removeTopN(markdown)), removeTopN(expect));
   });
 
   // ==========================================
-  test("br", () => {
+  test("br", async () => {
     // marked
     const markdown = `
 next line is \`<br>\`
@@ -151,11 +124,11 @@ text	upper line is <codespan><br></codespan>
 newLine	convertParagraph	tm`;
 
     // assert
-    assert.strictEqual(mdToWd(removeTopN(markdown)), removeTopN(expect));
+    assert.strictEqual(await mdToWd(removeTopN(markdown)), removeTopN(expect));
   });
 
   // ==========================================
-  test("new page", () => {
+  test("new page", async () => {
     // marked
     const markdown = `
 <!-- word newPage -->`;
@@ -165,11 +138,11 @@ newLine	convertParagraph	tm`;
 newPage				tm`;
 
     // assert
-    assert.strictEqual(mdToWd(removeTopN(markdown)), removeTopN(expect));
+    assert.strictEqual(await mdToWd(removeTopN(markdown)), removeTopN(expect));
   });
 
   // ==========================================
-  test("at mark", () => {
+  test("at mark", async () => {
     // marked
     const markdown = `
 anonymous@com.com`;
@@ -180,11 +153,11 @@ text\tanonymous@com.com
 newLine\tconvertParagraph\ttm`;
 
     // assert
-    assert.strictEqual(mdToWd(removeTopN(markdown)), removeTopN(expect));
+    assert.strictEqual(await mdToWd(removeTopN(markdown)), removeTopN(expect));
   });
 
   // ==========================================
-  test("emphasis1", () => {
+  test("emphasis1", async () => {
     // marked
     const markdown = `
 **This is bold text**
@@ -214,11 +187,48 @@ newLine	convertParagraph	tm
 text	2<sup>x</sup><sub>y</sub>
 newLine	convertParagraph	tm`;
     // assert
-    assert.strictEqual(mdToWd(removeTopN(markdown)), removeTopN(expect));
+    assert.strictEqual(await mdToWd(removeTopN(markdown)), removeTopN(expect));
   });
 
   // ==========================================
-  test("XXXXX", () => {
+  test("addTableSpanToMarkdown", async () => {
+    // marked
+    const markdown = `
+<!-- word emptyMerge -->
+<!-- word rowMerge 2-4  -->
+
+cell(4,2) is not merged. (comment cell)
+
+| data1-1 | data1-2                 |
+| ------- | ----------------------- |
+| data2-1 | data2-2                 |
+|         | data3-2                 |
+| data4-1 | <!-- not merged -->     |
+`;
+
+    // expect
+    const expect = `
+<!-- word emptyMerge -->
+<!-- word rowMerge 2-4  -->
+
+cell(4,2) is not merged. (comment cell)
+
+| data1-1 | data1-2                 |
+| ------- | ----------------------- |
+| data2-1 | data2-2                 |
+|          ^| data3-2                  ^|
+| data4-1  ^| <!-- not merged -->      ^|
+`;
+
+    // assert
+    assert.strictEqual(
+      await addTableSpanToMarkdown("", removeTopN(markdown), undefined),
+      removeTopN(expect)
+    );
+  });
+
+  // ==========================================
+  test("XXXXX", async () => {
     // marked
     const markdown = ``;
 
@@ -226,14 +236,14 @@ newLine	convertParagraph	tm`;
     const expect = ``;
 
     // assert
-    assert.strictEqual(mdToWd(removeTopN(markdown)), removeTopN(expect));
+    assert.strictEqual(await mdToWd(removeTopN(markdown)), removeTopN(expect));
   });
 
   // ==========================================
   test("demo-admonition", async () => {
     // marked
     const mdFile = "demo-admonition";
-    const mdPath = path.resolve(__dirname, "../../md_demo", mdFile + ".md");
+    const mdPath = path.resolve(__dirname, "../../md_demo/md", mdFile + ".md");
     const wd = await mdFileToWd(mdPath);
 
     // expect
@@ -247,8 +257,11 @@ newLine	convertParagraph	tm`;
   //
 });
 
+/**
+ *
+ */
 suite("Demo Test Suite", () => {
-  const r = path.resolve(__dirname, "../../md_demo");
+  const r = path.resolve(__dirname, "../../md_demo/md");
 
   Fs.readdir(r, (err, files) => {
     files
@@ -264,7 +277,11 @@ suite("Demo Test Suite", () => {
     test(mdBaseName, async () => {
       // marked
       const mdFile = mdBaseName;
-      const mdPath = path.resolve(__dirname, "../../md_demo", mdFile + ".md");
+      const mdPath = path.resolve(
+        __dirname,
+        "../../md_demo/md",
+        mdFile + ".md"
+      );
       const wd = await mdFileToWd(mdPath);
 
       // expect

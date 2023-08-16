@@ -1,0 +1,448 @@
+<!-- modified next page: http://kachibito.net/snippets/dynamic-active-table-of-contents -->
+<!DOCTYPE html>
+<html lang="en" class="">
+  <head>
+    <meta charset="UTF-8" />
+    <title>[[html main title]]</title>
+    <meta name="robots" content="noindex" />
+    <style type="text/css">
+      body {
+        display: flex;
+        flex-flow: space-between;
+        height: 100vh;
+        font-family: "Rubik";
+        margin: 0;
+        color: #333344;
+        line-height: 1.53em;
+        font-size: 1.2rem;
+        background-color: #efeeff;
+      }
+
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        /* font-family: "Rubik Mono One";
+        font-weight: 300;
+        margin-top: 3rem;
+        color: #484866; */
+      }
+
+      main {
+        flex: 3 3 100%;
+        overflow: auto;
+        padding: 2rem 3rem;
+      }
+
+      .toc1.active {
+        flex: 1 1 0;
+        /* background-color: #333344; */
+        min-width: 0;
+        /* padding: 1rem; */
+        overflow-y: auto;
+        font-size: small;
+      }
+      .toc1  {
+          flex: 1 1 300px;
+          /* background-color: #333344; */
+          min-width: 120px;
+          /* padding: 1rem; */
+          overflow-y: auto;
+          font-size: small;
+        }
+
+      @media screen and (min-width: 1000px) {
+      .toc1  {
+          flex: 1 1 300px;
+          /* background-color: #333344; */
+          min-width: 120px;
+          /* padding: 1rem; */
+          overflow-y: auto;
+          font-size: small;
+        }
+      }
+
+      @media screen and (max-width: 1000px) {
+      .toc1  {
+        flex: 1 1 0;
+        /* background-color: #333344; */
+        min-width: 0;
+        /* padding: 1rem; */
+        overflow-y: auto;
+        font-size: small;
+        }
+        .openbtn1{
+          display: none;
+        }
+      }
+
+      table {
+        width: 100%;
+        text-align: center;
+        border-collapse: collapse;
+        border-spacing: 0;
+      }
+      th {
+        padding: 10px;
+        background: #e9faf9;
+        border: solid 1px #778ca3;
+      }
+      td {
+        padding: 10px;
+        border: solid 1px #778ca3;
+      }
+
+      /* h1,
+      h2,
+      p {
+        max-width: 700px;
+      }
+
+      a {
+        color: #eeeeff;
+        text-decoration: none;
+      }
+
+      .active {
+        color: #ff8888;
+        font-weight: bold;
+      }
+
+      ul {
+        list-style: none;
+        padding-left: 1.25rem;
+      }
+
+      ul li::before {
+        content: "\2022";
+        color: #eeeeff;
+        font-weight: bold;
+        display: inline-block;
+        width: 1em;
+        margin-left: -1em;
+      } */
+      /* h1 {
+        counter-increment: h1;
+        counter-reset: h2;
+      }
+      h1::before {
+        content: counter(h1) "." " ";
+      } */
+
+      h2 {
+        counter-increment: h2;
+        counter-reset: h3;
+      }
+      h2::before {
+        content: counter(h2) "." " ";
+      }
+
+      h3 {
+        counter-increment: h3;
+        counter-reset: h4;
+      }
+      h3::before {
+        content: counter(h2) "." counter(h3) "." " ";
+      }
+
+      h4 {
+        counter-increment: h4;
+        counter-reset: h5;
+      }
+      h4::before {
+        content: counter(h2) "." counter(h3) "." counter(h4) "."
+          " ";
+      }
+
+      h5 {
+        counter-increment: h5;
+        counter-reset: h6;
+      }
+      h5::before {
+        content: counter(h2) "." counter(h3) "." counter(h4) "."
+          counter(h5) "." " ";
+      }
+
+      h6 {
+        counter-increment: h6;
+        counter-reset: h7;
+      }
+      h6::before {
+        content: "■" " ";
+      }
+
+
+      code {
+        display: inline-block;
+        padding: 0.1em 0.25em;
+        color: #444;
+        background-color: #e7edf3;
+        border-radius: 3px;
+        border: solid 1px #d6dde4;
+      }
+      
+      nav ul li {
+        counter-increment: item;
+        margin: 0 0 0 -1em;
+        padding: 0;
+        list-style-type: none;
+        font-size: medium;
+      }
+
+      nav ul ul li {
+        counter-increment: item;
+        margin: 0 0 0 -3em;
+        padding: 0;
+        list-style-type: none;
+        font-size: medium;
+      }
+
+      nav ul ul ul li {
+        counter-increment: item;
+        margin: 0 0 0 -5em;
+        padding: 0;
+        list-style-type: none;
+        font-size: medium;
+      }
+
+
+      nav ul li:first-child {
+        counter-reset: item;
+      }
+      nav ul li:before {
+        content: counters(item, ".") ". ";
+        float: left;
+      }
+      
+      .openbtn1 {
+        position: relative;
+        background: #57a2c7;
+        cursor: pointer;
+        width: 50px;
+        height: 50px;
+        border-radius: 5px;
+      }
+      .openbtn1 span {
+        display: inline-block;
+        transition: all 0.4s;
+        position: absolute;
+        left: 14px;
+        height: 3px;
+        border-radius: 2px;
+        background: #fff;
+        width: 22px;
+      }
+      .openbtn1.active span:nth-of-type(1) {
+        top: 14px;
+        transform: translateY(6px) rotate(-45deg);
+        width: 22px;
+      }
+      .openbtn1.active span:nth-of-type(2) {
+        opacity: 0;
+      }
+      .openbtn1.active span:nth-of-type(3) {
+        top: 36px;
+        transform: translateY(-6px) rotate(45deg);
+        width: 22px;
+      }
+
+      .openbtn1 span:nth-of-type(1) {
+        top: 24px;
+        transform: translateY(6px) rotate(-45deg);
+        width: 22px;
+      }
+      .openbtn1 span:nth-of-type(2) {
+        opacity: 0;
+      }
+      .openbtn1 span:nth-of-type(3) {
+        top: 25px;
+        transform: translateY(-6px) rotate(45deg);
+        width: 22px;
+      }
+      /*# sourceMappingURL=numbered.css.map */
+    </style>
+  </head>
+
+
+    <body>
+      <nav id="toc" class="toc1"></nav>
+      <main>
+        <div class="openbtn1">
+          <span></span>
+          <span></span>
+          <span></span>
+       </div>
+        673ab4838a71448692a56d601b77c818
+      </main>
+    </body>
+
+    <script>
+      let tocId = "toc";
+
+      let headings;
+      let headingIds = [];
+      let headingIntersectionData = {};
+      let headerObserver;
+
+      let isFirst = true;
+
+      function setLinkActive(link) {
+        const links = document.querySelectorAll(`#${tocId} a`);
+        links.forEach((link) => link.classList.remove("active"));
+        if (link) {
+          link.classList.add("active");
+        }
+      }
+
+      function getProperListSection(
+        heading,
+        previousHeading,
+        currentListElement
+      ) {
+        let listSection = currentListElement;
+        if (previousHeading) {
+          if (heading.tagName.slice(-1) > previousHeading.tagName.slice(-1)) {
+            let nextSection = document.createElement("ul");
+            listSection.appendChild(nextSection);
+            return nextSection;
+          } else if (
+            heading.tagName.slice(-1) < previousHeading.tagName.slice(-1)
+          ) {
+            let indentationDiff =
+              parseInt(previousHeading.tagName.slice(-1)) -
+              parseInt(heading.tagName.slice(-1));
+            while (indentationDiff > 0) {
+              listSection = listSection.parentElement;
+              indentationDiff--;
+            }
+          }
+        }
+        return listSection;
+      }
+
+      function setIdFromContent(element, appendedId) {
+        if (!element.id) {
+          element.id = `${element.innerHTML
+            .replace(/:/g, "")
+            .trim()
+            .toLowerCase()
+            .split(" ")
+            .join("-")}-${appendedId}`;
+        }
+      }
+
+      function addNavigationLinkForHeading(heading, currentSectionList) {
+        let listItem = document.createElement("li");
+        let anchor = document.createElement("a");
+        anchor.innerHTML = heading.innerHTML;
+        anchor.id = `${heading.id}-link`;
+        anchor.href = `#${heading.id}`;
+        anchor.onclick = (e) => {
+          setTimeout(() => {
+            setLinkActive(anchor);
+          });
+        };
+        listItem.appendChild(anchor);
+        currentSectionList.appendChild(listItem);
+      }
+
+      function buildTableOfContentsFromHeadings() {
+        const tocElement = document.querySelector(`#${tocId}`);
+        const main = document.querySelector("main");
+        if (!main) {
+          throw Error(
+            "A `main` tag section is required to query headings from."
+          );
+        }
+        headings = main.querySelectorAll("h2, h3, h4");
+        let previousHeading;
+        let currentSectionList = document.createElement("ul");
+        tocElement.appendChild(currentSectionList);
+
+        headings.forEach((heading, index) => {
+          currentSectionList = getProperListSection(
+            heading,
+            previousHeading,
+            currentSectionList
+          );
+          setIdFromContent(heading, index);
+          addNavigationLinkForHeading(heading, currentSectionList);
+
+          headingIds.push(heading.id);
+          headingIntersectionData[heading.id] = {
+            y: 0,
+          };
+          previousHeading = heading;
+        });
+      }
+
+      function updateActiveHeadingOnIntersection(entry) {
+        const previousY = headingIntersectionData[entry.target.id].y;
+        const currentY = entry.boundingClientRect.y;
+        const id = `#${entry.target.id}`;
+        const link = document.querySelector(id + "-link");
+        const index = headingIds.indexOf(entry.target.id);
+
+        if (entry.isIntersecting) {
+          if (currentY > previousY && index !== 0) {
+            console.log(id + ":1 enter top");
+          } else {
+            console.log(id + ":2 enter bottom");
+            setLinkActive(link);
+          }
+        } else {
+          if (currentY > previousY) {
+            console.log(id + ":3 leave bottom");
+            const lastLink = document.querySelector(
+              `#${headingIds[index - 1]}-link`
+            );
+            setLinkActive(lastLink);
+          } else {
+            console.log(id + ":4 leave top");
+          }
+        }
+
+        headingIntersectionData[entry.target.id].y = currentY;
+      }
+
+      function observeHeadings() {
+        let options = {
+          root: document.querySelector("main"),
+          threshold: 0.1,
+        };
+        headerObserver = new IntersectionObserver(
+          (entries) => entries.forEach(updateActiveHeadingOnIntersection),
+          options
+        );
+        Array.from(headings)
+          .reverse()
+          .forEach((heading) => headerObserver.observe(heading));
+      }
+
+      window.addEventListener("load", (event) => {
+        const isNavigate = window?.performance?.getEntriesByType('navigation')[0].type === 'back_forward';
+        if (isNavigate) {
+          //return;
+        }
+        buildTableOfContentsFromHeadings();
+        if ("IntersectionObserver" in window) {
+          observeHeadings();
+        }
+        const nav = document.getElementsByClassName('toc1')[0];
+        nav.classList.toggle('active');
+      });
+
+      window.addEventListener("unload", (event) => {
+        headerObserver.disconnect();
+      });
+
+      const btn = document.getElementsByClassName('openbtn1')[0];
+      const nav = document.getElementsByClassName('toc1')[0];
+      btn.addEventListener('click',function(){
+        this.classList.toggle('active');
+        nav.classList.toggle('active');
+      })
+    </script>
+</html>

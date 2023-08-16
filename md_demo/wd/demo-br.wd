@@ -1,5 +1,6 @@
-section	1	BR	br
-newLine	convertHeading	tm
+section	1	br
+text	BR
+newLine	convertHeading End	tm
 text	markdown
 newLine	convertParagraph	tm
 code	next line is `<br>`

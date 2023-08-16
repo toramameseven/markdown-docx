@@ -1,11 +1,12 @@
-<!-- word export demo-table-columns.md-->
-## table column width
+<!-- word export demo-table.md-->
+<!-- word tableWidth 50 -->
+# Tables
+
+## normal table
 
 markdown
 
 ```
-<!-- word cols 2,1 -->
-<!-- word emptyMerge -->
 | data1-1 | data1-2                 |
 | ------- | ----------------------- |
 | data2-1 | data2-2                 |
@@ -15,8 +16,6 @@ markdown
 
 result
 
-<!-- word cols 2,1 -->
-<!-- word emptyMerge -->
 | data1-1 | data1-2                 |
 | ------- | ----------------------- |
 | data2-1 | data2-2                 |

@@ -1,5 +1,6 @@
-section	2	normal link	normal-link
-newLine	convertHeading	tm
+section	2	normal-link
+text	normal link
+newLine	convertHeading End	tm
 code	look you [link text](http://dev.nodeca.com) see me
 newLine	convertCode	tm
 code	

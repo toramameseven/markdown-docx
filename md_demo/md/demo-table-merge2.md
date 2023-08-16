@@ -1,5 +1,5 @@
 <!-- word export demo-table-merge2.md-->
-## merge cells No.2
+# merge cells No.2
 
 markdown
 
@@ -20,13 +20,15 @@ result
 
 cell(4,2) is not merged. (comment cell)
 
+<!-- word param pptxSettings "C:\Users\XXXX\Desktop\github\markdown-docx\master-settings2.js" -->
+
 | data1-1 | data1-2                 |
 | ------- | ----------------------- |
 | data2-1 | data2-2                 |
 |         | data3-2                 |
 | data4-1 | <!-- not merged -->     |
 
-## table with emphasis
+# table with emphasis
 
 markdown
 

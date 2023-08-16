@@ -1,0 +1,16 @@
+param	pptxSettings	demo-pptx-settings.js			tm
+param	v	top			tm
+param	h	left			tm
+param	dpi	d			tm
+section	1	slide-title
+text	slide title
+newLine	convertHeading End	tm
+section	2	slide1
+text	slide1
+newLine	convertHeading End	tm
+image	./markdown2docx.png			tm
+newLine	convertParagraph	tm
+param	position	50,50,50,50			tm
+param	dpi	50			tm
+image	./markdown2docx.png			tm
+newLine	convertParagraph	tm

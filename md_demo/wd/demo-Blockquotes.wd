@@ -1,5 +1,6 @@
-section	1	Blockquotes	blockquotes
-newLine	convertHeading	tm
+section	1	blockquotes
+text	Blockquotes
+newLine	convertHeading End	tm
 text	NOTE: <b>markdown to docx</b> does not support blockquote.
 newLine	convertParagraph	tm
 text	markdown

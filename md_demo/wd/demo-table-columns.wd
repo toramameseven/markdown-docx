@@ -1,5 +1,7 @@
-section	2	table column width	table-column-width
-newLine	convertHeading	tm
+param	docxTemplate	_yyy.docx			tm
+section	2	table-column-width
+text	table column width
+newLine	convertHeading End	tm
 text	markdown
 newLine	convertParagraph	tm
 code	<!-- word cols 2,1 -->

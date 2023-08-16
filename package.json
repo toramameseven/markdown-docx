@@ -2,7 +2,7 @@
   "name": "markdown-docx",
   "displayName": "Markdown Docx",
   "description": "Markdown docx converter",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "toramameseven",
   "author": {
     "name": "toramame-seven"
@@ -42,13 +42,38 @@
     "commands": [
       {
         "enablement": "true",
+        "command": "main.createDocxTemplate",
+        "title": "Create a docx template."
+      },
+      {
+        "enablement": "true",
         "command": "explorer.ExportDocx",
         "title": "Convert to Docx"
       },
       {
         "enablement": "true",
-        "command": "explorer.ExportHtmlDocx",
+        "command": "explorer.ExportHtmlMarkdown",
         "title": "Convert html to md"
+      },
+      {
+        "enablement": "markdown-docx.isExperimentFeature",
+        "command": "explorer.mdToEd",
+        "title": "Convert me to ed"
+      },
+      {
+        "enablement": "markdown-docx.isExperimentFeature",
+        "command": "explorer.mdToTextile",
+        "title": "Convert me to textile"
+      },
+      {
+        "enablement": "markdown-docx.isExperimentFeature",
+        "command": "explorer.mdToPptx",
+        "title": "Convert me to pptx"
+      },
+      {
+        "enablement": "markdown-docx.isExperimentFeature",
+        "command": "explorer.mdToHtml",
+        "title": "Convert me to Html"
       },
       {
         "enablement": "true",
@@ -56,9 +81,19 @@
         "title": "Convert to Docx"
       },
       {
-        "enablement": "false",
+        "enablement": "markdown-docx.isExperimentFeature",
+        "command": "editor.ExportPptx",
+        "title": "Convert to Pptx"
+      },
+      {
+        "enablement": "markdown-docx.isExperimentFeature",
         "command": "editor.ExportHtmlDocx",
         "title": "Convert html to md"
+      },
+      {
+        "enablement": "markdown-docx.isExperimentFeature",
+        "command": "explorer.textileToMarkdown",
+        "title": "Convert textile to md"
       },
       {
         "enablement": "true",
@@ -66,9 +101,9 @@
         "title": "stop signal"
       },
       {
-        "enablement": "false",
-        "command": "explorer.SplitForHugo",
-        "title": "Split To Hugo mds"
+        "enablement": "markdown-docx.isExperimentFeature",
+        "command": "explorer.htmlToInlineHtml",
+        "title": "Convert html to inlineHtml"
       }
     ],
     "menus": {
@@ -79,13 +114,38 @@
           "group": "myGroup@1"
         },
         {
-          "when": "resourceExtname =~ /\\.md$|\\.mds$/i && !markdown-docx.isRunning && false",
-          "command": "explorer.SplitForHugo",
+          "when": "resourceExtname =~ /\\.wd$|\\.md$/i && !markdown-docx.isRunning && markdown-docx.isExperimentFeature",
+          "command": "explorer.mdToPptx",
           "group": "myGroup@1"
         },
         {
-          "when": "resourceExtname =~ /\\.html$/i && !markdown-docx.isRunning",
-          "command": "explorer.ExportHtmlDocx",
+          "when": "resourceExtname =~ /\\.html$/i && !markdown-docx.isRunning && markdown-docx.isExperimentFeature",
+          "command": "explorer.ExportHtmlMarkdown",
+          "group": "myGroup@1"
+        },
+        {
+          "when": "resourceExtname =~ /\\.md$/i && !markdown-docx.isRunning && markdown-docx.isExperimentFeature",
+          "command": "explorer.mdToEd",
+          "group": "myGroup@1"
+        },
+        {
+          "when": "resourceExtname =~ /\\.md$/i && !markdown-docx.isRunning && markdown-docx.isExperimentFeature",
+          "command": "explorer.mdToTextile",
+          "group": "myGroup@1"
+        },
+        {
+          "when": "resourceExtname =~ /\\.md$/i && !markdown-docx.isRunning && markdown-docx.isExperimentFeature",
+          "command": "explorer.mdToHtml",
+          "group": "myGroup@1"
+        },
+        {
+          "when": "resourceExtname =~ /\\.md$/i && !markdown-docx.isRunning && markdown-docx.isExperimentFeature",
+          "command": "explorer.htmlToInlineHtml",
+          "group": "myGroup@1"
+        },
+        {
+          "when": "resourceExtname =~ /\\.textile$/i && !markdown-docx.isRunning && markdown-docx.isExperimentFeature",
+          "command": "explorer.textileToMarkdown",
           "group": "myGroup@1"
         }
       ],
@@ -96,7 +156,12 @@
           "group": "myGroup@1"
         },
         {
-          "when": "resourceExtname =~ /\\.html$/i && !markdown-docx.isRunning && false",
+          "when": "resourceExtname =~ /\\.wd$|\\.md$/i && !markdown-docx.isRunning && markdown-docx.isExperimentFeature",
+          "command": "editor.ExportPptx",
+          "group": "myGroup@1"
+        },
+        {
+          "when": "resourceExtname =~ /\\.html$/i && !markdown-docx.isRunning && markdown-docx.isExperimentFeature",
           "command": "editor.ExportHtmlDocx",
           "group": "myGroup@1"
         },
@@ -110,12 +175,6 @@
     "configuration": {
       "title": "markdown-docx",
       "properties": {
-        "markdown-docx.path.docxEngine": {
-          "type": "string",
-          "default": "",
-          "description": "docx engine. if you use your own, set full path.",
-          "order": 1
-        },
         "markdown-docx.path.docxTemplate": {
           "type": "string",
           "default": "",
@@ -128,30 +187,48 @@
           "description": "math extension. experimental feature.",
           "order": 3
         },
-        "markdown-docx.docxEngine.timeout": {
-          "type": "number",
-          "default": 60000,
-          "description": "create docx timeout(ms).default 60000 ms",
-          "order": 4
-        },
         "markdown-docx.docxEngine.debug": {
           "type": "boolean",
           "default": false,
           "description": "some debug feature.",
           "order": 5
         },
-        "markdown-docx.docxEngine.logInterval": {
-          "type": "number",
-          "default": 10,
-          "description": "more than 1. 1: many, 10 few.",
-          "order": 6,
-          "minProperties": "1"
+        "markdown-docx.docxEngine.showOutputTab": {
+          "type": "boolean",
+          "default": false,
+          "description": "show output tab.",
+          "order": 6
+        },
+        "markdown-docx.docxEngine.isOverWrite": {
+          "type": "boolean",
+          "default": false,
+          "description": "If true, overwrite a docx file.",
+          "order": 8
+        },
+        "markdown-docx.docxEngine.wordExePath": {
+          "type": "string",
+          "default": "",
+          "description": "word exe path.",
+          "order": 9
+        },
+        "markdown-docx.docxEngine.pptExePath": {
+          "type": "string",
+          "default": "",
+          "description": "ppt exe path.",
+          "order": 10
+        },
+        "markdown-docx.docxEngine.isOpenWord": {
+          "type": "boolean",
+          "default": false,
+          "description": "If true, open the word file.",
+          "order": 11
         }
       }
     }
   },
   "scripts": {
     "vscode:prepublish": "npm run esbuild-base -- --minify",
+    "copy-wasm": "cpx ./node_modules/svg2png-wasm/svg2png_wasm_bg.wasm ./wasm",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
@@ -160,13 +237,15 @@
     "prepackage": "npm run pretest",
     "package": "vsce package --target win32-x64",
     "clean": "rimraf out",
-    "preesbuild-base": "npm run clean",
+    "preesbuild-base": "npm run clean && npm run copy-wasm",
     "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
+    "esbuild-basex": "node buildme.js",
     "esbuild": "npm run esbuild-base -- --sourcemap",
-    "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
+    "esbuild-only": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node -- --sourcemap",
     "test-compile": "tsc -p ./",
-    "installEx": "npm run package && code --install-extension markdown-docx-win32-x64-0.0.1.vsix",
-    "testm": "set TS_NODE_COMPILER_OPTIONS={\"module\":\"commonjs\"} && mocha -r ts-node/register src/test-node/**/*.ts"
+    "installEx": "npm run package && code --install-extension markdown-docx-win32-x64-0.0.2.vsix",
+    "testm": "set TS_NODE_COMPILER_OPTIONS={\"module\":\"commonjs\"} && mocha -r ts-node/register src/test-node/**/*.ts",
+    "license": "npx license-report --config=./license-report-config.json > usedModules.md"
   },
   "devDependencies": {
     "@types/encoding-japanese": "^2.0.1",
@@ -179,21 +258,29 @@
     "@typescript-eslint/eslint-plugin": "^5.42.0",
     "@typescript-eslint/parser": "^5.42.0",
     "@vscode/test-electron": "^2.2.0",
+    "cpx": "^1.5.0",
     "esbuild": "^0.16.13",
     "eslint": "^8.26.0",
     "glob": "^8.0.3",
+    "license-report": "^6.4.0",
     "mocha": "^10.1.0",
     "rimraf": "^3.0.2",
     "ts-node": "^10.9.1",
     "typescript": "^4.8.4"
   },
   "dependencies": {
+    "docx": "^8.2.0",
     "encoding-japanese": "^2.0.0",
     "front-matter": "^4.0.2",
     "iconv-lite": "^0.6.3",
+    "image-size": "^1.0.2",
+    "inline-source": "^8.0.2",
     "lodash": "^4.17.21",
     "marked": "^4.2.4",
-    "node-html-markdown": "^1.3.0",
-    "node-html-parser": "^6.1.4"
+    "node-html-parser": "^6.1.4",
+    "pptxgenjs": "^3.12.0",
+    "svg2png-wasm": "^1.4.0",
+    "tex-to-svg": "^0.2.0",
+    "textile-js": "^2.1.1"
   }
 }

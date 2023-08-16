@@ -5,3 +5,11 @@ node_modules
 *.vsix
 *.xxtxt
 *.wd0
+wasm
+others
+md_demo/md/*.wd
+md_demo/md/*.pptx
+md_demo/md/*.docx
+md_demo/md/*.html
+md_demo/md/*.txtile
+md_demo/md/*.ed

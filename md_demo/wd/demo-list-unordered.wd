@@ -1,5 +1,6 @@
-section	1	Lists Unordered	lists-unordered
-newLine	convertHeading	tm
+section	1	lists-unordered
+text	Lists Unordered
+newLine	convertHeading End	tm
 text	NOTE: <b>markdown to docx</b>  supports only three layers.
 newLine	convertParagraph	tm
 text	markdown

@@ -1,5 +1,6 @@
-section	1	Block code syntax highlighting	block-code-syntax-highlighting
-newLine	convertHeading	tm
+section	1	block-code-syntax-highlighting
+text	Block code syntax highlighting
+newLine	convertHeading End	tm
 text	NOTE: <b>markdown to docx</b> does not support Syntax highlighting.
 newLine	convertParagraph	tm
 code	var foo = function (bar) {

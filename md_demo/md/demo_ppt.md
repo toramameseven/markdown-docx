@@ -1,16 +1,20 @@
-<!-- word title "sample document" -->
-<!-- word subTitle "sample document subTitle" -->
-<!-- word division divisionXXX -->
-<!-- word date dateXXX -->
-<!-- word author authorXXX -->
-<!-- word docNumber XXXX-0004 -->
+<!-- word placeholder subTitle "sample document subTitle" -->
+<!-- word placeholder division divisionXXX -->
+<!-- word placeholder date dateXXX -->
+<!-- word placeholder author authorXXX -->
+<!-- word placeholder docNumber XXXX-0004 -->
 <!-- word newLine -->
 <!-- word toc 3 "toc caption" -->
+<!-- word levelOffset 0 -->
 
 
 <!-- https://markdown-it.github.io/ -->
 
-# title subtitle and table of content 
+# this is sample document
+
+## title subtitle and table of content 
+
+<!-- ppt position 5,20,45,80 -->
 
 markdown
 
@@ -19,6 +23,7 @@ markdown
 <!-- word subTitle sample document subTitle -->
 <!-- word toc 3 -->
 ```
+<!-- ppt position 55,20,45,80 -->
 
 The result is above.
 
@@ -26,42 +31,44 @@ The result is above.
 This sample markdown is modified from the document of [markdown-it](https://markdown-it.github.io/).
 
 <!-- word export demo-headings.md-->
-# Heading
+## Heading
 
+
+<!-- ppt position 5,20,45,80 -->
 markdown
 
 ```
-# Heading1
+### Heading2
 
-## Heading2
+#### Heading3
 
-### Heading3
+##### Heading4
 
-#### Heading4
+###### Heading5
 
-##### Heading5
-
-###### Heading6
 ```
+
+<!-- ppt position 55,20,45,80 -->
 
 result
 
-## Heading2
+### Heading2
 
-### Heading3
+#### Heading3
 
-#### Heading4
+##### Heading4
 
-##### Heading5
+###### Heading5
 
-###### Heading6
 
 
 
 
 <!-- word export demo-Horizontal.md-->
-# Horizontal Rules
+## Horizontal Rules
 
+
+<!-- ppt position 5,20,45,80 -->
 markdown
 
 ```
@@ -71,18 +78,15 @@ ___
 
 ***
 ```
+ 
+Horizontal Rules do not work.
 
-result
-___
-
----
-
-***
 
 
 <!-- word export demo-br.md-->
-# BR
+## BR
 
+<!-- ppt position 5,20,45,80 -->
 markdown
 
 ```
@@ -93,7 +97,9 @@ test<BR>
 <BR>
 
 upper line is `<br>`
+
 ```
+<!-- ppt position 55,20,45,80 -->
 result
 
 next line is `<br>`
@@ -103,11 +109,11 @@ test<BR>
 <BR>
 
 upper line is `<br>`
-
-
 
 <!-- word export demo-newpage.md-->
-# new page
+## new page
+
+### markdown
 
 markdown
 
@@ -120,24 +126,14 @@ upper line is `<!-- word newPage -->`
 ```
 result
 
-next line is `<!-- word newPage -->`
+`<!-- word newPage -->` does not work.
 
-<!-- word newPage -->
-
-upper line is `<!-- word newPage -->`
-
-
-<!-- word export demo-Typographic.md-->
-# Typographic replacements
-
-NOTE: All @ are replaced to "\\@" in **markdown to docx**. 
-
-anonymous@com.com
 
 
 <!-- word export demo-Emphasis.md-->
-# Emphasis
+## Emphasis
 
+<!-- ppt position 5,20,45,80 -->
 markdown
 
 ```
@@ -153,6 +149,7 @@ _This is italic text_
 
 2<sup>x</sup><sub>y</sub>
 ```
+<!-- ppt position 55,20,45,80 -->
 result
 
 **This is bold text**
@@ -168,8 +165,9 @@ _This is italic text_
 2<sup>x</sup><sub>y</sub>
 
 <!-- word export demo-Emphasis2.md-->
-# Emphasis2
+## Emphasis2
 
+<!-- ppt position 5,20,45,80 -->
 markdown
 
 ```
@@ -180,7 +178,7 @@ _This is italic text_
 ~~Strikethrough~~ 
 2<sup>x</sup><sub>y</sub>
 ```
-
+<!-- ppt position 55,20,45,80 -->
 result
 
 **This is bold text**
@@ -189,37 +187,20 @@ _This is italic text_
 _This is italic text_
 ~~Strikethrough~~ 
 2<sup>x</sup><sub>y</sub>
-
-NOTE: Sometime Emphasis does not work. That time, please add some spaces between words.
 
 
 <!-- word export demo-Blockquotes.md-->
-# Blockquotes
-
+## Blockquotes
+<!-- ppt position 5,20,45,80 -->
 NOTE: **markdown to docx** does not support blockquote.
 
-markdown
-
-```
-> Blockquotes can also be nested...
->
-> > ...by using additional greater-than *signs* _right_ next to each other...
-> >
-> > * eeeeeeeee
-> > > ...or with spaces between arrows.
-```
-result
-
-> Blockquotes can also be nested...
->
-> > ...by using additional greater-than *signs* _right_ next to each other...
-> >
-> > * eeeeeeeee
-> > > ...or with spaces between arrows.
 
 
 <!-- word export demo-list-unordered.md-->
-# Lists Unordered
+## Lists Unordered
+
+<!-- ppt position 5,20,45,80 -->
+
 
 NOTE: **markdown to docx**  supports only three layers.
 
@@ -237,6 +218,8 @@ markdown
 * look me [](#links) send you
 ```
 
+<!-- ppt position 55,20,45,80 -->
+
 result
 
 - Create a list by starting a line with `+`, `-`, or `*`
@@ -250,7 +233,9 @@ result
 * look me [](#links) send you
 
 <!-- word export demo-list-orderd.md-->
-# Lists ordered
+## Lists ordered
+
+<!-- ppt position 5,20,45,80 -->
 
 markdown
 
@@ -267,6 +252,9 @@ NOTE: **markdown to docx** does not support numbering with offset:
 57. foo
 1. bar
 ```
+
+<!-- ppt position 55,20,45,80 -->
+
 result
 
 1. Lorem ipsum dolor sit amet
@@ -283,7 +271,10 @@ NOTE: **markdown to docx** does not support numbering with offset:
 1. bar
 
 <!-- word export demo-list-mixed.md-->
-# Lists mixed
+## Lists mixed
+
+
+<!-- ppt position 5,20,45,80 -->
 
 markdown
 
@@ -292,6 +283,9 @@ markdown
     - unordered2
         1. ordered3
 ```
+
+<!-- ppt position 55,20,45,80 -->
+
 result
 
 1.  ordered1
@@ -300,19 +294,25 @@ result
 
 
 <!-- word export demo-code.md-->
-# Code
+## Code
+
+<!-- ppt position 5,20,45,80 -->
 
 markdown
 
 ```
 Inline `code`
 ```
+<!-- ppt position 55,20,45,80 -->
+
 result
 
 Inline `code`
 
 <!-- word export demo-code-indented.md-->
-# Indented code
+## Indented code
+
+<!-- ppt position 5,20,45,80 -->
 
 markdown
 
@@ -322,6 +322,7 @@ markdown
     line 2 of code
     line 3 of code
 ```
+<!-- ppt position 55,20,45,80 -->
 result
 
     // Some comments
@@ -330,22 +331,20 @@ result
     line 3 of code
 
 <!-- word export demo-code-fences.md-->
-# Block code syntax highlighting
+## Block code syntax highlighting
+
+<!-- ppt position 5,20,45,80 -->
 
 NOTE: **markdown to docx** does not support Syntax highlighting.
 
-```js
-var foo = function (bar) {
-  return bar++;
-};
-console.log(foo(5));
-```
-
 
 <!-- word export demo-table.md-->
-# Tables
+## Tables
+
 
 ## normal table
+
+<!-- ppt position 5,20,45,80 -->
 
 markdown
 
@@ -356,8 +355,7 @@ markdown
 | data3-1 | data3-2                 |
 | data4-1 | data4-2                 |
 ```
-
-result
+<!-- ppt position 55,20,45,80 -->
 
 | data1-1 | data1-2                 |
 | ------- | ----------------------- |
@@ -368,11 +366,12 @@ result
 
 <!-- word export demo-table-merge.md-->
 ## merge cells No.1
+<!-- ppt position 5,20,45,80 -->
 
 * cell(3,1) and cell(4,2) are merged.
-  
-markdown
 
+
+markdown
 ```
 <!-- word emptyMerge -->
 
@@ -383,8 +382,7 @@ markdown
 | data4-1 |                         |
 ```
 
-result
-
+<!-- ppt position 55,20,45,80 -->
 
 <!-- word emptyMerge -->
 
@@ -398,6 +396,8 @@ result
 <!-- word export demo-table-merge2.md-->
 ## merge cells No.2
 
+<!-- ppt position 5,20,45,80 -->
+
 markdown
 
 ```
@@ -411,11 +411,15 @@ cell(4,2) is not merged. (comment cell)
 |         | data3-2                 |
 | data4-1 | <!-- not merged -->     |
 ```
-result
+<!-- ppt position 55,20,45,80 -->
+
 
 <!-- word emptyMerge -->
 
 cell(4,2) is not merged. (comment cell)
+
+<!-- ppt position 55,30,45,80 -->
+
 
 | data1-1 | data1-2                 |
 | ------- | ----------------------- |
@@ -424,6 +428,8 @@ cell(4,2) is not merged. (comment cell)
 | data4-1 | <!-- not merged -->     |
 
 ## table with emphasis
+
+<!-- ppt position 5,20,45,80 -->
 
 markdown
 
@@ -435,7 +441,8 @@ markdown
 | data4-1 | **This is bold text**     |
 ```
 
-result
+<!-- ppt position 55,20,45,80 -->
+
 
 | data1-1 | data1-2                   |
 | ------- | ------------------------- |
@@ -446,6 +453,8 @@ result
 
 <!-- word export demo-table-columns.md-->
 ## table column width
+
+<!-- ppt position 5,20,45,80 -->
 
 markdown
 
@@ -459,7 +468,7 @@ markdown
 | data4-1 | data4-2                 |
 ```
 
-result
+<!-- ppt position 55,20,45,80 -->
 
 <!-- word cols 2,1 -->
 <!-- word emptyMerge -->
@@ -473,6 +482,8 @@ result
 <!-- word export demo-table-rowmerge.md-->
 ## Right aligned and rows merge
 
+<!-- ppt position 5,20,45,80 -->
+
 markdown
 
 ```
@@ -485,7 +496,7 @@ markdown
 | data4-1 | data4-2                 |
 ```
 
-result
+<!-- ppt position 55,20,45,80 -->
 
 <!-- word cols 1,3 -->
 <!-- word rowMerge 3-4 -->
@@ -495,10 +506,13 @@ result
 | data3-1 | data3-2                 |
 | data4-1 | data4-2                 |
 
+
 NOTE: aligned is not worked
 
 
 ## table with new line
+
+<!-- ppt position 5,20,45,80 -->
 
 markdown
 
@@ -509,7 +523,9 @@ markdown
 | data3-1 | data3-2<bR>data3-2-2    |
 | data4-1 | data4-2                 |
 ```
-result
+
+<!-- ppt position 55,20,45,80 -->
+
 
 | data1-1 | data1-2                 |
 | ------- | ----------------------- |
@@ -517,38 +533,12 @@ result
 | data3-1 | data3-2<BR>data3-2-2    |
 | data4-1 | data4-2                 |
 
-NOTE: does not work
-
-
-
-# Links
-
-<!-- word export demo-links-xref.md-->
-## cross reference in a docx
-
-markdown
-
-```
-## refs1
-
-## refs2 with space
-
-* look me [refs1](#refs1) send you
-* look me [refs2 with space](#refs2-with-space) send you
-```
-
-result
-
-## refs1
-
-## refs2 with space
-
-* look me [refs1](#refs1) send you
-* look me [refs2 with space](#refs2-with-space) send you
 
 
 <!-- word export demo-normalLink.md-->
-## normal link
+### normal link
+
+<!-- ppt position 5,20,45,80 -->
 
 ```
 look you [link text](http://dev.nodeca.com) see me
@@ -559,6 +549,9 @@ Jason Campbell <jasoncampbell@google.com> (http://twitter.com/jxson)
 
 * Autoconverted link https://github.com/nodeca/pica (enable linkify to see)
 ```
+
+<!-- ppt position 55,20,45,80 -->
+
 
 look you [link text](http://dev.nodeca.com) see me
 
@@ -570,7 +563,9 @@ Jason Campbell <jasoncampbell@google.com> (http://twitter.com/jxson)
 
 
 <!-- word export demo-image.md-->
-# Images
+## Images
+
+<!-- ppt position 5,20,45,80 -->
 
 markdown
 
@@ -579,39 +574,23 @@ markdown
 
 This extension logo is  ![logo](./markdown2docx.png) .
 ```
-
+<!-- ppt position 55,20,45,80 -->
 result
-
-![logo](./markdown2docx.png)
-
-This extension logo is  ![logo](./markdown2docx.png) .
 
 NOTE: **markdown to docx**  supports only image files.
 
-NOTE: Inline images do not work well.
+<!-- ppt position 55,30,45,80 -->
+![logo](./markdown2docx.png)
+
 
 <!-- word export demo-math.md-->
-# Math
-
-markdown
-
-```
-This sentence uses dollar sign delimiters to show math inline: $\sqrt{3x-1}+(1+x)^2$  `$\sqrt{3x-1}+(1+x)^2$`
-
-$\sqrt{3x-1}+(1+x)^2$
-```
-
-result
-
-This sentence uses dollar sign delimiters to show math inline: $\sqrt{3x-1}+(1+x)^2$  `$\sqrt{3x-1}+(1+x)^2$`
-
-$\sqrt{3x-1}+(1+x)^2$
+## Math
 
 NOTE: math works so so.
 
 
 <!-- word export demo-admonition.md-->
-# Admonition
+## Admonition
 
 markdown
 

@@ -10,6 +10,15 @@ export const codeStatusBar = vscode.window.createStatusBarItem(
   100
 );
 
+/**
+ * get vscode current folder
+ * @returns 
+ */
+export function getWorkingDirectory(){
+  let wf = vscode.workspace.workspaceFolders?.[0];
+  return wf;
+}
+
 function createMessage(message: string | unknown, source: string) {
   if (message instanceof Error) {
     return source + " : " + message.message;
@@ -27,47 +36,40 @@ export function showMessage(
 ) {
   switch (msgType) {
     case MessageType.info:
-      showInfo(message, source, showNotification);
-      break;
     case MessageType.warn:
-      showWarn(message, source, showNotification);
-      break;
+    case MessageType.debug:
     case MessageType.err:
+      showMessageCore(msgType, message, source, showNotification);
+      break;
     default:
-      showError(message, source, showNotification);
+      showMessageCore(MessageType.err, message, source, showNotification);
   }
 }
 
-function showInfo(message: unknown, source: string, showNotification = false) {
-  const messageOut = `[Info   - ${new Date().toLocaleTimeString()}] ${createMessage(
+function showMessageCore(msgType: MessageType, message: unknown, source: string, showNotification = false) {
+  const messageOut = `[${msgType}   - ${new Date().toLocaleTimeString()}] ${createMessage(
     message,
     source
   )}`;
   outputTab.appendLine(messageOut.trim());
   if (showNotification) {
-    vscode.window.showInformationMessage(messageOut);
-  }
-}
-
-function showWarn(message: unknown, source: string, showNotification = true) {
-  const messageOut = `[Warn   - ${new Date().toLocaleTimeString()}] ${createMessage(
-    message,
-    source
-  )}`;
-  outputTab.appendLine(messageOut.trim());
-  if (showNotification) {
-    vscode.window.showWarningMessage(messageOut);
-  }
-}
-
-function showError(message: unknown, source: string, showNotification = true) {
-  const messageOut = `[Error  - ${new Date().toLocaleTimeString()}] ${createMessage(
-    message,
-    source
-  )}`;
-  outputTab.appendLine(messageOut.trim());
-  if (showNotification) {
-    vscode.window.showErrorMessage(messageOut);
+    switch (msgType) {
+      case MessageType.info:
+        vscode.window.showInformationMessage(messageOut);
+        break;
+      case MessageType.warn:
+        vscode.window.showWarningMessage(messageOut);
+        break;
+      case MessageType.debug:
+        //
+        break;
+      case MessageType.err:
+        vscode.window.showErrorMessage(messageOut);
+        break;
+      default:
+        vscode.window.showErrorMessage(messageOut);
+        break;
+    }
   }
 }
 

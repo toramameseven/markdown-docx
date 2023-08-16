@@ -1,11 +1,12 @@
-<!-- word export demo-table.md-->
-# Tables
-
-## normal table
+<!-- word export demo-table-columns.md-->
+<!-- word param docxTemplate _yyy.docx -->
+## table column width
 
 markdown
 
 ```
+<!-- word cols 2,1 -->
+<!-- word emptyMerge -->
 | data1-1 | data1-2                 |
 | ------- | ----------------------- |
 | data2-1 | data2-2                 |
@@ -15,6 +16,8 @@ markdown
 
 result
 
+<!-- word cols 2,1 -->
+<!-- word emptyMerge -->
 | data1-1 | data1-2                 |
 | ------- | ----------------------- |
 | data2-1 | data2-2                 |
