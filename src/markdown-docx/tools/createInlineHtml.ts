@@ -7,7 +7,7 @@ import { getFileContents, selectExistsPath } from "./tools-common";
 
 export async function createInlineHtml(htmlPath: string, htmlBody: string) {
   try {
-    const r = await inlineSource(htmlBody, {
+    const r:string = await inlineSource(htmlBody, {
       compress: false,
       attribute: false,
       rootpath: path.dirname(htmlPath),
@@ -20,7 +20,7 @@ export async function createInlineHtml(htmlPath: string, htmlBody: string) {
 
     let sampleHtml = getFileContents(htmlTemplatePath);
 
-    const outHtml = sampleHtml.replace("[[html main contents]]", r);
+    const outHtml = sampleHtml.replace("673ab4838a71448692a56d601b77c818", r);
 
     return outHtml;
   } catch (error) {

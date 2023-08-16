@@ -232,6 +232,8 @@ We thank for the wonderful npm packages.
 
 [Packages](usedModules.md)
 
+some feature are not active now.
+
 And we use some useful articles below. 
 * [markdown-to-txt](https://www.npmjs.com/package/markdown-to-txt) tells us how to use **Marked**.
 * [marked-extended-tables](https://github.com/calculuschild/marked-extended-tables) is for merged table.
