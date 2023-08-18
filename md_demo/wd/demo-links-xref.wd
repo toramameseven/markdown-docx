@@ -6,15 +6,10 @@ newLine	convertHeading End	tm
 text	markdown
 newLine	convertParagraph	tm
 code	## refs1
-newLine	convertCode	tm
 code	
-newLine	convertCode	tm
 code	## refs2 with space
-newLine	convertCode	tm
 code	
-newLine	convertCode	tm
 code	* look me [refs1](#refs1) send you
-newLine	convertCode	tm
 code	* look me [refs2 with space](#refs2-with-space) send you
 newLine	convertCode	tm
 text	result

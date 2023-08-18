@@ -5,17 +5,11 @@ newLine	convertHeading End	tm
 text	markdown
 newLine	convertParagraph	tm
 code	<!-- word cols 2,1 -->
-newLine	convertCode	tm
 code	<!-- word emptyMerge -->
-newLine	convertCode	tm
 code	| data1-1 | data1-2                 |
-newLine	convertCode	tm
 code	| ------- | ----------------------- |
-newLine	convertCode	tm
 code	| data2-1 | data2-2                 |
-newLine	convertCode	tm
 code	| data3-1 | data3-2                 |
-newLine	convertCode	tm
 code	| data4-1 | data4-2                 |
 newLine	convertCode	tm
 text	result

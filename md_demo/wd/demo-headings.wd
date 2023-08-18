@@ -4,25 +4,15 @@ newLine	convertHeading End	tm
 text	markdown
 newLine	convertParagraph	tm
 code	# Heading1
-newLine	convertCode	tm
 code	
-newLine	convertCode	tm
 code	## Heading2
-newLine	convertCode	tm
 code	
-newLine	convertCode	tm
 code	### Heading3
-newLine	convertCode	tm
 code	
-newLine	convertCode	tm
 code	#### Heading4
-newLine	convertCode	tm
 code	
-newLine	convertCode	tm
 code	##### Heading5
-newLine	convertCode	tm
 code	
-newLine	convertCode	tm
 code	###### Heading6
 newLine	convertCode	tm
 text	result

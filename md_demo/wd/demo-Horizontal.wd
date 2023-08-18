@@ -4,13 +4,9 @@ newLine	convertHeading End	tm
 text	markdown
 newLine	convertParagraph	tm
 code	___
-newLine	convertCode	tm
 code	
-newLine	convertCode	tm
 code	---
-newLine	convertCode	tm
 code	
-newLine	convertCode	tm
 code	***
 newLine	convertCode	tm
 text	result

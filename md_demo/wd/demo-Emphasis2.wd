@@ -4,15 +4,10 @@ newLine	convertHeading End	tm
 text	markdown
 newLine	convertParagraph	tm
 code	**This is bold text**
-newLine	convertCode	tm
 code	**This is bold text**
-newLine	convertCode	tm
 code	_This is italic text_
-newLine	convertCode	tm
 code	_This is italic text_
-newLine	convertCode	tm
 code	~~Strikethrough~~ 
-newLine	convertCode	tm
 code	2<sup>x</sup><sub>y</sub>
 newLine	convertCode	tm
 text	result

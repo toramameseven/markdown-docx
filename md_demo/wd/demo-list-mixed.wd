@@ -4,9 +4,7 @@ newLine	convertHeading End	tm
 text	markdown
 newLine	convertParagraph	tm
 code	1.  ordered1
-newLine	convertCode	tm
 code	    - unordered2
-newLine	convertCode	tm
 code	        1. ordered3
 newLine	convertCode	tm
 text	result

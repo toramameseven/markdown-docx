@@ -3,13 +3,14 @@ text	Code
 newLine	convertHeading End	tm
 text	markdown
 newLine	convertParagraph	tm
-code	Inline `code`
-code	tttttt
-code	gttttttt
-code	
-code	ttttttttt
+code	if (isEnable){
+code	    let a = 1;
+code	}
 newLine	convertCode	tm
 text	result
 newLine	convertParagraph	tm
-text	Inline <codespan>code</codespan>
-newLine	convertParagraph	tm
+code	if (isEnable){
+code	    let a = 1;
+code	}
+code	
+newLine	convertCode	tm

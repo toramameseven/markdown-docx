@@ -503,10 +503,12 @@ async function resolveWordDownCommandEx(line: string, slide: PptSheet) {
         text: words[1],
         options: {
           fontFace: "Arial",
-          //color: pptx.SchemeColor.accent5,
+        //color: pptx.SchemeColor.accent5,
           highlight: "FFFF00",
           ...pptStyle.body,
           ...pptStyle.code,
+          fill:{ color:'0088CC' },
+          breakLine:true
         },
       });
       break;
@@ -537,7 +539,7 @@ async function resolveWordDownCommandEx(line: string, slide: PptSheet) {
         });
       }
       break;
-    case wdCommand.image:
+case wdCommand.image:
       break;
     case wdCommand.hr:
       if (!isNewSlideAtSection) {

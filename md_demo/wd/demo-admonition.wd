@@ -5,9 +5,7 @@ newLine	convertHeading End	tm
 text	markdown
 newLine	convertParagraph	tm
 code	NOTE: admonition note.
-newLine	convertCode	tm
 code	
-newLine	convertCode	tm
 code	WARNING: admonition warning.
 newLine	convertCode	tm
 text	result

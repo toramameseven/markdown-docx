@@ -523,8 +523,8 @@ function convertCode(params: DocxParam, isCommandEnd?: boolean) {
       const codeParam = i.split(_sp);
       const r = [wdCommand.code, codeParam[1]].join(_sp);
       outputWd(r);
-      addNewLine("convertCode");
     });
+    addNewLine("convertCode");
     return;
   }
   pushBlockInfo(new Base(wd0Command.code));

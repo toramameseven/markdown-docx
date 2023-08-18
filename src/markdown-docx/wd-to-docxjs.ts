@@ -48,13 +48,13 @@ const _sp = "\t";
 
 const DocStyle = {
   "1": "1",
-  hh0:"hh0",
-  hh1:"hh1",
-  hh2:"hh2",
-  hh3:"hh3",
-  hh4:"hh4",
-  hh5:"hh5",
-  hh6:"hh6",
+  hh0: "hh0",
+  hh1: "hh1",
+  hh2: "hh2",
+  hh3: "hh3",
+  hh4: "hh4",
+  hh5: "hh5",
+  hh6: "hh6",
   Body: "body",
   Body1: "body1",
   nList1: "nList1",
@@ -254,17 +254,22 @@ class DocParagraph {
     nodeType: WdCommand = wdCommand.non,
     indent: number = 0,
     docStyle: DocStyle = DocStyle.Body,
-    childe: ParagraphChild = new TextRun("")
+    child?: ParagraphChild
   ) {
     this.nodeType = nodeType;
     this.isFlush = false;
     this.indent = indent;
-    this.children = [childe];
+    if (child) {
+      this.children = [child];
+    }
     this.docStyle = docStyle;
     this.isImage = false;
   }
 
-  createDocxParagraph(): Paragraph | Table {
+  createDocxParagraph(): Paragraph | Table | undefined {
+    if (this.children.length === 0) {
+      return undefined;
+    }
     let pStyle = this.isImage ? "picture1" : this.docStyle;
 
     if (pStyle === "body") {
@@ -339,8 +344,8 @@ export async function wdToDocxJs(
   };
 
   // patch parameter
-  
-  const patchInfo:{ [v: string]: PatchInfo } = {};
+
+  const patchInfo: { [v: string]: PatchInfo } = {};
   for (let i = 0; i < lines.length; i++) {
     const wdCommandList = lines[i].split(_sp);
 
@@ -389,7 +394,9 @@ export async function wdToDocxJs(
     // when paragraph end, flush paragraph
     if (currentParagraph.isFlush) {
       const p = currentParagraph.createDocxParagraph();
-      patches.push(p);
+      if (p) {
+        patches.push(p);
+      }
       // reset paragraph. but keep the indent.
       currentParagraph = new DocParagraph(
         wdCommand.text,
@@ -527,13 +534,14 @@ async function resolveWDCommandEx(
       return current;
       break;
     case wdCommand.code:
-      child = new TextRun(words[1]);
-      current = new DocParagraph(
-        nodeType,
-        currentParagraph.indent,
-        "code",
-        child
-      );
+      current = currentParagraph;
+      if (current.docStyle === DocStyle.code) {
+        child = new TextRun({ text: words[1], break: 1 });
+      } else {
+        child = new TextRun({ text: words[1] });
+      }
+      current.addChild(child);
+      current.docStyle = "code";
       return current;
       break;
     case wdCommand.link:
@@ -591,11 +599,8 @@ async function resolveWDCommandEx(
       break;
     case wdCommand.newLine:
       if (words[1] === "convertHeading End") {
-        if (currentParagraph.docStyle === 'hh0'){
-          current = new DocParagraph(
-            wdCommand.text,
-            0
-          );
+        if (currentParagraph.docStyle === "hh0") {
+          current = new DocParagraph(wdCommand.text, 0);
           return current;
         }
         child = new Bookmark({

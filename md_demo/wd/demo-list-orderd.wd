@@ -4,25 +4,15 @@ newLine	convertHeading End	tm
 text	markdown
 newLine	convertParagraph	tm
 code	1. Lorem ipsum dolor sit amet
-newLine	convertCode	tm
 code	2. Consectetur adipiscing elit
-newLine	convertCode	tm
 code	3. Integer molestie lorem at massa
-newLine	convertCode	tm
 code	
-newLine	convertCode	tm
 code	4. You can use sequential numbers...
-newLine	convertCode	tm
 code	5. ...or keep all the numbers as `1.`
-newLine	convertCode	tm
 code	
-newLine	convertCode	tm
 code	NOTE: **markdown to docx** does not support numbering with offset:
-newLine	convertCode	tm
 code	
-newLine	convertCode	tm
 code	57. foo
-newLine	convertCode	tm
 code	1. bar
 newLine	convertCode	tm
 text	result

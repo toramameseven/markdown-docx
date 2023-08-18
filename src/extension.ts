@@ -22,6 +22,8 @@ import { textileToHtml } from "./markdown-docx/tools/toolsTextile";
 
 export let isDebug = false;
 
+export const isEnableExperimentalFeature: boolean = true;
+
 // for cancel spawn
 let ac = new AbortController();
 
@@ -125,9 +127,11 @@ export function activate(context: vscode.ExtensionContext) {
       ac.abort();
     })
   );
-  
+
   // this feature is only experiment!!
-  // enableExperimentFeature();
+  if (isEnableExperimentalFeature) {
+    enableExperimentFeature();
+  }
 
   vscodeCommon.showMessage(
     MessageType.info,
@@ -162,7 +166,7 @@ function exportEdFromMarkdown(uriFile: vscode.Uri) {
     ac,
     message: vscodeCommon.showMessage,
   });
-  
+
   if (thisOption.isShowOutputTab) {
     vscodeCommon.outputTab.show();
   }
@@ -294,14 +298,12 @@ async function exportDocxFromExplorer(uriFile: vscode.Uri) {
 async function exportDocxFromExplorerCore(uriFile: vscode.Uri) {
   const filePath = uriFile.fsPath;
 
-
-
   resetAbortController();
   const thisOption = createDocxOptionExtension({
     ac,
     message: vscodeCommon.showMessage,
   });
-  
+
   if (thisOption.isShowOutputTab) {
     vscodeCommon.outputTab.show();
   }
@@ -403,7 +405,6 @@ async function exportDocxFromEditorCore(
   // eslint-disable-next-line no-unused-vars
   edit: any
 ) {
-
   resetAbortController();
   const thisOption = createDocxOptionExtension({
     ac,

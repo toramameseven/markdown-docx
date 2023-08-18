@@ -4,21 +4,13 @@ newLine	convertHeading End	tm
 text	markdown
 newLine	convertParagraph	tm
 code	<!-- word emptyMerge -->
-newLine	convertCode	tm
 code	
-newLine	convertCode	tm
 code	cell(4,2) is not merged. (comment cell)
-newLine	convertCode	tm
 code	
-newLine	convertCode	tm
 code	| data1-1 | data1-2                 |
-newLine	convertCode	tm
 code	| ------- | ----------------------- |
-newLine	convertCode	tm
 code	| data2-1 | data2-2                 |
-newLine	convertCode	tm
 code	|         | data3-2                 |
-newLine	convertCode	tm
 code	| data4-1 | <!-- not merged -->     |
 newLine	convertCode	tm
 text	result
@@ -58,13 +50,9 @@ newLine	convertHeading End	tm
 text	markdown
 newLine	convertParagraph	tm
 code	| data1-1 | data1-2                   |
-newLine	convertCode	tm
 code	| ------- | --------------------  --- |
-newLine	convertCode	tm
 code	| data2-1 | _This is italic text_     |
-newLine	convertCode	tm
 code	|         | 2<sup>x</sup><sub>y</sub> |
-newLine	convertCode	tm
 code	| data4-1 | **This is bold text**     |
 newLine	convertCode	tm
 text	result

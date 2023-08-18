@@ -4,17 +4,11 @@ newLine	convertHeading End	tm
 text	markdown
 newLine	convertParagraph	tm
 code	next line is `<br>`
-newLine	convertCode	tm
 code	
-newLine	convertCode	tm
 code	test<BR>
-newLine	convertCode	tm
 code	
-newLine	convertCode	tm
 code	<BR>
-newLine	convertCode	tm
 code	
-newLine	convertCode	tm
 code	upper line is `<br>`
 newLine	convertCode	tm
 text	result

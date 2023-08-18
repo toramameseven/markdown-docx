@@ -4,9 +4,7 @@ newLine	convertHeading End	tm
 text	markdown
 newLine	convertParagraph	tm
 code	![logo](./markdown2docx.png)
-newLine	convertCode	tm
 code	
-newLine	convertCode	tm
 code	This extension logo is  ![logo](./markdown2docx.png) .
 newLine	convertCode	tm
 text	result

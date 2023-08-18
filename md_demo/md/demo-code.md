@@ -5,6 +5,10 @@ markdown
 
 ```
 Inline `code`
+tttttt
+gttttttt
+
+ttttttttt
 ```
 result
 

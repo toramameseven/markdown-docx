@@ -2,17 +2,11 @@ section	2	normal-link
 text	normal link
 newLine	convertHeading End	tm
 code	look you [link text](http://dev.nodeca.com) see me
-newLine	convertCode	tm
 code	
-newLine	convertCode	tm
 code	Jason Campbell <jasoncampbell\@google.com> (http://twitter.com/jxson)
-newLine	convertCode	tm
 code	
-newLine	convertCode	tm
 code	* [link with title](http://nodeca.github.io/pica/demo/ "title text!")
-newLine	convertCode	tm
 code	
-newLine	convertCode	tm
 code	* Autoconverted link https://github.com/nodeca/pica (enable linkify to see)
 newLine	convertCode	tm
 text	look you 

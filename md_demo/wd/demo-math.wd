@@ -4,9 +4,7 @@ newLine	convertHeading End	tm
 text	markdown
 newLine	convertParagraph	tm
 code	This sentence uses dollar sign delimiters to show math inline: $\sqrt{3x-1}+(1+x)^2$  `$\sqrt{3x-1}+(1+x)^2$`
-newLine	convertCode	tm
 code	
-newLine	convertCode	tm
 code	$\sqrt{3x-1}+(1+x)^2$
 newLine	convertCode	tm
 text	result
