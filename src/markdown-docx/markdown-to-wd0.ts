@@ -334,7 +334,9 @@ function splitBlockContents(blockContents: string) {
 }
 
 // a code block needs empty lines
-function splitCodeBlockContents(blockContents: string) {
+function splitCodeBlockContents(
+  blockContents: string
+) {
   const lines = blockContents.split(_newline).map((s) => {
     //if (s.match(/\t|^\/.*/)) {
     if (s.match(/\t/)) {
@@ -342,11 +344,21 @@ function splitCodeBlockContents(blockContents: string) {
       return _newline + s + _newline;
     } else {
       // only text
-      return `\n${wd0Command.text}\t${wd0Command.text}\t` + s + _newline;
+      return `\n${wd0Command.text}\t${wd0Command.text}\t${s}${_newline}`;
     }
   });
   return lines;
 }
+
+const blockCodeParagraph =
+  (blokType: string) => (content: string, language: string | undefined) => {
+    const lines = splitCodeBlockContents(content);
+    const params = {
+      language: language ?? "",
+      body: lines.join(_newline),
+    };
+    return createBlockCommand(blokType, params);
+  };
 
 const blockParagraph =
   (blokType: string, isNeedEmptyLine = false) =>
@@ -537,7 +549,7 @@ const docxRenderer: Marked.Renderer = {
   listitem: blockListItem,
 
   // ``` or tab
-  code: blockParagraph(markedCommand.code, true),
+  code: blockCodeParagraph(markedCommand.code),
 
   // >
   blockquote: block(markedCommand.blockquote),

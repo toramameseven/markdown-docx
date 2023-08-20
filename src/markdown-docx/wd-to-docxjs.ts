@@ -42,7 +42,10 @@ import {
 } from "docx";
 import { svg2imagePng } from "./tools/svg-png-image";
 import { WdCommand, wdCommand } from "./wd0-to-wd";
+import mermaid from "mermaid";
+import { initialize } from "svg2png-wasm";
 // import { OoxParameters } from "./markdown-to-wd0";
+//import mermaid from "mermaid";
 
 const _sp = "\t";
 
@@ -146,7 +149,7 @@ class TableJs {
           );
         } else {
           this.cells[this.row][this.column].push(
-            new Paragraph({ children: resolveEmphasis(words[2]) })
+            new Paragraph({ children: await resolveEmphasis(words[2]) })
           );
           return;
         }
@@ -246,6 +249,7 @@ class DocParagraph {
   isFlush: boolean;
   indent: number;
   children: ParagraphChild[] = [];
+  childrenRaw: string[] = [];
   docStyle: DocStyle;
   isImage: boolean;
   refId: string = "";
@@ -280,7 +284,28 @@ class DocParagraph {
       children: this.children,
       style: pStyle,
     });
+
+    this.initialize();
     return docxR;
+  }
+
+  createRawString(): string {
+    if (this.childrenRaw.length === 0) {
+      return "";
+    }
+
+    const r = this.childrenRaw.join("\n");
+    this.initialize();
+    return r;
+  }
+
+  initialize() {
+    (this.nodeType = wdCommand.text), (this.isFlush = false);
+    this.children = [];
+    this.childrenRaw = [];
+    this.docStyle = DocStyle.Body;
+    this.isImage = false;
+    this.refId = "";
   }
 
   addIndent() {
@@ -300,7 +325,7 @@ class DocParagraph {
   addChild(s: string | ParagraphChild, isImage = false) {
     const ss = typeof s === "string" ? new TextRun(s) : s;
     this.isImage = false;
-    if (isImage && this.children.length === 1) {
+    if (isImage && this.children.length === 0) {
       this.isImage = true;
     }
     this.children.push(ss);
@@ -397,11 +422,6 @@ export async function wdToDocxJs(
       if (p) {
         patches.push(p);
       }
-      // reset paragraph. but keep the indent.
-      currentParagraph = new DocParagraph(
-        wdCommand.text,
-        currentParagraph.indent
-      );
     }
   } // end for
 
@@ -540,6 +560,7 @@ async function resolveWDCommandEx(
       } else {
         child = new TextRun({ text: words[1] });
       }
+      current.childrenRaw.push(words[1]);
       current.addChild(child);
       current.docStyle = "code";
       return current;
@@ -568,6 +589,7 @@ async function resolveWDCommandEx(
       return currentParagraph;
       break;
     case "text":
+      // admonition
       const admonition = words[1].match(/^(note|warning)(:\s)(.*)/i);
 
       let s = words[1];
@@ -577,13 +599,14 @@ async function resolveWDCommandEx(
         currentParagraph.nodeType = admonitionType as WdCommand;
         currentParagraph.docStyle = resolveAdmonition(admonitionType);
       }
-
-      const mathBlock = s.match(/^\$(.*)\$$/);
+      
+      // math $~~~~~$
+      const mathBlock = s.match(/^\$(.+)\$$/);
       if (mathBlock?.length && option?.mathExtension) {
         const child = await createMathImage(mathBlock[1]);
         currentParagraph.addChild(child, true);
       } else {
-        const stack = resolveEmphasis(s);
+        const stack = await resolveEmphasis(s);
         stack.forEach((x) => currentParagraph.addChild(x));
       }
 
@@ -615,6 +638,30 @@ async function resolveWDCommandEx(
         );
         current.isFlush = true;
         return current;
+      }
+      if (words[1] === "convertCode") {
+        if (words[2] === "mermaid") {
+          // do render mermaid
+
+          const mermaid = require("mermaid");
+
+          const diagramCode = `
+          graph LR
+              A-->B
+              B-->C
+              C-->D
+              D-->A
+          `;
+          const { svg } = await mermaid.render("diagramId", diagramCode);
+          console.log(svg);
+        }
+        if (words[2] === "math") {
+          const child = await createMathImage(
+            currentParagraph.createRawString()
+          );
+          currentParagraph.addChild(child, true);
+          return currentParagraph;
+        }
       }
       if (!["convertTitle", "convertSubTitle"].includes(words[1])) {
         // output paragraph
@@ -775,8 +822,9 @@ export async function createDocxPatch(
   fs.writeFileSync(docxOutPath, patchDoc);
 }
 
-function resolveEmphasis(source: string) {
-  let rg = /<(|\/)sub>|<(|\/)sup>|<(|\/)codespan>|<(|\/)i>|<(|\/)b>|<(|\/)~~>/g;
+async function resolveEmphasis(source: string) {
+  let rg =
+    /<(|\/)sub>|<(|\/)sup>|<(|\/)codespan>|<(|\/)i>|<(|\/)b>|<(|\/)~~>|\$/g;
 
   let indexBefore = 0;
   const stack = [];
@@ -789,24 +837,61 @@ function resolveEmphasis(source: string) {
     style: "",
   };
   let result: any;
+  let insideMath: boolean = false;
+  let mathString: string = "";
+  showMessageThis?.(
+    MessageType.debug,
+    `source: ${source}`,
+    "resolveEmphasis",
+    false
+  );
   while ((result = rg.exec(source)) !== null) {
     // text
     let text = source.substring(indexBefore, result.index);
     if (text) {
-      stack.push(new TextRun({ text, ...textProp }));
+      showMessageThis?.(
+        MessageType.debug,
+        `text: ${text}`,
+        "resolveEmphasis",
+        false
+      );
+
+      if (insideMath) {
+        mathString = text;
+      } else {
+        stack.push(new TextRun({ text, ...textProp }));
+      }
     }
     // tag
     text = source.substring(result.index + 1, rg.lastIndex - 1);
+    showMessageThis?.(
+      MessageType.debug,
+      `tag : ${text}`,
+      "resolveEmphasis",
+      false
+    );
     const tag = text.replace("/", "");
     const isOn = text === tag;
 
     if (tag === "codespan") {
+      flushMathStringAsNormalString();
       if (isOn) {
         textProp["style"] = "codespan";
       } else {
         textProp["style"] = "";
       }
+    } else if (tag === "$") {
+      if (!insideMath) {
+        insideMath = true;
+      } else if (textProp.style !== "codespan" &&  mathString) {
+        stack.push(await createMathImage(mathString));
+        mathString = "";
+        insideMath = false;
+      } else {
+        flushMathStringAsNormalString(tag);
+      }
     } else {
+      flushMathStringAsNormalString();
       textProp = { ...textProp, [resolveEmphasisTag(tag)]: isOn };
     }
     indexBefore = rg.lastIndex;
@@ -815,10 +900,17 @@ function resolveEmphasis(source: string) {
   // text
   let text = source.substring(indexBefore);
   if (text) {
+    showMessageThis?.(
+      MessageType.debug,
+      `text: ${text}`,
+      "resolveEmphasis",
+      false
+    );
     stack.push(new TextRun({ text, ...textProp }));
   }
   return stack;
 
+  /// inner function
   function resolveEmphasisTag(tag: string) {
     if (tag === "b") {
       return "bold";
@@ -836,5 +928,13 @@ function resolveEmphasis(source: string) {
       return "strike";
     }
     return "";
+  }
+
+  function flushMathStringAsNormalString(endDollar: string = "") {
+    if (mathString) {
+      stack.push(new TextRun({ text: "$" + mathString + endDollar, ...textProp }));
+    }
+    mathString = "";
+    insideMath = false;
   }
 }

@@ -45,8 +45,8 @@ suite("Extension Test Suite", () => {
 
     // expect
     const expect = `
-toc	1	table of content	tm
-newLine	convertToc	tm`;
+toc\t1\ttable of content\ttm
+newLine\tconvertToc\t\ttm`;
 
     // assert
     assert.strictEqual(await mdToWd(removeTopN(markdown)), removeTopN(expect));
@@ -64,7 +64,7 @@ newLine	convertToc	tm`;
     const expect = `
 section\t1\theading1
 text\theading1
-newLine\tconvertHeading End\ttm`;
+newLine\tconvertHeading End\t\ttm`;
 
     // assert
     assert.strictEqual(await mdToWd(removeTopN(markdown)), removeTopN(expect));
@@ -82,7 +82,7 @@ newLine\tconvertHeading End\ttm`;
     const expect = `
 section\t6\theading6
 text\theading6
-newLine\tconvertHeading End\ttm`;
+newLine\tconvertHeading End\t\ttm`;
 
     // assert
     assert.strictEqual(await mdToWd(removeTopN(markdown)), removeTopN(expect));
@@ -100,9 +100,9 @@ ___
 
     // expect
     const expect = `
-hr	
-hr	
-hr	`;
+hr\t
+hr\t
+hr\t`;
 
     // assert
     assert.strictEqual(await mdToWd(removeTopN(markdown)), removeTopN(expect));
@@ -118,10 +118,10 @@ upper line is \`<br>\``;
 
     // expect
     const expect = `
-text	next line is <codespan><br></codespan>
-newLine	wd0NewLine	tm
-text	upper line is <codespan><br></codespan>
-newLine	convertParagraph	tm`;
+text\tnext line is <codespan><br></codespan>
+newLine\twd0NewLine\t\ttm
+text\tupper line is <codespan><br></codespan>
+newLine\tconvertParagraph\t\ttm`;
 
     // assert
     assert.strictEqual(await mdToWd(removeTopN(markdown)), removeTopN(expect));
@@ -135,7 +135,7 @@ newLine	convertParagraph	tm`;
 
     // expect
     const expect = `
-newPage				tm`;
+newPage\t\t\t\ttm`;
 
     // assert
     assert.strictEqual(await mdToWd(removeTopN(markdown)), removeTopN(expect));
@@ -150,7 +150,7 @@ anonymous@com.com`;
     // expect
     const expect = `
 text\tanonymous@com.com
-newLine\tconvertParagraph\ttm`;
+newLine\tconvertParagraph\t\ttm`;
 
     // assert
     assert.strictEqual(await mdToWd(removeTopN(markdown)), removeTopN(expect));
@@ -174,18 +174,18 @@ _This is italic text_
 
     // expect
     const expect = `
-text	<b>This is bold text</b>
-newLine	convertParagraph	tm
-text	<b>This is bold text</b>
-newLine	convertParagraph	tm
-text	<i>This is italic text</i>
-newLine	convertParagraph	tm
-text	<i>This is italic text</i>
-newLine	convertParagraph	tm
-text	<~~>Strikethrough</~~>
-newLine	convertParagraph	tm
-text	2<sup>x</sup><sub>y</sub>
-newLine	convertParagraph	tm`;
+text\t<b>This is bold text</b>
+newLine\tconvertParagraph\t\ttm
+text\t<b>This is bold text</b>
+newLine\tconvertParagraph\t\ttm
+text\t<i>This is italic text</i>
+newLine\tconvertParagraph\t\ttm
+text\t<i>This is italic text</i>
+newLine\tconvertParagraph\t\ttm
+text\t<~~>Strikethrough</~~>
+newLine\tconvertParagraph\t\ttm
+text\t2<sup>x</sup><sub>y</sub>
+newLine\tconvertParagraph\t\ttm`;
     // assert
     assert.strictEqual(await mdToWd(removeTopN(markdown)), removeTopN(expect));
   });

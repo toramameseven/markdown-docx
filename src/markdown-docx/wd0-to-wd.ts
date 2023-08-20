@@ -45,6 +45,7 @@ interface BaseBlock {
 class Base implements BaseBlock {
   blockType: Wd0Command;
   blockList: string[] = [];
+  codeLanguage: string = "";
   constructor(blockType: Wd0Command) {
     this.blockType = blockType;
   }
@@ -369,8 +370,8 @@ function getBlockInfoTypeLast() {
 
 //   convert functions
 
-function addNewLine(info: string) {
-  const r = [wdCommand.newLine, info, "tm"].join(_sp);
+function addNewLine(info: string, subInfo: string = "") {
+  const r = [wdCommand.newLine, info, subInfo, "tm"].join(_sp);
   outputWd(r);
 }
 
@@ -524,10 +525,14 @@ function convertCode(params: DocxParam, isCommandEnd?: boolean) {
       const r = [wdCommand.code, codeParam[1]].join(_sp);
       outputWd(r);
     });
-    addNewLine("convertCode");
+    addNewLine("convertCode", (code as Base).codeLanguage);
     return;
   }
-  pushBlockInfo(new Base(wd0Command.code));
+
+  const blockInfo = new Base(wd0Command.code);
+  blockInfo.codeLanguage = params.language;
+  pushBlockInfo(blockInfo);
+
 }
 
 function convertHr(params: DocxParam, isCommandEnd?: boolean) {
@@ -665,6 +670,7 @@ function outputWd(wdText: string) {
     blockInfos.slice(-1)[0].blockList.push(wdText);
     return;
   }
+  
   // do not duplicate new lines.
   if (wdText.split(_sp)[0] === wdCommand.newLine) {
     if (
