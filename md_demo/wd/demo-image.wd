@@ -1,21 +1,21 @@
 section	1	images
 text	Images
-newLine	convertHeading End	tm
+newLine	convertHeading End		tm
 text	markdown
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm
 code	![logo](./markdown2docx.png)
 code	
 code	This extension logo is  ![logo](./markdown2docx.png) .
-newLine	convertCode	tm
+newLine	convertCode		tm
 text	result
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm
 image	./markdown2docx.png	logo		tm
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm
 text	This extension logo is  
 image	./markdown2docx.png	logo		tm
 text	 .
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm
 text	NOTE: <b>markdown to docx</b>  supports only image files.
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm
 text	NOTE: Inline images do not work well.
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm

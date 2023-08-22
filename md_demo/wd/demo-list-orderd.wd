@@ -1,8 +1,8 @@
 section	1	lists-ordered
 text	Lists ordered
-newLine	convertHeading End	tm
+newLine	convertHeading End		tm
 text	markdown
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm
 code	1. Lorem ipsum dolor sit amet
 code	2. Consectetur adipiscing elit
 code	3. Integer molestie lorem at massa
@@ -14,35 +14,35 @@ code	NOTE: **markdown to docx** does not support numbering with offset:
 code	
 code	57. foo
 code	1. bar
-newLine	convertCode	tm
+newLine	convertCode		tm
 text	result
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm
 indentPlus
 OderList	1	
 text	Lorem ipsum dolor sit amet
 text	 				tm
 text	fffffa2<sup>x</sup><sub>y</sub>affff
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm
 OderList	1	
 text	Consectetur adipiscing elit
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm
 OderList	1	
 text	Integer molestie lorem at massa
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm
 OderList	1	
 text	You can use sequential numbers...
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm
 OderList	1	
 text	...or keep all the numbers as <codespan>1.</codespan>
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm
 indentMinus
 text	NOTE: <b>markdown to docx</b> does not support numbering with offset:
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm
 indentPlus
 OderList	1	
 text	foo
-newLine	convertListItem End	tm
+newLine	convertListItem End		tm
 OderList	1	
 text	bar
-newLine	convertListItem End	tm
+newLine	convertListItem End		tm
 indentMinus

@@ -3,7 +3,7 @@
 
 markdown
 
-```
+```md
 Inline `code`
 tttttt
 gttttttt

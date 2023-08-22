@@ -1,20 +1,20 @@
 param	tableWidth	50			tm
 section	1	tables
 text	Tables
-newLine	convertHeading End	tm
+newLine	convertHeading End		tm
 section	2	normal-table
 text	normal table
-newLine	convertHeading End	tm
+newLine	convertHeading End		tm
 text	markdown
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm
 code	| data1-1 | data1-2                 |
 code	| ------- | ----------------------- |
 code	| data2-1 | data2-2                 |
 code	| data3-1 | data3-2                 |
 code	| data4-1 | data4-2                 |
-newLine	convertCode	tm
+newLine	convertCode		tm
 text	result
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm
 tableCreate	4	2
 tableWidthInfo	6.5,6.5
 tablecontents	0	0	next	left

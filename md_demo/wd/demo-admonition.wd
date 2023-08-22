@@ -1,16 +1,16 @@
 param	docxTemplate	_xxx.docx			tm
 section	1	admonition
 text	Admonition
-newLine	convertHeading End	tm
+newLine	convertHeading End		tm
 text	markdown
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm
 code	NOTE: admonition note.
 code	
 code	WARNING: admonition warning.
-newLine	convertCode	tm
+newLine	convertCode		tm
 text	result
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm
 text	NOTE: admonition note.
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm
 text	WARNING: admonition warning.
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm

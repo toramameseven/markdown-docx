@@ -42,8 +42,6 @@ import {
 } from "docx";
 import { svg2imagePng } from "./tools/svg-png-image";
 import { WdCommand, wdCommand } from "./wd0-to-wd";
-import mermaid from "mermaid";
-import { initialize } from "svg2png-wasm";
 // import { OoxParameters } from "./markdown-to-wd0";
 //import mermaid from "mermaid";
 
@@ -640,21 +638,6 @@ async function resolveWDCommandEx(
         return current;
       }
       if (words[1] === "convertCode") {
-        if (words[2] === "mermaid") {
-          // do render mermaid
-
-          const mermaid = require("mermaid");
-
-          const diagramCode = `
-          graph LR
-              A-->B
-              B-->C
-              C-->D
-              D-->A
-          `;
-          const { svg } = await mermaid.render("diagramId", diagramCode);
-          console.log(svg);
-        }
         if (words[2] === "math") {
           const child = await createMathImage(
             currentParagraph.createRawString()
