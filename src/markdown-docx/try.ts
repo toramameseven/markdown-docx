@@ -1,16 +1,26 @@
-const isNumber = (value: unknown): value is number => {
-  return typeof value === "number";
-};
-
-function numberToStirng(value: unknown) {
-  if (isNumber(value)) {
-    console.log("number");
-    return value.toString();
-  }
-  console.log("not number");
-  return value;
-}
 
 
-console.log(numberToStirng(1));
-console.log(numberToStirng("s"));
+
+let ss = `[{
+  "shape": "pptx.shapes.RECTANGLE",
+  "x":0.5,
+  "y":0.8,
+  "w":1.5,
+  "h":3.0,
+  "fill":{ "color": "pptx.colors.ACCENT1" },
+  "align":"center",
+  "fontSize":14
+},
+{
+  "shape": "pptx.shapes.RECTANGLE",
+  "x":0.5,
+  "y":0.8,
+  "w":1.5,
+  "h":3.0,
+  "fill":{ "color": "pptx.colors.ACCENT1" },
+  "align":"center",
+  "fontSize":14
+}]`;
+
+
+console.log(JSON.parse(ss));

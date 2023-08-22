@@ -43,11 +43,11 @@ let pptStyle: PptStyle = {
   code: {},
   codeSpan: {},
   tableProps: {},
-  layout:"",
+  layout: "",
   headFontFace: {},
   bodyFontFace: {},
   tableHeaderColor: "000000",
-  tableHeaderFillColor: "FFFFFF"
+  tableHeaderFillColor: "FFFFFF",
 };
 
 // for delete the require cache.
@@ -135,7 +135,7 @@ export async function wdToPptxJs(
     return;
   }
 
-  // get pptStyle 
+  // get pptStyle
   try {
     if (pptxSettingsFilePath === settingPath) {
       delete require.cache[pptxSettingsFilePath];
@@ -161,8 +161,11 @@ export async function wdToPptxJs(
   // initialize pptx
   let pptx: PptxGenJS = new pptxGen();
 
-  pptx.theme = {...pptx.theme, ...pptStyle.headFontFace, ...pptStyle.bodyFontFace}; // { headFontFace: "Arial Light" };
-
+  pptx.theme = {
+    ...pptx.theme,
+    ...pptStyle.headFontFace,
+    ...pptStyle.bodyFontFace,
+  }; // { headFontFace: "Arial Light" };
 
   // FYI: use `headFontFace` and/or `bodyFontFace` to set the default font for the entire presentation (including slide Masters)
   // pptx.theme = { bodyFontFace: "Arial" };
@@ -244,6 +247,22 @@ export async function wdToPptxJs(
         parseInt(documentInfo.param.dpi ?? "96")
       );
       currentSheet.addImage(image);
+      continue;
+    }
+
+    // shape command
+    if (wdCommandList[0].split("/")[0] === "code" && wdCommandList[0].split("/")[1] === "ppt") {
+      //create text frame
+      currentSheet.addTextPropsArray();
+      currentSheet.addTextFrame();
+
+      currentSheet.pptxParagraph.addChildRaw(wdCommandList[1]);
+      // initialize image
+      continue;
+    }
+
+    if (wdCommandList[0] === "newLine" && wdCommandList[2] === "ppt") {
+      currentSheet.flushShapes();
       continue;
     }
 
@@ -418,7 +437,7 @@ function getHeaderStyle(header: string) {
  */
 async function resolveWordDownCommandEx(line: string, slide: PptSheet) {
   const words = line.split(_sp);
-  const nodeType = words[0] as WdCommand;
+  const nodeType = words[0].split("/")[0] as WdCommand;
   let fontSize: number | undefined;
 
   thisMessage?.(
@@ -503,14 +522,15 @@ async function resolveWordDownCommandEx(line: string, slide: PptSheet) {
         text: words[1],
         options: {
           fontFace: "Arial",
-        //color: pptx.SchemeColor.accent5,
+          //color: pptx.SchemeColor.accent5,
           highlight: "FFFF00",
           ...pptStyle.body,
           ...pptStyle.code,
-          fill:{ color:'0088CC' },
-          breakLine:true
+          fill: { color: "0088CC" },
+          breakLine: true,
         },
       });
+      slide.pptxParagraph.addChildRaw(words[1]);
       break;
     case wdCommand.link:
       // link ref|bookmark hover text
@@ -539,7 +559,7 @@ async function resolveWordDownCommandEx(line: string, slide: PptSheet) {
         });
       }
       break;
-case wdCommand.image:
+    case wdCommand.image:
       break;
     case wdCommand.hr:
       if (!isNewSlideAtSection) {
@@ -597,6 +617,10 @@ case wdCommand.image:
         slide.pptxParagraph.insideDocumentTitle = false;
         slide.pptxParagraph.clear();
         return;
+      }
+
+      if("convertCode" === words[1]){
+        slide.pptxParagraph.codeLang = words[2];
       }
 
       if (!["convertTitle", "convertSubTitle"].includes(words[1])) {

@@ -42,6 +42,7 @@ import {
 } from "docx";
 import { svg2imagePng } from "./tools/svg-png-image";
 import { WdCommand, wdCommand } from "./wd0-to-wd";
+import { initialize } from "svg2png-wasm";
 // import { OoxParameters } from "./markdown-to-wd0";
 //import mermaid from "mermaid";
 
@@ -511,7 +512,7 @@ async function resolveWDCommandEx(
 ) {
   const words = line.split(_sp);
   let current: DocParagraph;
-  const nodeType = words[0] as WdCommand;
+  const nodeType = words[0].split("/")[0] as WdCommand;
   let style: DocStyle;
   let child: ParagraphChild;
 
@@ -597,7 +598,7 @@ async function resolveWDCommandEx(
         currentParagraph.nodeType = admonitionType as WdCommand;
         currentParagraph.docStyle = resolveAdmonition(admonitionType);
       }
-      
+
       // math $~~~~~$
       const mathBlock = s.match(/^\$(.+)\$$/);
       if (mathBlock?.length && option?.mathExtension) {
@@ -637,14 +638,33 @@ async function resolveWDCommandEx(
         current.isFlush = true;
         return current;
       }
+
       if (words[1] === "convertCode") {
+        // if (words[2] === "mermaid") {
+        //   // do render mermaid
+
+        //   const mermaid = require("mermaid");
+
+        //   const diagramCode = `
+        //   graph LR
+        //       A-->B
+        //       B-->C
+        //       C-->D
+        //       D-->A
+        //   `;
+        //   const { svg } = await mermaid.render("diagramId", diagramCode);
+        //   console.log(svg);
+        // }
         if (words[2] === "math") {
           const child = await createMathImage(
             currentParagraph.createRawString()
           );
           currentParagraph.addChild(child, true);
+          currentParagraph.isFlush = true;
           return currentParagraph;
         }
+        currentParagraph.isFlush = true;
+        return currentParagraph;
       }
       if (!["convertTitle", "convertSubTitle"].includes(words[1])) {
         // output paragraph
@@ -866,7 +886,7 @@ async function resolveEmphasis(source: string) {
     } else if (tag === "$") {
       if (!insideMath) {
         insideMath = true;
-      } else if (textProp.style !== "codespan" &&  mathString) {
+      } else if (textProp.style !== "codespan" && mathString) {
         stack.push(await createMathImage(mathString));
         mathString = "";
         insideMath = false;
@@ -915,7 +935,9 @@ async function resolveEmphasis(source: string) {
 
   function flushMathStringAsNormalString(endDollar: string = "") {
     if (mathString) {
-      stack.push(new TextRun({ text: "$" + mathString + endDollar, ...textProp }));
+      stack.push(
+        new TextRun({ text: "$" + mathString + endDollar, ...textProp })
+      );
     }
     mathString = "";
     insideMath = false;

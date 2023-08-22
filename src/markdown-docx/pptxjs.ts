@@ -56,13 +56,18 @@ export const sheetObjectType = {
   text: "text",
   table: "table",
   image: "image",
+  shape: "shape",
 } as const;
 export type SheetObjectType =
   (typeof sheetObjectType)[keyof typeof sheetObjectType];
 
 export type SheetObject = {
   type: SheetObjectType;
-  sheetObject: pptxGen.ImageProps | TableProps | TextFrame;
+  sheetObject:
+    | pptxGen.ImageProps
+    | TableProps
+    | TextFrame
+    | pptxGen.TextPropsOptions;
 };
 
 /**
@@ -118,11 +123,21 @@ export class PptSheet {
     this.sheetObjects.push({ type: "image", sheetObject: image });
   }
 
+  flushShapes() {
+    const shapes = this.pptxParagraph.createTextCode();
+    shapes.forEach((s) =>
+      this.sheetObjects.push({ type: "shape", sheetObject: s })
+    );
+  }
+
   addTable(table: TableProps) {
     this.sheetObjects.push({ type: "table", sheetObject: table });
   }
 
   addTextFrame(textPosition: {} = {}) {
+    if (this.currentTextPropsArray.length === 0 ){
+      return;
+    }
     const sheetObject = {
       textPropsArray: this.currentTextPropsArray,
       outputPosition: { ...this.currentTextPropPositionPCT, ...textPosition },
@@ -133,7 +148,9 @@ export class PptSheet {
 
   addTextPropsArray() {
     const textPropsArray = this.pptxParagraph.createTextPropsArray();
-    this.currentTextPropsArray.push(...textPropsArray);
+    if (textPropsArray.length) {
+      this.currentTextPropsArray.push(...textPropsArray);
+    }
   }
 
   setDefaultPositionPCT(position: {}) {
@@ -164,6 +181,25 @@ export class PptSheet {
             const i = x.sheetObject as pptxGen.ImageProps;
             this.slide!.addImage(i);
             break;
+          case "shape":
+            const s = x.sheetObject as pptxGen.TextPropsOptions;
+
+            // let sss = `{
+            //   "objectName": "山本山",
+            //   "shape": "rect",
+            //   "x":0.5,
+            //   "y":0.8,
+            //   "w":1.5,
+            //   "h":3.0,
+            //   "fill":{ "color": "555555" },
+            //   "align":"center",
+            //   "fontSize":14
+            // }`;
+
+            const sname = s.objectName ?? "";
+            delete s.objectName;
+            this.slide!.addText(sname ?? "", s);
+            break;
           default:
             break;
         }
@@ -182,7 +218,9 @@ export class PptParagraph {
   // }
 
   children: PptxGenJS.TextProps[] = [];
+  childrenRaw: string[] = [];
   textPropsOptions: PptxGenJS.TextPropsOptions = {};
+  codeLang: string = "";
   isNewSheet: boolean = false;
   defaultFontSize: number = 18;
   currentFontSize: number = 18;
@@ -199,6 +237,9 @@ export class PptParagraph {
   }
 
   createTextPropsArray(): PptxGenJS.TextProps[] {
+    if (this.children.length === 0) {
+      return [];
+    }
     const r = this.children.map((p) => {
       return {
         text: p.text,
@@ -206,7 +247,25 @@ export class PptParagraph {
       };
     });
     this.children = [];
+    this.childrenRaw = [];
     this.isFlush = false;
+    this.codeLang = "";
+    this.currentFontSize = this.defaultFontSize;
+    this.currentLineSpacing = this.defaultLineSpacing;
+    return r;
+  }
+
+  createTextCode() {
+    const shapeJson: pptxGen.TextPropsOptions[] = JSON.parse(
+      this.childrenRaw.join("")
+    );
+
+    const r = shapeJson;
+
+    this.children = [];
+    this.childrenRaw = [];
+    this.isFlush = false;
+    this.codeLang = "";
     this.currentFontSize = this.defaultFontSize;
     this.currentLineSpacing = this.defaultLineSpacing;
     return r;
@@ -234,10 +293,16 @@ export class PptParagraph {
   }
 
   addChild(s: string | PptxGenJS.TextProps) {
-    const ss = typeof s === "string" ? { text: s } : s;
-    this.children.push(ss);
+    if (typeof s === "string") {
+      this.children.push({ text: s });
+      this.childrenRaw.push(s);
+    } else {
+      this.children.push(s);
+    }
   }
-
+  addChildRaw(s: string) {
+    this.childrenRaw.push(s);
+  }
   addChildren(s: PptxGenJS.TextProps[]) {
     this.children.push(...s);
   }
@@ -375,7 +440,13 @@ export class TableJs {
           const textColor = i === 0 ? "F7F7F7" : "676767";
           rows[i].push({
             ...tCell,
-            options: { rowspan, colspan, valign: "middle", color: textColor , fill:{color: fillColor} },
+            options: {
+              rowspan,
+              colspan,
+              valign: "middle",
+              color: textColor,
+              fill: { color: fillColor },
+            },
           });
         }
       }
