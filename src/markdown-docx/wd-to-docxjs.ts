@@ -375,6 +375,11 @@ export async function wdToDocxJs(
 
     // when find create table
     if (wdCommandList[0] === "tableCreate") {
+      if (tableJs){
+        patches.push(tableJs.createTable(documentInfo));
+        tableJs = undefined;
+        patches.push(new Paragraph(" "));
+      }
       tableJs = new TableJs(
         parseInt(wdCommandList[1]),
         parseInt(wdCommandList[2]),
