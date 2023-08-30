@@ -24,7 +24,7 @@ export async function createInlineHtml(htmlPath: string, htmlBody: string) {
 
     return outHtml;
   } catch (error) {
-    console.log(error);
+    throw(error);
   }
   return "";
 }
