@@ -135,7 +135,7 @@ export class PptSheet {
   }
 
   addTextFrame(textPosition: {} = {}) {
-    if (this.currentTextPropsArray.length === 0 ){
+    if (this.currentTextPropsArray.length === 0) {
       return;
     }
     const sheetObject = {
@@ -261,6 +261,15 @@ export class PptParagraph {
     );
 
     const r = shapeJson;
+    for (let i = 1; i < r.length; i++) {
+      if (Object.keys(r[i]).length === 0) {
+        // clear
+        //rOut.push(r[i]);
+      } else {
+        // 
+        r[i] = ({ ...r[i - 1], ...r[i] });
+      }
+    }
 
     this.children = [];
     this.childrenRaw = [];
@@ -268,7 +277,8 @@ export class PptParagraph {
     this.codeLang = "";
     this.currentFontSize = this.defaultFontSize;
     this.currentLineSpacing = this.defaultLineSpacing;
-    return r;
+    // remove empty obj
+    return r.filter(ro =>(Object.keys(ro).length));
   }
 
   clear() {

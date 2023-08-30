@@ -160,7 +160,8 @@ export async function wdToPptxJs(
 
   // initialize pptx
   let pptx: PptxGenJS = new pptxGen();
-
+  
+  // may be for en-US
   pptx.theme = {
     ...pptx.theme,
     ...pptStyle.headFontFace,
