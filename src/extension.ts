@@ -146,6 +146,7 @@ export function activate(context: vscode.ExtensionContext) {
  */
 function exportMarkdownFromHtml(uriFile: vscode.Uri) {
   try {
+    
     vscodeCommon.updateStatusBar(true);
     const filePath = uriFile.fsPath;
     if (filePath.match(/\.html$|\.htm$/i)) {
@@ -231,10 +232,15 @@ function exportHtmlFromMarkdown(uriFile: vscode.Uri) {
 }
 
 async function exportInlineHtmlFromMarkdown(uriFile: vscode.Uri) {
+  resetAbortController();
   const thisOption = createDocxOptionExtension({
     ac,
     message: vscodeCommon.showMessage,
   });
+
+  if (thisOption.isShowOutputTab) {
+    vscodeCommon.outputTab.show();
+  }
 
   try {
     vscodeCommon.updateStatusBar(true);
