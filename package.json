@@ -109,7 +109,7 @@
     "menus": {
       "explorer/context": [
         {
-          "when": "resourceExtname =~ /\\.wd$|\\.md$/i && !markdown-docx.isRunning",
+          "when": "resourceExtname =~ /\\.wd$|\\.md$/i && !markdown-docx.isRunning && markdown-docx.isMainFeature",
           "command": "explorer.ExportDocx",
           "group": "myGroup@1"
         },
@@ -151,7 +151,7 @@
       ],
       "editor/context": [
         {
-          "when": "resourceExtname =~ /\\.wd$|\\.md$/i && !markdown-docx.isRunning",
+          "when": "resourceExtname =~ /\\.wd$|\\.md$/i && !markdown-docx.isRunning && markdown-docx.isMainFeature",
           "command": "editor.ExportDocx",
           "group": "myGroup@1"
         },
@@ -269,6 +269,7 @@
     "typescript": "^4.8.4"
   },
   "dependencies": {
+    "@mermaid-js/mermaid-cli": "^10.3.1",
     "docx": "^8.2.0",
     "encoding-japanese": "^2.0.0",
     "front-matter": "^4.0.2",
