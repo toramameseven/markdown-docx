@@ -14,3 +14,6 @@ result
 
 Inline `code`
 
+
+![](test.png)
+
