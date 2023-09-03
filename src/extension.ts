@@ -17,7 +17,7 @@ import {
 } from "./markdown-docx/markdown-to-xxxx";
 import { wdToPptx } from "./markdown-docx/wd-to-pptxJs";
 import { createDocxTemplateFile } from "./markdown-docx/common";
-import { getWorkingDirectory } from "./common-vscode";
+import { getWorkingDirectory, updateStatusBar } from "./common-vscode";
 import { textileToHtml } from "./markdown-docx/tools/toolsTextile";
 
 export let isDebug = false;
@@ -34,6 +34,7 @@ function resetAbortController() {
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
+
   // activate event
   vscodeCommon.showMessage(
     MessageType.info,
@@ -132,6 +133,9 @@ export function activate(context: vscode.ExtensionContext) {
   if (isEnableExperimentalFeature) {
     enableExperimentFeature();
   }
+
+  enableMainFeature();
+
 
   vscodeCommon.showMessage(
     MessageType.info,
@@ -511,6 +515,14 @@ function enableExperimentFeature() {
   vscode.commands.executeCommand(
     "setContext",
     "markdown-docx.isExperimentFeature",
+    true
+  );
+}
+
+function enableMainFeature() {
+  vscode.commands.executeCommand(
+    "setContext",
+    "markdown-docx.isMainFeature",
     true
   );
 }
