@@ -13,3 +13,9 @@ md_demo/md/*.docx
 md_demo/md/*.html
 md_demo/md/*.txtile
 md_demo/md/*.ed
+md_demo/md-ppt/*.wd
+md_demo/md-ppt/*.pptx
+md_demo/md-ppt/*.docx
+md_demo/md-ppt/*.html
+md_demo/md-ppt/*.txtile
+md_demo/md-ppt/*.ed

@@ -44,10 +44,10 @@ const tableHeaderColor = "000000";
 const tableHeaderFillColor = "FFFFFF";
 // header testPropsOption
 const h1 = { ...fontBaseHeading, fontSize: 48, lineSpacing: 0 };
-const h2 = { ...fontBaseHeading, fontSize: 42, lineSpacing: 0 };
-const h3 = { ...fontBaseHeading, fontSize: 36, lineSpacing: 0 };
-const h4 = { ...fontBaseHeading, fontSize: 30, lineSpacing: 0 };
-const h5 = { ...fontBaseHeading, fontSize: 24, lineSpacing: 0 };
+const h2 = { ...fontBaseHeading, fontSize: 24, lineSpacing: 0 };
+const h3 = { ...fontBaseHeading, fontSize: 22, lineSpacing: 0 };
+const h4 = { ...fontBaseHeading, fontSize: 20, lineSpacing: 0 };
+const h5 = { ...fontBaseHeading, fontSize: 18, lineSpacing: 0 };
 const h6 = {
   ...fontBaseHeading,
   ...mainFontSize,

@@ -63,7 +63,8 @@ let pptStyle: PptStyle = {
   bodyFontFace: {},
   tableHeaderColor: "000000",
   tableHeaderFillColor: "FFFFFF",
-  defaultPositionPCT: "10,15,80,70"
+  defaultPositionPCT: "10,15,80,70",
+  tablePropsArray:[]
 };
 
 // for delete the require cache.
