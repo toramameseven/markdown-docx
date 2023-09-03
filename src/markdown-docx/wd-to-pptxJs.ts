@@ -8,7 +8,7 @@ import * as imageSize from "image-size";
 const TeXToSVG = require("tex-to-svg");
 import {
   docxStyle,
-  PptSheet,
+  PptxDocument,
   PptStyle,
   TableJs,
   TextFrame,
@@ -36,7 +36,7 @@ type Record = { [v: string]: string };
 type DocumentInfoParam = {
   dpi?: string;
   position?: string;
-  pptxSettings?: string
+  pptxSettings?: string;
 };
 type DocumentInfo = {
   placeholder: Record;
@@ -63,6 +63,7 @@ let pptStyle: PptStyle = {
   bodyFontFace: {},
   tableHeaderColor: "000000",
   tableHeaderFillColor: "FFFFFF",
+  defaultPositionPCT: "10,15,80,70"
 };
 
 // for delete the require cache.
@@ -71,7 +72,7 @@ let pptxSettingsFilePath = "";
 // wd command separator
 const _sp = "\t";
 
-/** slide paging at section */ 
+/** slide paging at section */
 const isNewSlideAtSection: boolean = true;
 
 // ############################################################
@@ -100,8 +101,6 @@ export async function wdToPptx(
   return;
 }
 
-
-
 /**
  *
  * @param body
@@ -120,7 +119,7 @@ export async function wdToPptxJs(
   thisMessage = option.message;
 
   // get lines
-  const lines = (body + "\nEndline").split(/\r?\n/);
+  const lines = (body + "\nend").split(/\r?\n/);
 
   // get document information
   const toInfoSearch = lines.length > 50 ? 49 : lines.length - 1;
@@ -172,7 +171,7 @@ export async function wdToPptxJs(
 
   // initialize pptx
   let pptx: PptxGenJS = new pptxGen();
-  
+
   // may be for en-US
   pptx.theme = {
     ...pptx.theme,
@@ -188,19 +187,19 @@ export async function wdToPptxJs(
   createMasterSlides(pptx);
 
   // create sheet object
-  const currentSheet = new PptSheet(pptx, pptStyle);
-  currentSheet.setDefaultPositionPCT({
-    ...getPositionPercent("10,15,70,70"),
+  const pptDocument = new PptxDocument(pptx, pptStyle);
+  pptDocument.setDefaultPositionPCT({
+    ...getPositionPercent(pptStyle.defaultPositionPCT),
   });
 
-  // add title slide
+  // add pptx document title (cover page)
   if (documentInfo.placeholder.title) {
-    currentSheet.addTitleSlide(documentInfo.placeholder);
+    pptDocument.addPptxCover(documentInfo.placeholder);
   }
 
   // create first slide
   if (!isNewSlideAtSection) {
-    currentSheet.addDocumentSlide();
+    pptDocument.addDocumentSlide();
   }
 
   // working table
@@ -217,8 +216,8 @@ export async function wdToPptxJs(
     // when find create table
     if (wdCommandList[0] === "tableCreate") {
       // flush texts before creating tables.
-      currentSheet.addTextPropsArrayFromParagraph();
-      currentSheet.addTextFrameToSheetObjects();
+      pptDocument.addTextPropsArrayFromParagraph();
+      pptDocument.addTextFrameToSheetObjects();
 
       // initialize table.
       tableJs = new TableJs(
@@ -235,14 +234,17 @@ export async function wdToPptxJs(
     } else {
       // in not table command, create table.
       if (tableJs) {
-        let slideWidth = percentToInches(currentSheet.currentTextPropPositionPCT.x, pptx);
+        let slideWidth = percentToInches(
+          pptDocument.currentTextPropPositionPCT.w,
+          pptx
+        );
 
         const r = tableJs!.createTable(
-          currentSheet.currentTextPropPositionPCT,
+          pptDocument.currentTextPropPositionPCT,
           pptStyle.tableProps,
           slideWidth
         );
-        currentSheet.addTableToSheetObjects(r);
+        pptDocument.addTableToSheetObjects(r);
         tableJs = undefined;
       }
     }
@@ -250,8 +252,8 @@ export async function wdToPptxJs(
     // image command
     if (wdCommandList[0] === "image") {
       //create text frame
-      currentSheet.addTextPropsArrayFromParagraph();
-      currentSheet.addTextFrameToSheetObjects();
+      pptDocument.addTextPropsArrayFromParagraph();
+      pptDocument.addTextFrameToSheetObjects();
 
       // initialize image
       const image = createImageChild(
@@ -259,27 +261,30 @@ export async function wdToPptxJs(
         wdCommandList[1],
         wdCommandList[2],
         pptx,
-        currentSheet.currentTextPropPositionPCT,
+        pptDocument.currentTextPropPositionPCT,
         parseInt(documentInfo.param.dpi ?? "96")
       );
-      currentSheet.addImageToSheetObjects(image);
+      pptDocument.addImageToSheetObjects(image);
       continue;
     }
 
     // shape command
-    if (wdCommandList[0].split("/")[0] === "code" && wdCommandList[0].split("/")[1] === "ppt") {
+    if (
+      wdCommandList[0].split("/")[0] === "code" &&
+      wdCommandList[0].split("/")[1] === "ppt"
+    ) {
       //create text frame
-      currentSheet.addTextPropsArrayFromParagraph();
-      currentSheet.addTextFrameToSheetObjects();
+      pptDocument.addTextPropsArrayFromParagraph();
+      pptDocument.addTextFrameToSheetObjects();
 
-      currentSheet.pptxParagraph.addChildRaw(wdCommandList[1]);
+      pptDocument.addRawString(wdCommandList[1]);
       // initialize image
       continue;
     }
-    
+
     // flush ppt shape
     if (wdCommandList[0] === "newLine" && wdCommandList[2] === "ppt") {
-      currentSheet.addShapesToSheetObjects();
+      pptDocument.addShapesToSheetObjects();
       continue;
     }
 
@@ -294,10 +299,10 @@ export async function wdToPptxJs(
       // update current position
       if (documentInfo.param.position) {
         //create text frame
-        currentSheet.addTextPropsArrayFromParagraph();
-        currentSheet.addTextFrameToSheetObjects();
+        pptDocument.addTextPropsArrayFromParagraph();
+        pptDocument.addTextFrameToSheetObjects();
         // update position
-        currentSheet.setCurrentPositionPCT({
+        pptDocument.setCurrentPositionPCT({
           ...getPositionPercent(documentInfo.param.position),
         });
         documentInfo.param.position = "";
@@ -306,30 +311,28 @@ export async function wdToPptxJs(
     }
 
     // body commands( main command)
-    await resolveWordDownCommandEx(
-      lines[i],
-      currentSheet
-    );
+    await resolveWordDownCommandEx(lines[i], pptDocument);
 
     thisMessage?.(
       MessageType.debug,
-      `${functionName}:currentSheet.pptxParagraph.children.length:${currentSheet.pptxParagraph.children.length}`,
+      `${functionName}:currentSheet.pptxParagraph.children.length: ${pptDocument.getCurrentParagraphNum()}`,
       "wd-to-pptxJs",
       false
     );
 
     // when paragraph end, flush paragraph
-    const isNewSheet = currentSheet.pptxParagraph.isNewSheet;
-    if (currentSheet.pptxParagraph.isFlush || isNewSheet) {
-      currentSheet.addTextPropsArrayFromParagraph();
+    const isNewSheet = pptDocument.isNewSheet;
+    if (pptDocument.isParagraphFlush || isNewSheet) {
+      pptDocument.isParagraphFlush = false;
+      pptDocument.addTextPropsArrayFromParagraph();
 
       if (isNewSheet) {
-        currentSheet.addTextFrameToSheetObjects();
-        currentSheet.createSheet();
+        pptDocument.addTextFrameToSheetObjects();
+        pptDocument.createSheet();
 
         // new sheet
-        currentSheet.addDocumentSlide();
-        currentSheet.pptxParagraph.isNewSheet = false;
+        pptDocument.addDocumentSlide();
+        pptDocument.isNewSheet = false;
         thisMessage?.(
           MessageType.debug,
           `${functionName}:add new slide`,
@@ -341,9 +344,9 @@ export async function wdToPptxJs(
   }
 
   // end loop lines
-  currentSheet.addTextPropsArrayFromParagraph();
-  currentSheet.addTextFrameToSheetObjects(); //getPosition(documentInfo.position, pptx));
-  currentSheet.createSheet();
+  pptDocument.addTextPropsArrayFromParagraph();
+  pptDocument.addTextFrameToSheetObjects(); //getPosition(documentInfo.position, pptx));
+  pptDocument.createSheet();
 
   //Export Presentation
   const outPathPPtx = Path.resolve(
@@ -406,13 +409,13 @@ function resolveCommentCommand(
     for (let i = 2; i < wdCommandList.length; i += 2) {
       switch (wdCommandList[i - 1]) {
         case "dpi":
-          documentInfo.param.dpi =  wdCommandList[i];
+          documentInfo.param.dpi = wdCommandList[i];
           break;
         case "pptxSettings":
-            documentInfo.param.pptxSettings =  wdCommandList[i];
-            break;
+          documentInfo.param.pptxSettings = wdCommandList[i];
+          break;
         case "position":
-          documentInfo.param.position =  wdCommandList[i];
+          documentInfo.param.position = wdCommandList[i];
           break;
         default:
           // todo error
@@ -458,11 +461,14 @@ function getHeaderStyle(header: string) {
  *
  * @param line
  * @param slide.docxParagraph
- * @param slide
+ * @param pptxDocument
  * @param mdSourcePath
  * @returns
  */
-async function resolveWordDownCommandEx(line: string, slide: PptSheet) {
+async function resolveWordDownCommandEx(
+  line: string,
+  pptxDocument: PptxDocument
+) {
   const words = line.split(_sp);
   const nodeType = words[0].split("/")[0] as WdCommand;
   let fontSize: number | undefined;
@@ -480,85 +486,66 @@ async function resolveWordDownCommandEx(line: string, slide: PptSheet) {
       // section|1|タイトル(slug)
       const currentStyle = getHeaderStyle(words[1]);
 
-      // ## is slide title
       if (words[1] === "2") {
+        // ## is slide title
         if (isNewSlideAtSection) {
-          slide.addTextFrameToSheetObjects();
-          slide.createSheet();
-          slide.addDocumentSlide();
+          pptxDocument.addTextFrameToSheetObjects();
+          pptxDocument.createSheet();
+          pptxDocument.addDocumentSlide();
         }
-        slide.pptxParagraph.insideSlideTitle = true;
-      }
-      // # is a document title.
-      if (words[1] === "1") {
-        slide.pptxParagraph.insideDocumentTitle = true;
+        pptxDocument.status = "insideSlideTitle";
+      } else if (words[1] === "1") {
+        // # is title for a cover
+        pptxDocument.status = "insideCover";
+      } else {
+        // more ### headings
+        pptxDocument.addTextProps({
+          options: { breakLine: true },
+        });
+        pptxDocument.addTextPropsArrayFromParagraph();
       }
 
-      //
-      // slide.pptxParagraph.addChild({
-      //   text: " ",
-      //   options: {
-      //     ...pptStyle.body,
-      //   },
-      // });
-
-      slide.pptxParagraph.currentFontSize = currentStyle.fontSize ?? 32;
-      slide.pptxParagraph.currentLineSpacing = currentStyle.lineSpacing ?? 0;
+      pptxDocument.setTextPropsOptions({
+        fontSize: currentStyle.fontSize ?? 32,
+        lineSpacing: currentStyle.lineSpacing ?? 0,
+      });
       break;
     case "NormalList":
       // OderList	1
       // text	Consectetur adipiscing elit
       // newLine	convertParagraph	tm
-
-
-      // slide.pptxParagraph.addChild({
-      //   text: " ",
-      //   options: {
-      //     bullet: true,
-      //     // color: PptxGenJS.SchemeColor.accent6,
-      //     indentLevel: parseInt(words[1]),
-      //     ...pptStyle.body,
-      //   },
-      // });
-
-      slide.pptxParagraph.textPropsOptions = {
-        bullet: true,
-        // color: PptxGenJS.SchemeColor.accent6,
-        indentLevel: parseInt(words[1]),
-        ...pptStyle.body,
-      };
-    
-
-      fontSize = getHeaderStyle("").fontSize;
-      if (fontSize) {
-        slide.pptxParagraph.currentFontSize = fontSize;
-      } else {
-        //todo Error
-      }
-      break;
-    case wdCommand.OderList:
-      slide.pptxParagraph.addChild({
-        text: " ",
+      fontSize = getHeaderStyle("").fontSize ?? 10;
+      pptxDocument.addTextProps({
+        text: "\u200b",
         options: {
-          bullet: { type: "number", style: "romanLcPeriod" },
-          // color: PptxGenJS.SchemeColor.accent6,
+          bullet: true,
           indentLevel: parseInt(words[1]),
           ...pptStyle.body,
+          fontSize,
         },
       });
-      fontSize = getHeaderStyle("").fontSize;
-      if (fontSize) {
-        slide.pptxParagraph.currentFontSize = fontSize;
-      } else {
-        //todo Error
-      }
+
+      break;
+    case wdCommand.OderList:
+      fontSize = getHeaderStyle("").fontSize ?? 10;
+
+      pptxDocument.addTextProps({
+        text: "\u200b",
+        options: {
+          bullet: { type: "number", numberType: "arabicPeriod" },
+          indentLevel: parseInt(words[1]),
+          ...pptStyle.body,
+          fontSize,
+        },
+      });
+
       break;
     case "code":
       if (words[1] === "") {
         // "end code" insert an empty line.
         return;
       }
-      slide.pptxParagraph.addChild({
+      pptxDocument.addTextProps({
         text: words[1],
         options: {
           fontFace: "Arial",
@@ -570,31 +557,32 @@ async function resolveWordDownCommandEx(line: string, slide: PptSheet) {
           breakLine: true,
         },
       });
-      slide.pptxParagraph.addChildRaw(words[1]);
+      pptxDocument.addRawString(words[1]);
       break;
     case wdCommand.link:
       // link ref|bookmark hover text
       if (!words[3]) {
-        slide.pptxParagraph.addChild({
+        pptxDocument.addTextProps({
           text: words[1],
           options: {
             hyperlink: {
               url: words[1],
               tooltip: words[2],
             },
-            fontSize: slide.pptxParagraph.currentFontSize,
+            fontSize: pptxDocument.textPropsOptions().fontSize ?? 18,
           },
         });
       } else {
         // outside link
-        slide.pptxParagraph.addChild({
+        pptxDocument.addTextProps({
           text: words[3],
           options: {
             hyperlink: {
               url: words[1],
               tooltip: words[2],
             },
-            fontSize: slide.pptxParagraph.currentFontSize,
+            //fontSize: slide.pptxParagraph.currentFontSize,
+            fontSize: pptxDocument.textPropsOptions().fontSize ?? 18,
           },
         });
       }
@@ -603,7 +591,7 @@ async function resolveWordDownCommandEx(line: string, slide: PptSheet) {
       break;
     case wdCommand.hr:
       if (!isNewSlideAtSection) {
-        slide.pptxParagraph.isNewSheet = true;
+        pptxDocument.isNewSheet = true;
       }
     case "text":
       const admonition = words[1].match(/^(note|warning)(:\s)(.*)/i);
@@ -622,60 +610,54 @@ async function resolveWordDownCommandEx(line: string, slide: PptSheet) {
       // }
 
       resolveEmphasis(s, pptStyle).forEach((x) =>
-        slide.pptxParagraph.addChild({
+        pptxDocument.addTextProps({
           text: x.text,
           options: {
             ...x.options,
-            fontSize: slide.pptxParagraph.currentFontSize,
-            lineSpacing: slide.pptxParagraph.currentLineSpacing,
+            fontSize: pptxDocument.textPropsOptions().fontSize ?? 18,
+            lineSpacing: pptxDocument.textPropsOptions().lineSpacing ?? 0,
             valign: "top",
           },
         })
       );
       break;
     case "indentPlus":
-      slide.pptxParagraph.addIndent();
+      pptxDocument.addIndent();
       break;
     case "indentMinus":
-      slide.pptxParagraph.removeIndent();
+      pptxDocument.removeIndent();
       break;
     case "newLine":
       // slide title
       if (
         "convertHeading End" === words[1] &&
-        slide.pptxParagraph.insideSlideTitle
+        pptxDocument.status === "insideSlideTitle"
       ) {
-        slide.addSlideHeader({});
+        pptxDocument.addSlideHeader({});
+        pptxDocument.isParagraphFlush = true;
+        pptxDocument.status = "non";
       }
 
       // # is document title, so this does not render #. do nothing here.
       // # is treated outside for loop.
       if (
         "convertHeading End" === words[1] &&
-        slide.pptxParagraph.insideDocumentTitle
+        pptxDocument.status === "insideCover"
       ) {
-        slide.pptxParagraph.clear();
-        return;
-      }
-
-      if("convertCode" === words[1]){
-        slide.pptxParagraph.codeLang = words[2];
-      }
-
-      if (["convertListItem End"].includes(words[1])) {
-        slide.pptxParagraph.isFlush = true;
+        pptxDocument.clearParagraph();
+        pptxDocument.status = "non";
         return;
       }
 
       if (!["convertTitle", "convertSubTitle"].includes(words[1])) {
         // output paragraph
 
-        slide.pptxParagraph.addChild({
-          text: "",
-          options: { breakLine: true },
-        });
+        // slide.pptxParagraph.addChild({
+        //   text: "",
+        //   options: { breakLine: true },
+        // });
 
-        slide.pptxParagraph.isFlush = true;
+        pptxDocument.isParagraphFlush = true;
       }
     default:
     // todo error;
@@ -752,10 +734,10 @@ function getPositionInch(position: string, pptx: pptxGen) {
   return { x, y, w, h };
 }
 
-function percentToInches(lenPercent: number|string, pptx: pptxGen) {
+function percentToInches(lenPercent: number | string, pptx: pptxGen) {
   // 914400; // One (1) inch (OfficeXML measures in EMU (English Metric Units))
   let lenPercentR = 0;
-  if (typeof lenPercent === 'string'){
+  if (typeof lenPercent === "string") {
     lenPercentR = parseFloat(lenPercent);
   } else {
     lenPercentR = lenPercent;
@@ -769,7 +751,7 @@ function percentToInches(lenPercent: number|string, pptx: pptxGen) {
  * @param position "x,y,w,h" in percent
  * @returns
  */
-function getPositionPercent(position: string) :PositionP{
+function getPositionPercent(position: string): PositionP {
   const functionName = "getPositionPCT";
   try {
     const positions = position.split(",");
@@ -827,7 +809,7 @@ function createImageChild(
   imagePathR: string,
   imageAlt: string,
   pptx: pptxGen,
-  pos: PositionP = {...initialPositionP},
+  pos: PositionP = { ...initialPositionP },
   dpi: number = 96
 ) {
   const imagePath = Path.resolve(mdSourcePath, imagePathR);
