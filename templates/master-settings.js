@@ -48,10 +48,31 @@ const h2 = { ...fontBaseHeading, fontSize: 42, lineSpacing: 0 };
 const h3 = { ...fontBaseHeading, fontSize: 36, lineSpacing: 0 };
 const h4 = { ...fontBaseHeading, fontSize: 30, lineSpacing: 0 };
 const h5 = { ...fontBaseHeading, fontSize: 24, lineSpacing: 0 };
-const h6 = { ...fontBaseHeading, ...mainFontSize, lineSpacing: mainLineSpacing  };
-const body = { ...fontBaseHeading, ...mainFontSize, lineSpacing: mainLineSpacing };
-const code = { ...fontBase, ...mainFontSize, highlight: "FFFF00" , lineSpacing: mainLineSpacing };
-const codeSpan = { ...fontBase, ...mainFontSize, highlight: "FFFF00" , lineSpacing: mainLineSpacing };
+const h6 = {
+  ...fontBaseHeading,
+  ...mainFontSize,
+  lineSpacing: mainLineSpacing,
+};
+
+const body = {
+  ...fontBaseHeading,
+  ...mainFontSize,
+  lineSpacing: mainLineSpacing,
+};
+
+const code = {
+  ...fontBase,
+  ...mainFontSize,
+  highlight: "FFFF00",
+  lineSpacing: mainLineSpacing,
+};
+
+const codeSpan = {
+  ...fontBase,
+  ...mainFontSize,
+  highlight: "FFFF00",
+  lineSpacing: mainLineSpacing,
+};
 
 // TITLE_SLIDE
 const titleSlide = {
@@ -200,12 +221,32 @@ const tableProps = {
   fill: backgroundColor,
   color: "000000",
   valign: "middle",
-  align: "center",
+  align: "left",
   border: { type: "solid", pt: 1, color: "000000" },
   ...mainFontFace,
   ...mainFontSize,
   ...mainFontColor,
 };
+
+const tablePropsArray = [
+  {
+    x: 0,
+    y: "30%",
+    w: "100%",
+    rowH: 0.75,
+    fill: backgroundColor,
+    color: "000000",
+    valign: "middle",
+    align: "left",
+    border: { type: "solid", pt: 1, color: "000000" },
+    ...mainFontFace,
+    ...mainFontSize,
+    ...mainFontColor,
+  },
+];
+
+/** "x,y,w,h" in percent */
+const defaultPositionPCT = "10,15,80,70";
 
 module.exports = {
   titleSlide: titleSlide,
@@ -222,5 +263,7 @@ module.exports = {
   tableProps,
   layout,
   bodyFontFace,
-  headFontFace
+  headFontFace,
+  defaultPositionPCT,
+  tablePropsArray,
 };
