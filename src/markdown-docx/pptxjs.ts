@@ -1,5 +1,7 @@
 import pptxGen from "pptxgenjs";
 import type PptxGenJS from "pptxgenjs";
+
+import { parse as JSONCParse } from 'jsonc-parser';
 export type Position = { x: number; y: number; w: number; h: number };
 export type PositionP = {
   x: `${number}%`;
@@ -305,7 +307,7 @@ class PptParagraph {
   }
 
   createTextCode() {
-    const shapeJson: pptxGen.TextPropsOptions[] = JSON.parse(
+    const shapeJson: pptxGen.TextPropsOptions[] = JSONCParse(
       this.childrenRaw.join("")
     );
 

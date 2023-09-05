@@ -397,10 +397,12 @@ export async function wdToPptxJs(
 function createMasterSlides(pptx: PptxGenJS) {
   // https://github.com/gitbrent/PptxGenJS/issues/1175
   // TITLE_SLIDE
-  pptx.defineSlideMaster(JSON.parse(JSON.stringify(pptStyle.titleSlide)));
+  //pptx.defineSlideMaster(JSON.parse(JSON.stringify(pptStyle.titleSlide)));
+  pptx.defineSlideMaster(pptStyle.titleSlide);
 
   // MASTER_SLIDE (MASTER_PLACEHOLDER)
-  pptx.defineSlideMaster(JSON.parse(JSON.stringify(pptStyle.masterSlide)));
+  //pptx.defineSlideMaster(JSON.parse(JSON.stringify(pptStyle.masterSlide)));
+  pptx.defineSlideMaster(pptStyle.masterSlide);
 }
 
 /**

@@ -189,7 +189,7 @@ out
 {"objectName": "star8","shape": "star8","x":10,"y":4.5},
 {"objectName": "stripedRightArrow","shape": "stripedRightArrow","x":10,"y":5},
 {"objectName": "sun","shape": "sun","x":10,"y":5.5},
-{"objectName": "swooshArrow","shape": "swooshArrow","x":10,"y":6}
+{"objectName": "swooshArrow","shape": "swooshArrow","x":10,"y":6},
 ]
 ```
 out
