@@ -272,7 +272,7 @@ export async function wdToPptxJs(
     // shape command
     if (
       wdCommandList[0].split("/")[0] === "code" &&
-      wdCommandList[0].split("/")[1] === "ppt"
+      wdCommandList[0].split("/")[1] === "json:ppt"
     ) {
       //create text frame
       pptDocument.addTextPropsArrayFromParagraph();
@@ -284,7 +284,7 @@ export async function wdToPptxJs(
     }
 
     // flush ppt shape
-    if (wdCommandList[0] === "newLine" && wdCommandList[2] === "ppt") {
+    if (wdCommandList[0] === "newLine" && wdCommandList[2] === "json:ppt") {
       pptDocument.addShapesToSheetObjects();
       continue;
     }
