@@ -3,12 +3,12 @@ text	Emphasis2
 newLine	convertHeading End		tm
 text	markdown
 newLine	convertParagraph		tm
-code	**This is bold text**
-code	**This is bold text**
-code	_This is italic text_
-code	_This is italic text_
-code	~~Strikethrough~~ 
-code	2<sup>x</sup><sub>y</sub>
+code/	**This is bold text**
+code/	**This is bold text**
+code/	_This is italic text_
+code/	_This is italic text_
+code/	~~Strikethrough~~ 
+code/	2<sup>x</sup><sub>y</sub>
 newLine	convertCode		tm
 text	result
 newLine	convertParagraph		tm

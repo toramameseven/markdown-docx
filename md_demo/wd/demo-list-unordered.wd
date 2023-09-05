@@ -5,15 +5,15 @@ text	NOTE: <b>markdown to docx</b>  supports only three layers.
 newLine	convertParagraph		tm
 text	markdown
 newLine	convertParagraph		tm
-code	- Create a list by starting a line with `+`, `-`, or `*`
-code	- Sub-lists are made by indenting 2 spaces:
-code	  - Marker character change forces new list start:
-code	    - Ac tristique libero volutpat at
-code	    * Facilisis in pretium nisl aliquet
-code	    - Nulla volutpat aliquam velit
-code	- Very easy!
-code	
-code	* look me [](#links) send you
+code/	- Create a list by starting a line with `+`, `-`, or `*`
+code/	- Sub-lists are made by indenting 2 spaces:
+code/	  - Marker character change forces new list start:
+code/	    - Ac tristique libero volutpat at
+code/	    * Facilisis in pretium nisl aliquet
+code/	    - Nulla volutpat aliquam velit
+code/	- Very easy!
+code/	
+code/	* look me [](#links) send you
 newLine	convertCode		tm
 text	result
 newLine	convertParagraph		tm

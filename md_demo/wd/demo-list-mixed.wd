@@ -3,9 +3,9 @@ text	Lists mixed
 newLine	convertHeading End		tm
 text	markdown
 newLine	convertParagraph		tm
-code	1.  ordered1
-code	    - unordered2
-code	        1. ordered3
+code/	1.  ordered1
+code/	    - unordered2
+code/	        1. ordered3
 newLine	convertCode		tm
 text	result
 newLine	convertParagraph		tm

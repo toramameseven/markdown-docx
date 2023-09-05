@@ -3,9 +3,9 @@ text	Math
 newLine	convertHeading End		tm
 text	markdown
 newLine	convertParagraph		tm
-code	This sentence uses dollar sign delimiters to show math inline: $\sqrt{3x-1}+(1+x)^2$  `$\sqrt{3x-1}+(1+x)^2$`
-code	
-code	$\sqrt{3x-1}+(1+x)^2$
+code/	This sentence uses dollar sign delimiters to show math inline: $\sqrt{3x-1}+(1+x)^2$  `$\sqrt{3x-1}+(1+x)^2$`
+code/	
+code/	$\sqrt{3x-1}+(1+x)^2$
 newLine	convertCode		tm
 text	result
 newLine	convertParagraph		tm
@@ -14,15 +14,4 @@ newLine	convertParagraph		tm
 text	$\sqrt{3x-1}+(1+x)^2$
 newLine	convertParagraph		tm
 text	NOTE: math works so so.
-newLine	convertParagraph		tm
-code	\begin{eqnarray}
-code	|x|
-code	 =
-code	  \begin{cases}
-code	    x & ( x \geqq 0 ) \\
-code	    -x & ( x \lt 0 )
-code	  \end{cases}
-code	\end{eqnarray}
-newLine	convertCode	math	tm
-text	ddd
 newLine	convertParagraph		tm

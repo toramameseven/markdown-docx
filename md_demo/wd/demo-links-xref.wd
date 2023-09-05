@@ -5,12 +5,12 @@ text	cross reference in a docx
 newLine	convertHeading End		tm
 text	markdown
 newLine	convertParagraph		tm
-code	## refs1
-code	
-code	## refs2 with space
-code	
-code	* look me [refs1](#refs1) send you
-code	* look me [refs2 with space](#refs2-with-space) send you
+code/	## refs1
+code/	
+code/	## refs2 with space
+code/	
+code/	* look me [refs1](#refs1) send you
+code/	* look me [refs2 with space](#refs2-with-space) send you
 newLine	convertCode		tm
 text	result
 newLine	convertParagraph		tm

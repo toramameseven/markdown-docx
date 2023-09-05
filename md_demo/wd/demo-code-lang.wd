@@ -3,14 +3,14 @@ text	Code
 newLine	convertHeading End		tm
 text	markdown
 newLine	convertParagraph		tm
-code	if (isEnable){
-code	    let a = 1;
-code	}
+code/	if (isEnable){
+code/	    let a = 1;
+code/	}
 newLine	convertCode	js	tm
 text	result
 newLine	convertParagraph		tm
-code	if (isEnable){
-code	    let a = 1;
-code	}
-code	
+code/	if (isEnable){
+code/	    let a = 1;
+code/	}
+code/	
 newLine	convertCode	js	tm

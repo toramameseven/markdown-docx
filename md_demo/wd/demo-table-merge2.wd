@@ -3,15 +3,15 @@ text	merge cells No.2
 newLine	convertHeading End		tm
 text	markdown
 newLine	convertParagraph		tm
-code	<!-- word emptyMerge -->
-code	
-code	cell(4,2) is not merged. (comment cell)
-code	
-code	| data1-1 | data1-2                 |
-code	| ------- | ----------------------- |
-code	| data2-1 | data2-2                 |
-code	|         | data3-2                 |
-code	| data4-1 | <!-- not merged -->     |
+code/	<!-- word emptyMerge -->
+code/	
+code/	cell(4,2) is not merged. (comment cell)
+code/	
+code/	| data1-1 | data1-2                 |
+code/	| ------- | ----------------------- |
+code/	| data2-1 | data2-2                 |
+code/	|         | data3-2                 |
+code/	| data4-1 | <!-- not merged -->     |
 newLine	convertCode		tm
 text	result
 newLine	convertParagraph		tm
@@ -49,11 +49,11 @@ text	table with emphasis
 newLine	convertHeading End		tm
 text	markdown
 newLine	convertParagraph		tm
-code	| data1-1 | data1-2                   |
-code	| ------- | --------------------  --- |
-code	| data2-1 | _This is italic text_     |
-code	|         | 2<sup>x</sup><sub>y</sub> |
-code	| data4-1 | **This is bold text**     |
+code/	| data1-1 | data1-2                   |
+code/	| ------- | --------------------  --- |
+code/	| data2-1 | _This is italic text_     |
+code/	|         | 2<sup>x</sup><sub>y</sub> |
+code/	| data4-1 | **This is bold text**     |
 newLine	convertCode		tm
 text	result
 newLine	convertParagraph		tm

@@ -3,15 +3,15 @@ text	Indented code
 newLine	convertHeading End		tm
 text	markdown
 newLine	convertParagraph		tm
-code	    // Some comments
-code	    line 1 of code
-code	    line 2 of code
-code	    line 3 of code
+code/	    // Some comments
+code/	    line 1 of code
+code/	    line 2 of code
+code/	    line 3 of code
 newLine	convertCode		tm
 text	result
 newLine	convertParagraph		tm
-code	// Some comments
-code	line 1 of code
-code	line 2 of code
-code	line 3 of code
+code/	// Some comments
+code/	line 1 of code
+code/	line 2 of code
+code/	line 3 of code
 newLine	convertCode		tm

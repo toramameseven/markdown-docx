@@ -3,17 +3,17 @@ text	Heading
 newLine	convertHeading End		tm
 text	markdown
 newLine	convertParagraph		tm
-code	# Heading1
-code	
-code	## Heading2
-code	
-code	### Heading3
-code	
-code	#### Heading4
-code	
-code	##### Heading5
-code	
-code	###### Heading6
+code/	# Heading1
+code/	
+code/	## Heading2
+code/	
+code/	### Heading3
+code/	
+code/	#### Heading4
+code/	
+code/	##### Heading5
+code/	
+code/	###### Heading6
 newLine	convertCode		tm
 text	result
 newLine	convertParagraph		tm

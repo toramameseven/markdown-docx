@@ -3,12 +3,8 @@ text	Code
 newLine	convertHeading End		tm
 text	markdown
 newLine	convertParagraph		tm
-code	Inline `code`
-code	tttttt
-code	gttttttt
-code	
-code	ttttttttt
-newLine	convertCode	md	tm
+code/	Inline `code`
+newLine	convertCode		tm
 text	result
 newLine	convertParagraph		tm
 text	Inline <codespan>code</codespan>

@@ -4,9 +4,9 @@ newLine	convertHeading End		tm
 section	2	sample
 text	sample
 newLine	convertHeading End		tm
-code	  graph TD;
-code	      A-->B;
-code	      A-->C;
-code	      B-->D;
-code	      C-->D;
+code/	  graph TD;
+code/	      A-->B;
+code/	      A-->C;
+code/	      B-->D;
+code/	      C-->D;
 newLine	convertCode	mermaid	tm

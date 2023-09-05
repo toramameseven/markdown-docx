@@ -3,9 +3,9 @@ text	Images
 newLine	convertHeading End		tm
 text	markdown
 newLine	convertParagraph		tm
-code	![logo](./markdown2docx.png)
-code	
-code	This extension logo is  ![logo](./markdown2docx.png) .
+code/	![logo](./markdown2docx.png)
+code/	
+code/	This extension logo is  ![logo](./markdown2docx.png) .
 newLine	convertCode		tm
 text	result
 newLine	convertParagraph		tm

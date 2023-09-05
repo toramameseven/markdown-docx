@@ -3,13 +3,13 @@ text	BR
 newLine	convertHeading End		tm
 text	markdown
 newLine	convertParagraph		tm
-code	next line is `<br>`
-code	
-code	test<BR>
-code	
-code	<BR>
-code	
-code	upper line is `<br>`
+code/	next line is `<br>`
+code/	
+code/	test<BR>
+code/	
+code/	<BR>
+code/	
+code/	upper line is `<br>`
 newLine	convertCode		tm
 text	result
 newLine	convertParagraph		tm

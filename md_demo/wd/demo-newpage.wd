@@ -3,11 +3,11 @@ text	new page
 newLine	convertHeading End		tm
 text	markdown
 newLine	convertParagraph		tm
-code	next line is `<!-- word newPage -->`
-code	
-code	<!-- word newPage -->
-code	
-code	upper line is `<!-- word newPage -->`
+code/	next line is `<!-- word newPage -->`
+code/	
+code/	<!-- word newPage -->
+code/	
+code/	upper line is `<!-- word newPage -->`
 newLine	convertCode		tm
 text	result
 newLine	convertParagraph		tm
