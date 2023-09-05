@@ -232,7 +232,7 @@ function exportHtmlFromMarkdown(uriFile: vscode.Uri) {
     if (filePath.match(/\.md$/i)) {
       // wordDown
       //const r = markdownToExDown(filePath, "");
-      const r = markdownToHtml(filePath, "", 0, thisOption);
+      const r = markdownToHtml(filePath, "", 0, thisOption, false, false);
       vscodeCommon.showMessage(MessageType.info, r, "extension");
     }
   } catch (error) {
