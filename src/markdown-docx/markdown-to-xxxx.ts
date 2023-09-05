@@ -185,7 +185,8 @@ export async function markdownToHtml(
   /** zero base number */
   startLine = 0,
   option: DocxOption,
-  isInclude: boolean = false
+  isInclude: boolean,
+  withMenu: boolean
 ) {
   option.message && (showMessage = option.message);
   const dirPath = Path.dirname(pathMarkdown);
@@ -210,7 +211,7 @@ export async function markdownToHtml(
 
     let rr = "";
     if (isInclude) {
-      rr = await createInlineHtml(pathMarkdown, r.wdBody);
+      rr = await createInlineHtml(pathMarkdown, r.wdBody, withMenu);
     }
 
     const outHtml = rr ? rr : r.wdBody;
@@ -256,7 +257,7 @@ export async function textileToMarkdown(
 
     let rr = "";
     if (isInclude) {
-      rr = await createInlineHtml(pathMarkdown, r.wdBody);
+      rr = await createInlineHtml(pathMarkdown, r.wdBody, false);
     }
 
     const outHtml = rr ? rr : r.wdBody;
