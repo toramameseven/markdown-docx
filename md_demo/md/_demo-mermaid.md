@@ -1,7 +1,4 @@
-# mermaid
-
-## sample
-
+## mermaid
 
 ```mermaid
   graph TD;

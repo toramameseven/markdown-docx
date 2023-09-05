@@ -4,7 +4,7 @@
 
 https://github.com/gitbrent/PptxGenJS/blob/master/demos/modules/demo_shape.mjs
 
-```ppt
+```json:ppt
 [
     {"objectName": "rect", "shape": "rect", "x":0.5, "y":0.8, "w":2, "h":0.3, "fill":{ "color": "bbbbbb" }, "align":"center", "fontSize":14},
     {"objectName": "homePlate", "shape": "homePlate", "x":0.5, "y":1.1},

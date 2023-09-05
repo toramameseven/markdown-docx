@@ -368,10 +368,10 @@ text	Block code syntax highlighting
 newLine	convertHeading End		tm
 text	NOTE: <b>markdown to docx</b> does not support Syntax highlighting.
 newLine	convertParagraph		tm
-code/	var foo = function (bar) {
-code/	  return bar++;
-code/	};
-code/	console.log(foo(5));
+code/js	var foo = function (bar) {
+code/js	  return bar++;
+code/js	};
+code/js	console.log(foo(5));
 newLine	convertCode	js	tm
 section	2	tables
 text	Tables

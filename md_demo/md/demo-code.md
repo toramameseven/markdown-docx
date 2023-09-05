@@ -3,17 +3,11 @@
 
 markdown
 
-```md
+```
 Inline `code`
-tttttt
-gttttttt
-
-ttttttttt
 ```
 result
 
 Inline `code`
 
-
-![](test.png)
 
