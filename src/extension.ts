@@ -86,6 +86,13 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     vscode.commands.registerCommand(
+      "explorer.htmlToInlineHtmlNoMenu",
+      exportInlineHtmlFromMarkdownNoMenu
+    )
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
       "explorer.textileToMarkdown",
       exportMarkdownFromTextile
     )
@@ -250,7 +257,33 @@ async function exportInlineHtmlFromMarkdown(uriFile: vscode.Uri) {
     vscodeCommon.updateStatusBar(true);
     const filePath = uriFile.fsPath;
     if (filePath.match(/\.md$/i)) {
-      const r = await markdownToHtml(filePath, "", 0, thisOption, true);
+      const r = await markdownToHtml(filePath, "", 0, thisOption, true, true);
+
+      vscodeCommon.showMessage(MessageType.info, r, "extension");
+    }
+  } catch (error) {
+    vscodeCommon.showMessage(MessageType.err, error, "extension");
+  } finally {
+    vscodeCommon.updateStatusBar(false);
+  }
+}
+
+async function exportInlineHtmlFromMarkdownNoMenu(uriFile: vscode.Uri) {
+  resetAbortController();
+  const thisOption = createDocxOptionExtension({
+    ac,
+    message: vscodeCommon.showMessage,
+  });
+
+  if (thisOption.isShowOutputTab) {
+    vscodeCommon.outputTab.show();
+  }
+
+  try {
+    vscodeCommon.updateStatusBar(true);
+    const filePath = uriFile.fsPath;
+    if (filePath.match(/\.md$/i)) {
+      const r = await markdownToHtml(filePath, "", 0, thisOption, true, false);
 
       vscodeCommon.showMessage(MessageType.info, r, "extension");
     }
