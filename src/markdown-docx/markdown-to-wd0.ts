@@ -56,6 +56,7 @@ const ooxParameters = {
   docxTemplate: "docxTemplate",
   refFormat: "refFormat",
 } as const;
+
 export type OoxParameters = (typeof ooxParameters)[keyof typeof ooxParameters];
 
 export const wd0Command = {

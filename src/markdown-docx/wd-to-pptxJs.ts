@@ -64,7 +64,7 @@ let pptStyle: PptStyle = {
   tableHeaderColor: "000000",
   tableHeaderFillColor: "FFFFFF",
   defaultPositionPCT: "10,15,80,70",
-  tablePropsArray:[]
+  tablePropsArray: [],
 };
 
 // for delete the require cache.
@@ -133,7 +133,7 @@ export async function wdToPptxJs(
 
   // get ppt settings
   const settingPath = await selectExistsPath(
-    [documentInfo.param.pptxSettings ?? "", "master-settings.js"],
+    [documentInfo.param.pptxSettings ?? "", "clear.ppt.js"],
     [wdDirFullPath, `${__dirname}/../templates`, `${__dirname}/../../templates`]
   );
 
@@ -314,12 +314,13 @@ export async function wdToPptxJs(
     // body commands( main command)
     await resolveWordDownCommandEx(lines[i], pptDocument);
 
-    thisMessage?.(
-      MessageType.debug,
-      `${functionName}:currentSheet.pptxParagraph.children.length: ${pptDocument.getCurrentParagraphNum()}`,
-      "wd-to-pptxJs",
-      false
-    );
+    // only debug
+    // thisMessage?.(
+    //   MessageType.debug,
+    //   `${functionName}:currentSheet.pptxParagraph.children.length: ${pptDocument.getCurrentParagraphNum()}`,
+    //   "wd-to-pptxJs",
+    //   false
+    // );
 
     // when paragraph end, flush paragraph
     const isNewSheet = pptDocument.isNewSheet;
@@ -334,12 +335,13 @@ export async function wdToPptxJs(
         // new sheet
         pptDocument.addDocumentSlide();
         pptDocument.isNewSheet = false;
-        thisMessage?.(
-          MessageType.debug,
-          `${functionName}:add new slide`,
-          "wd-to-pptxJs",
-          false
-        );
+        // only debug
+        // thisMessage?.(
+        //   MessageType.debug,
+        //   `${functionName}:add new slide`,
+        //   "wd-to-pptxJs",
+        //   false
+        // );
       }
     }
   }
@@ -360,10 +362,21 @@ export async function wdToPptxJs(
   pptx.author = documentInfo.placeholder.author ?? ""; // ("Brent Ely");
   pptx.revision = "1";
 
-  const r = await pptx.writeFile({
-    fileName: outPathPPtx,
-    compression: true,
-  });
+  let pptFilePath = "";
+  try {
+    pptFilePath = await pptx.writeFile({
+      fileName: outPathPPtx,
+      compression: true,
+    });
+  } catch (error) {
+    thisMessage?.(
+      MessageType.err,
+      `${functionName}: ppt write error!!`,
+      "wd-to-pptxJs",
+      true
+    );
+    throw error;
+  }
 
   // open ppt
   const pptExe = await selectExistsPath(
@@ -374,7 +387,7 @@ export async function wdToPptxJs(
     [""]
   );
 
-  runCommand(pptExe, r);
+  runCommand(pptExe, pptFilePath);
 }
 
 /**
@@ -474,12 +487,13 @@ async function resolveWordDownCommandEx(
   const nodeType = words[0].split("/")[0] as WdCommand;
   let fontSize: number | undefined;
 
-  thisMessage?.(
-    MessageType.debug,
-    `resolveWordDownCommandEx: ${nodeType}:${words[1]}`,
-    "wd-to-pptxJs",
-    false
-  );
+  // only debug
+  // thisMessage?.(
+  //   MessageType.debug,
+  //   `resolveWordDownCommandEx: ${nodeType}:${words[1]}`,
+  //   "wd-to-pptxJs",
+  //   false
+  // );
 
   switch (nodeType) {
     case "section":
@@ -653,10 +667,9 @@ async function resolveWordDownCommandEx(
       if (!["convertTitle", "convertSubTitle"].includes(words[1])) {
         // output paragraph
 
-        // slide.pptxParagraph.addChild({
-        //   text: "",
-        //   options: { breakLine: true },
-        // });
+        pptxDocument.addTextProps({
+          options: { breakLine: true },
+        });
 
         pptxDocument.isParagraphFlush = true;
       }
@@ -821,23 +834,23 @@ function createImageChild(
   let imageHeightInch = (sizeImage.height ?? 100) / dpi;
 
   // slide size in (inch / 100)
-  const pEmp = 1.093613298337708e-8; // 1/ 914400 * 0.01
+  const pEmp = 1.093613298337708e-6; // 1/ 914400 * 0.01
   const slideWidth = pptx.presLayout.width * pEmp;
   const slideHeight = pptx.presLayout.height * pEmp;
 
   //frame size inch
-  const frameWidth = slideWidth * parseFloat(pos.w.replace("%", ""));
-  const frameHeight = slideHeight * parseFloat(pos.w.replace("%", ""));
+  const frameWidth = slideWidth * parseFloat(pos.w.replace("%", "")) * 0.01;
+  const frameHeight = slideHeight * parseFloat(pos.h.replace("%", "")) * 0.01;
 
-  const maxOutputSizeInch = Math.min(frameWidth, frameHeight);
+  const r = imageWidthInch / imageHeightInch;
+  if (imageWidthInch > frameWidth) {
+    imageWidthInch = frameWidth;
+    imageHeightInch = imageWidthInch / r;
+  }
 
-  if (
-    imageWidthInch > maxOutputSizeInch ||
-    imageHeightInch > maxOutputSizeInch
-  ) {
-    const r = maxOutputSizeInch / Math.max(imageWidthInch, imageHeightInch);
-    imageWidthInch *= r;
-    imageHeightInch *= r;
+  if (imageHeightInch > frameHeight) {
+    imageHeightInch = frameHeight;
+    imageWidthInch = imageHeightInch * r;
   }
 
   let positions = {};

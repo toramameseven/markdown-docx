@@ -1,4 +1,4 @@
-<!-- word export demo-list-mixed.md-->
+
 # Lists mixed
 
 ## Lists mixed
