@@ -39,6 +39,7 @@ import {
   SimpleField,
   TableLayoutType,
   PageBreak,
+  CheckBox,
 } from "docx";
 import { svg2imagePng } from "./tools/svg-png-image";
 import { WdCommand, wdCommand } from "./wd0-to-wd";
@@ -375,7 +376,7 @@ export async function wdToDocxJs(
 
     // when find create table
     if (wdCommandList[0] === "tableCreate") {
-      if (tableJs){
+      if (tableJs) {
         patches.push(tableJs.createTable(documentInfo));
         tableJs = undefined;
         patches.push(new Paragraph(" "));
@@ -780,16 +781,24 @@ async function createImageChild(
 
   const sizeImage = imageSize.imageSize(imagePath);
 
-  const maxSize = 400; //convertInchesToTwip(3);
+  const maxSize = 600; //convertInchesToTwip(3);
 
   let width = sizeImage.width ?? 100;
   let height = sizeImage.height ?? 100;
 
-  if (width > maxSize || height > maxSize) {
-    const r = maxSize / Math.max(width, height);
-    width *= r;
-    height *= r;
+
+  const r = width / height;
+
+  if (width > maxSize) {
+    width = maxSize;
+    height = width / r;
   }
+
+  if (height > maxSize) {
+    height = maxSize;
+    width = height * r;
+  }
+
   const child = new ImageRun({
     data: fs.readFileSync(imagePath),
     transformation: {
@@ -832,7 +841,7 @@ export async function createDocxPatch(
 
 async function resolveEmphasis(source: string) {
   let rg =
-    /<(|\/)sub>|<(|\/)sup>|<(|\/)codespan>|<(|\/)i>|<(|\/)b>|<(|\/)~~>|\$/g;
+    /<(|\/)sub>|<(|\/)sup>|<(|\/)codespan>|<(|\/)i>|<(|\/)b>|<(|\/)~~>|☑|☐|\$/g;
 
   let indexBefore = 0;
   const stack = [];
@@ -903,6 +912,11 @@ async function resolveEmphasis(source: string) {
       textProp = { ...textProp, [resolveEmphasisTag(tag)]: isOn };
     }
     indexBefore = rg.lastIndex;
+
+    // add checkbox
+    if (tag === "☑" || tag === "☐") {
+      stack.push(new CheckBox({ checked: tag === "☑" }));
+    }
   }
 
   // text
