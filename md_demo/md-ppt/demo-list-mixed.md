@@ -15,4 +15,19 @@
 
 above is lsit
 
+## position
+
+<!-- ppt position 10,10,30,50-->
+
+
+* sssss
+* sssss
+
+
+<!-- ppt position 50,10,30,50-->
+
+
+* sssss
+* sssss
+
 

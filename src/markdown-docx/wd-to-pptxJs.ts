@@ -38,8 +38,9 @@ type DocumentInfoParam = {
   position?: string;
   pptxSettings?: string;
 };
+
 type DocumentInfo = {
-  placeholder: Record;
+  placeholders: Record;
   param: DocumentInfoParam;
 };
 
@@ -76,7 +77,13 @@ const _sp = "\t";
 /** slide paging at section */
 const isNewSlideAtSection: boolean = true;
 
-// ############################################################
+/**
+ * create ppt from wdBody
+ * @param fileWd .wd path
+ * @param wdBody wd string
+ * @param option DocxOptions
+ * @returns
+ */
 export async function wdToPptx(
   fileWd: string,
   wdBody: string,
@@ -114,7 +121,7 @@ export async function wdToPptxJs(
 ): Promise<void> {
   const functionName = "wdToPptxJs";
   // doc info
-  const documentInfo: DocumentInfo = { placeholder: {}, param: {} };
+  const documentInfo: DocumentInfo = { placeholders: {}, param: {} };
   const wdDirFullPath = Path.dirname(wdFullPath);
 
   thisMessage = option.message;
@@ -194,8 +201,8 @@ export async function wdToPptxJs(
   });
 
   // add pptx document title (cover page)
-  if (documentInfo.placeholder.title) {
-    pptDocument.addPptxCover(documentInfo.placeholder);
+  if (documentInfo.placeholders.title) {
+    pptDocument.addPptxCover(documentInfo.placeholders);
   }
 
   // create first slide
@@ -357,11 +364,13 @@ export async function wdToPptxJs(
     Path.basename(wdFullPath, ".wd") + ".md.pptx"
   );
 
-  pptx.title = documentInfo.placeholder.title ?? ""; // "PptxGenJS Test Suite Presentation";
-  pptx.subject = documentInfo.placeholder.subTitle ?? ""; // "PptxGenJS Test Suite Export";
-  pptx.author = documentInfo.placeholder.author ?? ""; // ("Brent Ely");
+  // create ppt document information
+  pptx.title = documentInfo.placeholders.title ?? ""; // "PptxGenJS Test Suite Presentation";
+  pptx.subject = documentInfo.placeholders.subTitle ?? ""; // "PptxGenJS Test Suite Export";
+  pptx.author = documentInfo.placeholders.author ?? ""; // ("Brent Ely");
   pptx.revision = "1";
 
+  // save ppt file
   let pptFilePath = "";
   try {
     pptFilePath = await pptx.writeFile({
@@ -417,7 +426,7 @@ function resolveCommentCommand(
   documentInfo: DocumentInfo
 ) {
   if (wdCommandList[0] === "placeholder") {
-    documentInfo.placeholder[wdCommandList[1]] = wdCommandList[2];
+    documentInfo.placeholders[wdCommandList[1]] = wdCommandList[2];
     return true;
   }
 
@@ -443,7 +452,7 @@ function resolveCommentCommand(
 
   // not comment command
   if (wdCommandList[0] === "section" && wdCommandList[1] === "1") {
-    documentInfo.placeholder["title"] = wdCommandList2[1];
+    documentInfo.placeholders["title"] = wdCommandList2[1];
   }
 
   return false;
@@ -516,9 +525,11 @@ async function resolveWordDownCommandEx(
         pptxDocument.status = "insideCover";
       } else {
         // more ### headings
-        pptxDocument.addTextProps({
-          options: { breakLine: true },
-        });
+        if (pptxDocument.getCurrentParagraphNum() > 0) {
+          pptxDocument.addTextProps({
+            options: { breakLine: true },
+          });
+        }
         pptxDocument.addTextPropsArrayFromParagraph();
       }
 
@@ -668,10 +679,11 @@ async function resolveWordDownCommandEx(
 
       if (!["convertTitle", "convertSubTitle"].includes(words[1])) {
         // output paragraph
-
-        pptxDocument.addTextProps({
-          options: { breakLine: true },
-        });
+        if (pptxDocument.getCurrentParagraphNum() > 0) {
+          pptxDocument.addTextProps({
+            options: { breakLine: true },
+          });
+        }
 
         pptxDocument.isParagraphFlush = true;
       }

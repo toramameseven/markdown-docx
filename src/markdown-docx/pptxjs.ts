@@ -199,6 +199,10 @@ export class PptxDocument {
     this.pptxParagraph.addTextProps(s);
   }
 
+  getCurrentParagraphLength(){
+    return this.pptxParagraph.children.length;
+  }
+
   clearParagraph() {
     this.pptxParagraph.clear();
   }
