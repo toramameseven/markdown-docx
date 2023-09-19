@@ -1,7 +1,8 @@
 import pptxGen from "pptxgenjs";
 import type PptxGenJS from "pptxgenjs";
 
-import { parse as JSONCParse } from 'jsonc-parser';
+import { parse as JSONCParse } from "jsonc-parser";
+import Module = require("module");
 export type Position = { x: number; y: number; w: number; h: number };
 export type PositionP = {
   x: `${number}%`;
@@ -17,6 +18,15 @@ export const initialPositionP: PositionP = {
   h: "100%",
 };
 
+type TableInfoOptions = {
+  titleRowColor: string;
+  titleRowFillColor: string;
+  oddRowColor: string;
+  oddRowFillColor: string;
+  evenRowColor: string;
+  evenRowFillColor: string;
+};
+
 export type PptStyle = {
   titleSlide: PptxGenJS.SlideMasterProps;
   masterSlide: PptxGenJS.SlideMasterProps;
@@ -30,13 +40,14 @@ export type PptStyle = {
   code: PptxGenJS.TextPropsOptions;
   codeSpan: PptxGenJS.TextPropsOptions;
   tableProps: PptxGenJS.TableProps;
-  tablePropsArray:PptxGenJS.TableProps[];
+  tablePropsArray: PptxGenJS.TableProps[];
   tableHeaderColor: string;
   tableHeaderFillColor: string;
   layout: string;
   bodyFontFace: PptxGenJS.TableCellProps;
   headFontFace: PptxGenJS.ThemeProps;
   defaultPositionPCT: string;
+  tableInfoOptions: TableInfoOptions[];
 };
 
 export type TextFrame = {
@@ -153,6 +164,19 @@ export class PptxDocument {
     );
   }
 
+  // todo
+
+  addJsObjectToSheetObjects() {
+    const jsArray: any[] = this.pptxParagraph.createJsObjectCode();
+    jsArray.forEach((s) => {
+      let textFrame: TextFrame = {
+        textPropsArray: s.params[0],
+        outputPosition: s.params[1]
+      };
+      this.sheetObjects.push({ type: "text", sheetObject: textFrame });
+    });
+  }
+
   addTableToSheetObjects(table: TableProps) {
     this.sheetObjects.push({ type: "table", sheetObject: table });
   }
@@ -199,7 +223,7 @@ export class PptxDocument {
     this.pptxParagraph.addTextProps(s);
   }
 
-  getCurrentParagraphLength(){
+  getCurrentParagraphLength() {
     return this.pptxParagraph.children.length;
   }
 
@@ -312,7 +336,7 @@ class PptParagraph {
 
   createTextCode() {
     const shapeJson: pptxGen.TextPropsOptions[] = JSONCParse(
-      this.childrenRaw.join("")
+      this.childrenRaw.join("\n")
     );
 
     const r = shapeJson;
@@ -329,6 +353,18 @@ class PptParagraph {
     this.clear();
     // remove empty obj
     return r.filter((ro) => Object.keys(ro).length);
+  }
+
+  // not pending
+
+  createJsObjectCode() {
+    const m = new Module("");
+    const code = this.childrenRaw.join("\n");
+    // @ts-ignore
+    m._compile(code, "");
+    const exp:[] = m.exports.array;
+    this.clear();
+    return exp;
   }
 
   clear() {

@@ -66,6 +66,14 @@ let pptStyle: PptStyle = {
   tableHeaderFillColor: "FFFFFF",
   defaultPositionPCT: "10,15,80,70",
   tablePropsArray: [],
+  tableInfoOptions: [{
+    titleRowColor: "F7F7F7",
+    titleRowFillColor: "676767",
+    oddRowColor: "676767",
+    oddRowFillColor: "F7F7F7",
+    evenRowColor: "676767",
+    evenRowFillColor: "F7F7F7"
+  }],
 };
 
 // for delete the require cache.
@@ -279,7 +287,7 @@ export async function wdToPptxJs(
     // shape command
     if (
       wdCommandList[0].split("/")[0] === "code" &&
-      wdCommandList[0].split("/")[1] === "json:ppt"
+      ( wdCommandList[0].split("/")[1] === "json:ppt" || wdCommandList[0].split("/")[1] === "js:ppt")
     ) {
       //create text frame
       pptDocument.addTextPropsArrayFromParagraph();
@@ -295,6 +303,13 @@ export async function wdToPptxJs(
       pptDocument.addShapesToSheetObjects();
       continue;
     }
+
+    // flush pptxgen js commnad
+    if (wdCommandList[0] === "newLine" && wdCommandList[2] === "js:ppt") {
+      pptDocument.addJsObjectToSheetObjects();
+      continue;
+    }
+
 
     // html comment command <!-- word xxxx -->
     const isResolveCommand = resolveCommentCommand(

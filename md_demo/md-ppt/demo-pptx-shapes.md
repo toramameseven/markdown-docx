@@ -213,7 +213,6 @@ out
 {"objectName": "wedgeEllipseCallout","shape": "wedgeEllipseCallout","x":2,"y":6},
 {"objectName": "wedgeRectCallout","shape": "wedgeRectCallout","x":2,"y":1},
 {"objectName": "wedgeRoundRectCallout","shape": "wedgeRoundRectCallout","x":4,"y":1.5}
-
 ]
 ```
 out
