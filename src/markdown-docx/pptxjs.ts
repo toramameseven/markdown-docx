@@ -168,13 +168,24 @@ export class PptxDocument {
 
   addJsObjectToSheetObjects() {
     const jsArray: any[] = this.pptxParagraph.createJsObjectCode();
-    jsArray.forEach((s) => {
-      let textFrame: TextFrame = {
-        textPropsArray: s.params[0],
-        outputPosition: s.params[1]
-      };
-      this.sheetObjects.push({ type: "text", sheetObject: textFrame });
-    });
+    for (let i = 0; i < jsArray.length; i++) {
+      let element = jsArray[i];
+      if (element.type === "text") {
+        let textFrame: TextFrame = {
+          textPropsArray: element.params[0],
+          outputPosition: element.params[1],
+        };
+        this.sheetObjects.push({ type: "text", sheetObject: textFrame });
+      }      
+      
+      if (element.type === "table") {
+        let table: TableProps = {
+          tableRows: element.params[0],
+          options: element.params[1],
+        };
+        this.sheetObjects.push({ type: "table", sheetObject: table });
+      }
+    }
   }
 
   addTableToSheetObjects(table: TableProps) {
@@ -362,7 +373,7 @@ class PptParagraph {
     const code = this.childrenRaw.join("\n");
     // @ts-ignore
     m._compile(code, "");
-    const exp:[] = m.exports.array;
+    const exp: [] = m.exports.array;
     this.clear();
     return exp;
   }

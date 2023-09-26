@@ -81,7 +81,10 @@ We do not use Microsoft Word at version 0.0.2.
   
   empty cells are merged. only row direction.
 
+## check box
 
+* ☑ check box: checked
+* ☐ check box: not checked
 
 ## sample markdown file
 
