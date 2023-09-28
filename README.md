@@ -1,4 +1,15 @@
+<!-- word placeholder subTitle subTitle -->
+<!-- word placeholder author author -->
+<!-- word placeholder division division -->
+<!-- word placeholder date date -->
+<!-- word placeholder docNumber XXXX-XXXX -->
+
+<!-- word docxTemplate _with_cover.docx -->
+
 # Markdown Docx README
+
+<!-- word toc 1 TOC -->
+<!-- word newPage -->
 
 This is the README **Markdown Docx**. 
 
@@ -222,6 +233,8 @@ next styles are created.
 * The indent of table of contents is not good.
 
 ## vbs rendering does not support
+
+NOTE: vbs rendering does not support
 
 ## How to package
 
