@@ -396,6 +396,7 @@ export async function wdToDocxJs(
       // in not table command, create table.
       if (tableJs) {
         patches.push(tableJs.createTable(documentInfo));
+        patches.push(new Paragraph(" "));
         tableJs = undefined;
       }
     }
