@@ -8,11 +8,12 @@ import {
 } from "./common";
 import { addTableSpanToMarkdown } from "./add-table-span";
 import { spanTable } from "./marked-extended-tables";
+import { Bookmarks } from "./bookmarks";
 
 const source = "markdown-to-wd";
 let showMessage: ShowMessage | undefined;
 
-const idMap = new Map();
+const bookmarks = new Bookmarks();
 
 const markedCommand = {
   heading: "heading",
@@ -47,7 +48,7 @@ const wordCommand = {
   export: "export",
   placeholder: "placeholder",
   param: "param",
-} as const;
+  } as const;
 
 const ooxParameters = {
   pptxSettings: "pptxSettings",
@@ -150,6 +151,8 @@ const documentInfoParams = [
   "refFormat",
   "tableWidth",
   "levelOffset",
+  "tableCaption",
+  "tableCaptionId",
 ] as const;
 type DocumentInfoParams = (typeof documentInfoParams)[number];
 const isDocumentInfoParams = (name: string): name is DocumentInfoParams => {
@@ -236,45 +239,14 @@ function resolveHtmlComment(content: string) {
   }
 }
 
+
 export function getWordTitle(wd: string) {
   const r = parseHtmlComment(wd);
   const title = r?.command === "title" ? r.params[0] : "no title";
   return title;
 }
 
-// https://qiita.com/satokaz/items/64582da4640898c4bf42
-// slugify:
-export function slugify(header: string, alowDuplicate = false) {
-  //return encodeURI(
-  let r = header
-    .trim()
-    .toLowerCase()
-    .replace(
-      /[\]\[\!\"\#\$\%\&\'\(\)\*\+\,\.\/\:\;\<\=\>\?\@\\\^\_\{\|\}\~＠＃＄％＾＆＊（）＿＋－＝｛｝”’＜＞［］「」・、。～]/g,
-      ""
-    )
-    .replace(/\s+/g, "-") // Replace spaces with hyphens
-    .replace(/\-+$/, ""); // Replace trailing hyphen
 
-  if (alowDuplicate === false) {
-    r = createUniqId(r, r);
-  }
-
-  return r;
-}
-
-function createUniqId(id: string, originalId: string, index = 0) {
-  let testId = id;
-  if (idMap.has(testId)) {
-    testId = createUniqId(
-      originalId + "-" + (index + 1).toString(),
-      originalId,
-      index + 1
-    );
-  }
-  idMap.set(testId, testId);
-  return testId;
-}
 
 // -----------------------------------
 
@@ -305,7 +277,7 @@ const blockHeading = (content: string, index: number) => {
   }
 
   let idTitle = (r && r[4]) ?? title;
-  idTitle = slugify(idTitle);
+  idTitle = bookmarks.slugify(idTitle);
 
   const lines = splitBlockContents(content);
   const headings = {
@@ -444,7 +416,7 @@ const blockLink = (
   // [content](#href "title") .. word cross ref
   // when content === "", cross ref
   if (convertRef.length > 1 && convertRef[0] === "#") {
-    convertRef = slugify(convertRef, true);
+    convertRef = bookmarks.slugify(convertRef, true);
     content = "";
   }
 
@@ -490,7 +462,7 @@ export async function markdownToWd0(
   options?: Marked.MarkedOptions,
   messageFunction?: ShowMessage
 ) {
-  idMap.clear();
+  bookmarks.clear();
   showMessage = messageFunction;
 
   const typeOfConvert = {
