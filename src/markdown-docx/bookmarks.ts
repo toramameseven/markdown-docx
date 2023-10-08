@@ -2,14 +2,16 @@ export class Bookmarks {
   bookmarkMap = new Map();
   constructor() {}
 
-  clear(){
+  clear() {
     this.bookmarkMap = new Map();
   }
 
-  has(testId: string){
+  has(testId: string) {
     return this.bookmarkMap.has(testId);
   }
 
+  // https://qiita.com/satokaz/items/64582da4640898c4bf42
+  // slugify:
   slugify(header: string, alowDuplicate = false) {
     //return encodeURI(
     let r = header
