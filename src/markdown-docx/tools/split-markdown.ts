@@ -1,6 +1,6 @@
 import * as Fs from "fs";
 import * as path from "path";
-import { getWordTitle, slugify } from "../markdown-to-wd0";
+import { getWordTitle, /* slugify */ } from "../markdown-to-wd0";
 import {
   getFileContents,
   getWordDownCommand,
@@ -54,7 +54,8 @@ async function splitForHugo(marked: string, pathToSave: string = "") {
     const title = getHeading1Title(element);
     if (title !== "") {
       // has section
-      const fileName = path.resolve(dirHugoMds, slugify(title) + ".md");
+      // const fileName = path.resolve(dirHugoMds, slugify(title) + ".md");
+      const fileName = "";
       console.log(`try save: ${fileName}`);
       if (!(await fileExists(fileName))) {
         Fs.writeFileSync(fileName, createFrontMatter(title, index) + element);
