@@ -43,14 +43,15 @@ import {
 } from "docx";
 import { svg2imagePng } from "./tools/svg-png-image";
 import { WdCommand, wdCommand } from "./wd0-to-wd";
-import { initialize } from "svg2png-wasm";
+//import { initialize } from "svg2png-wasm";
+import { Bookmarks } from "./bookmarks";
 // import { OoxParameters } from "./markdown-to-wd0";
-//import mermaid from "mermaid";
+// import mermaid from "mermaid";
 
 const _sp = "\t";
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 const DocStyle = {
-  "1": "1",
   hh0: "hh0",
   hh1: "hh1",
   hh2: "hh2",
@@ -58,7 +59,9 @@ const DocStyle = {
   hh4: "hh4",
   hh5: "hh5",
   hh6: "hh6",
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   Body: "body",
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   Body1: "body1",
   nList1: "nList1",
   nList2: "nList2",
@@ -69,23 +72,32 @@ const DocStyle = {
   code: "code",
   note1: "note1",
   warning1: "warn1",
+  imageCaption: "imageCaption",
+  tableCaption: "tableCaption",
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   Error: "Error",
 } as const;
 type DocStyle = (typeof DocStyle)[keyof typeof DocStyle];
 
 // https://chaika.hatenablog.com/entry/2021/11/03/083000
-const documentInforParams = [
+const documentInfoParams = [
   "pptxSettings",
   "position",
   "dpi",
   "docxTemplate",
   "refFormat",
+  "captionRefFormat",
   "tableWidth",
+  "tableCaption",
+  "tablePrefix",
+  "figurePrefix",
 ] as const;
-type DocumentInfoParams = (typeof documentInforParams)[number];
+type DocumentInfoParams = (typeof documentInfoParams)[number];
+
 type DocumentInfo = {
-  placeholder: { [v: string]: string };
-  param: { [v in DocumentInfoParams]?: string };
+  placeholders: { [v: string]: string };
+  params: { [v in DocumentInfoParams]?: string };
+  bookmarks: Bookmarks;
 };
 
 /**
@@ -174,6 +186,24 @@ class TableJs {
     }
   }
 
+  applyToPatch(
+    patches: (Paragraph | Table | TableOfContents)[],
+    documentInfo: DocumentInfo
+  ) {
+    if (documentInfo.params.tableCaption && documentInfo.params.tablePrefix) {
+      patches.push(
+        this.createTableCaptionParagraph(
+          documentInfo.params.tableCaption,
+          documentInfo
+        )
+      );
+    }
+    // clear caption
+    documentInfo.params.tableCaption = "";
+    patches.push(this.createTable(documentInfo));
+    patches.push(new Paragraph(" "));
+  }
+
   createTable(documentInfo: DocumentInfo) {
     let rows = new Array(this.rows);
     for (let i = 0; i < this.rows; i++) {
@@ -221,7 +251,7 @@ class TableJs {
       return new TableRow({ children: rr });
     });
 
-    const tableWidth = getFloat(documentInfo.param.tableWidth, 20, 100);
+    const tableWidth = getFloat(documentInfo.params.tableWidth, 20, 100);
 
     const tableJs = new Table({
       layout: TableLayoutType.FIXED,
@@ -242,6 +272,26 @@ class TableJs {
   createRawColumnSpan(r1: number, c1: number, r2: number, c2: number) {
     return [r2 - r1 + 1, c2 - c1 + 1];
   }
+
+  createTableCaptionParagraph(
+    tableCaption: string,
+    documentInfo: DocumentInfo
+  ) {
+    const tableCaptionId = documentInfo.bookmarks.slugify("table-" + tableCaption);
+    const tableCaptionBookmark = new Bookmark({
+      id: tableCaptionId,
+      children: [
+        new TextRun(documentInfo.params.tablePrefix + " "),
+        new SimpleField(` SEQ GRIDTABLE \\* ARABIC  `),
+      ],
+    });
+
+    const docxR = new Paragraph({
+      children: [tableCaptionBookmark, new TextRun(" " + tableCaption)],
+      style: DocStyle.tableCaption,
+    });
+    return docxR;
+  }
 }
 
 class DocParagraph {
@@ -253,6 +303,7 @@ class DocParagraph {
   docStyle: DocStyle;
   isImage: boolean;
   refId: string = "";
+  imageCaption: string = "";
 
   constructor(
     nodeType: WdCommand = wdCommand.non,
@@ -276,6 +327,11 @@ class DocParagraph {
     }
     let pStyle = this.isImage ? "picture1" : this.docStyle;
 
+    // if more then one item, its not block images
+    if (this.children.length > 1) {
+      this.imageCaption = "";
+    }
+
     if (pStyle === "body") {
       pStyle = `body${this.indent + 1}`;
     }
@@ -285,6 +341,34 @@ class DocParagraph {
       style: pStyle,
     });
 
+    this.initialize();
+    return docxR;
+  }
+
+  createDocxParagraphAsImageCaption(
+    documentInfo: DocumentInfo
+  ): Paragraph | Table | undefined {
+    if (this.imageCaption === "") {
+      return undefined;
+    }
+
+    const imageCaptionId = documentInfo.bookmarks.slugify("fig-" + this.imageCaption);
+    const imageCaptionBookmark = new Bookmark({
+      id: imageCaptionId,
+      children: [
+        new TextRun(documentInfo.params.figurePrefix + " "),
+        new SimpleField(` SEQ DOCXFIG \\* ARABIC  `),
+      ],
+    });
+
+    const children = documentInfo.params.figurePrefix ? [imageCaptionBookmark, new TextRun(" " + this.imageCaption)] : [new TextRun(" ")];
+
+    const docxR = new Paragraph({
+      children,
+      style: DocStyle.imageCaption,
+    });
+
+    this.imageCaption = "";
     this.initialize();
     return docxR;
   }
@@ -351,6 +435,7 @@ export async function wdToDocxJs(
   mdSourcePath: string,
   option: DocxOption
 ): Promise<void> {
+  // message function
   option.message && (showMessageThis = option.message);
 
   // for placeholder
@@ -364,9 +449,14 @@ export async function wdToDocxJs(
   let tableJs: TableJs | undefined = undefined;
 
   const documentInfo: DocumentInfo = {
-    placeholder: { title },
-    param: { refFormat: "[[$n $t (p.$p)]]" },
+    placeholders: { title },
+    params: { refFormat: "[[$n $t (p.$p)]]", captionRefFormat: "($t)" },
+    bookmarks: new Bookmarks(),
   };
+
+  // initialize params
+  documentInfo.params.tablePrefix = "Table";
+  documentInfo.params.figurePrefix = "Fig.";
 
   // patch parameter
 
@@ -377,9 +467,8 @@ export async function wdToDocxJs(
     // when find create table
     if (wdCommandList[0] === "tableCreate") {
       if (tableJs) {
-        patches.push(tableJs.createTable(documentInfo));
+        tableJs.applyToPatch(patches, documentInfo);
         tableJs = undefined;
-        patches.push(new Paragraph(" "));
       }
       tableJs = new TableJs(
         parseInt(wdCommandList[1]),
@@ -395,8 +484,7 @@ export async function wdToDocxJs(
     } else {
       // in not table command, create table.
       if (tableJs) {
-        patches.push(tableJs.createTable(documentInfo));
-        patches.push(new Paragraph(" "));
+        tableJs.applyToPatch(patches, documentInfo);
         tableJs = undefined;
       }
     }
@@ -427,6 +515,13 @@ export async function wdToDocxJs(
       const p = currentParagraph.createDocxParagraph();
       if (p) {
         patches.push(p);
+      }
+
+      // image figure caption
+      const p2 =
+        currentParagraph.createDocxParagraphAsImageCaption(documentInfo);
+      if (p2) {
+        patches.push(p2);
       }
     }
   } // end for
@@ -502,7 +597,7 @@ function resolveCommentCommand(
 
   // param words
   if (wdCommandList[0] === "param") {
-    documentInfo.param[wdCommandList[1] as DocumentInfoParams] =
+    documentInfo.params[wdCommandList[1] as DocumentInfoParams] =
       wdCommandList[2];
     return true;
   } // param words
@@ -536,6 +631,7 @@ async function resolveWDCommandEx(
         `hh${hhHeader}` as DocStyle // `${words[1]}` as DocStyle, // we do not know how this works.
       );
       current.refId = words[2];
+      documentInfo.bookmarks.slugify(current.refId);
       return current;
       break;
     case wdCommand.NormalList:
@@ -574,9 +670,10 @@ async function resolveWDCommandEx(
     case wdCommand.link:
       if (!words[3]) {
         // internal link
-        let children = resolveXref(words[1], documentInfo.param.refFormat);
+        let children = resolveXref(words[1], documentInfo);
         currentParagraph.addChildren(children);
       } else {
+        // external link
         child = new ExternalHyperlink({
           children: [
             new TextRun({
@@ -592,6 +689,7 @@ async function resolveWDCommandEx(
     case wdCommand.image:
       child = await createImageChild(mdSourcePath, words[1], option);
       currentParagraph.addChild(child, true);
+      currentParagraph.imageCaption = words[2];
       return currentParagraph;
       break;
     case "text":
@@ -687,7 +785,21 @@ async function resolveWDCommandEx(
   }
 }
 
-function resolveXref(linkRef: string, refFormat: string = "[[$n $t p.$p]]") {
+function getLinkType(linkRef: string): "section"|"caption" {
+  if (linkRef.slice(0, "fig-".length) === "fig-"){
+    return "caption";
+  }
+  if (linkRef.slice(0, "table-".length) === "table-"){
+    return "caption";
+  }
+  return "section";
+}
+
+function resolveXref(linkRef: string, documentInfo: DocumentInfo) {
+
+  let refFormat = getLinkType(linkRef) === "section" ? documentInfo.params.refFormat : documentInfo.params.captionRefFormat;
+  refFormat = refFormat || "[[$n $t p.$p]]";
+
   const refItems = [];
   for (let i = 0; i < refFormat.length; i++) {
     let t = refFormat.slice(i, i + 2);
@@ -787,7 +899,6 @@ async function createImageChild(
   let width = sizeImage.width ?? 100;
   let height = sizeImage.height ?? 100;
 
-
   const r = width / height;
 
   if (width > maxSize) {
@@ -825,7 +936,7 @@ export async function createDocxPatch(
   children: (Paragraph | Table | TableOfContents)[],
   docxTemplatePath: string,
   docxOutPath: string,
-  docInfo: { placeholder: {}; param: {} },
+  docInfo: { placeholders: {}; params: {} },
   patchInfo: { [v: string]: PatchInfo }
 ) {
   const patchDoc = await patchDocument(fs.readFileSync(docxTemplatePath), {

@@ -56,6 +56,9 @@ const ooxParameters = {
   dpi: "dpi",
   docxTemplate: "docxTemplate",
   refFormat: "refFormat",
+  captionRefFormat: "captionRefFormat",
+  figurePrefix: "figurePrefix",
+  tablePrefix: "tablePrefix",
 } as const;
 
 export type OoxParameters = (typeof ooxParameters)[keyof typeof ooxParameters];
@@ -149,10 +152,13 @@ const documentInfoParams = [
   "dpi",
   "docxTemplate",
   "refFormat",
+  "captionRefFormat",
   "tableWidth",
   "levelOffset",
   "tableCaption",
   "tableCaptionId",
+  "tablePrefix",
+  "figurePrefix"
 ] as const;
 type DocumentInfoParams = (typeof documentInfoParams)[number];
 const isDocumentInfoParams = (name: string): name is DocumentInfoParams => {

@@ -1,5 +1,8 @@
 <!-- word export demo-table.md-->
 <!-- word tableWidth 50 -->
+<!-- word figurePrefix "図" -->
+<!-- word tablePrefix "表" -->
+
 # Tables
 
 ## normal table
@@ -46,4 +49,5 @@ NOTE: **markdown to docx**  supports only image files.
 
 NOTE: Inline images do not work well.
 
-[this table](#logo-block)
+~~~のようになります[this table](#fig-logo-block)。
+[this table](#fig-logo-block-1)
