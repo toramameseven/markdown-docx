@@ -19,6 +19,10 @@ markdown
 
 ## normal table
 
+<!-- word newLine -->
+<!-- word newLine -->
+<!-- word newLine -->
+
 result
 
 <!-- word tableCaption これはキャプションです tableCaptionId x0001 -->

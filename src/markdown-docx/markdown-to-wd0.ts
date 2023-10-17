@@ -61,7 +61,7 @@ const ooxParameters = {
   tablePrefix: "tablePrefix",
 } as const;
 
-export type OoxParameters = (typeof ooxParameters)[keyof typeof ooxParameters];
+// export type OoxParameters = (typeof ooxParameters)[keyof typeof ooxParameters];
 
 export const wd0Command = {
   ...markedCommand,
@@ -154,6 +154,7 @@ const documentInfoParams = [
   "refFormat",
   "captionRefFormat",
   "tableWidth",
+  "imageWidth",
   "levelOffset",
   "tableCaption",
   "tableCaptionId",
@@ -161,6 +162,7 @@ const documentInfoParams = [
   "figurePrefix"
 ] as const;
 type DocumentInfoParams = (typeof documentInfoParams)[number];
+
 const isDocumentInfoParams = (name: string): name is DocumentInfoParams => {
   return documentInfoParams.some((value) => value === name);
 };
@@ -462,6 +464,8 @@ function joinObjectToString(params: DocxParam) {
   return r.join(_sp);
 }
 
+
+
 export async function markdownToWd0(
   markdown: string,
   convertType: "docx" | "excel" | "html" | "textile",
@@ -490,7 +494,8 @@ export async function markdownToWd0(
   );
   let levelOffset = parseInt(offsetMatch?.groups?.name ?? "0");
   levelOffset = Number.isNaN(levelOffset) ? 0 : levelOffset;
-
+  
+  
   const walkTokens = (token: any) => {
     if (token.type === "heading") {
       token.depth += levelOffset;

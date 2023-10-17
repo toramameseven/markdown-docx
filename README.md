@@ -73,6 +73,13 @@ We do not use Microsoft Word at version 0.0.2.
   
   `[[1.1 this section (p.10)]]`
 
+###### image
+
+* `<!-- word imageWidth 200 -->`
+
+  set max image size.
+ 
+
 ###### table
 
 * `<!-- word tableWidth 90 -->`

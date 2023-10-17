@@ -9,6 +9,8 @@ function getLinkType(linkRef: string): "section"|"caption" {
 }
 
 
-console.log(getLinkType("table.xxxxx"));
-console.log(getLinkType("fig.xxxxx"));
-console.log(getLinkType("figxxxxx"));
+// console.log(getLinkType("table.xxxxx"));
+// console.log(getLinkType("fig.xxxxx"));
+// console.log(getLinkType("figxxxxx"));
+
+console.log("abcde".substring(0,3));

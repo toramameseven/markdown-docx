@@ -88,6 +88,7 @@ const documentInfoParams = [
   "refFormat",
   "captionRefFormat",
   "tableWidth",
+  "imageWidth",
   "tableCaption",
   "tablePrefix",
   "figurePrefix",
@@ -304,11 +305,13 @@ class DocParagraph {
   isImage: boolean;
   refId: string = "";
   imageCaption: string = "";
+  isListBefore: boolean = false;
 
   constructor(
     nodeType: WdCommand = wdCommand.non,
     indent: number = 0,
     docStyle: DocStyle = DocStyle.Body,
+    isListBefore: boolean = false,
     child?: ParagraphChild
   ) {
     this.nodeType = nodeType;
@@ -319,6 +322,7 @@ class DocParagraph {
     }
     this.docStyle = docStyle;
     this.isImage = false;
+    this.isListBefore = isListBefore;
   }
 
   createDocxParagraph(): Paragraph | Table | undefined {
@@ -390,6 +394,7 @@ class DocParagraph {
     this.docStyle = DocStyle.Body;
     this.isImage = false;
     this.refId = "";
+    this.isListBefore =false;
   }
 
   addIndent() {
@@ -512,6 +517,10 @@ export async function wdToDocxJs(
 
     // when paragraph end, flush paragraph
     if (currentParagraph.isFlush) {
+      if (currentParagraph.isListBefore && currentParagraph.docStyle.substring(0, 2) === 'hh'){
+        patches.push(new Paragraph(" "));
+      }
+      currentParagraph.isListBefore = false;
       const p = currentParagraph.createDocxParagraph();
       if (p) {
         patches.push(p);
@@ -628,7 +637,8 @@ async function resolveWDCommandEx(
       current = new DocParagraph(
         nodeType,
         currentParagraph.indent,
-        `hh${hhHeader}` as DocStyle // `${words[1]}` as DocStyle, // we do not know how this works.
+        `hh${hhHeader}` as DocStyle, // `${words[1]}` as DocStyle, // we do not know how this works.
+        currentParagraph.isListBefore
       );
       current.refId = words[2];
       documentInfo.bookmarks.slugify(current.refId);
@@ -687,7 +697,7 @@ async function resolveWDCommandEx(
       return currentParagraph;
       break;
     case wdCommand.image:
-      child = await createImageChild(mdSourcePath, words[1], option);
+      child = await createImageChild(mdSourcePath, words[1], option, documentInfo);
       currentParagraph.addChild(child, true);
       currentParagraph.imageCaption = words[2];
       return currentParagraph;
@@ -722,6 +732,7 @@ async function resolveWDCommandEx(
       break;
     case wdCommand.indentMinus:
       currentParagraph.removeIndent();
+      currentParagraph.isListBefore = true;
       return currentParagraph;
       break;
     case wdCommand.newLine:
@@ -738,12 +749,12 @@ async function resolveWDCommandEx(
           nodeType,
           currentParagraph.indent,
           currentParagraph.docStyle,
+          currentParagraph.isListBefore,
           child
         );
         current.isFlush = true;
         return current;
       }
-
       if (words[1] === "convertCode") {
         // if (words[2] === "mermaid") {
         //   // do render mermaid
@@ -877,7 +888,8 @@ async function createMathImage(mathEq: string) {
 async function createImageChild(
   mdSourcePath: string,
   imagePathR: string,
-  option?: DocxOption
+  option?: DocxOption,
+  documentInfo?: DocumentInfo
 ) {
   const imagePath = Path.resolve(mdSourcePath, imagePathR);
 
@@ -893,8 +905,8 @@ async function createImageChild(
   }
 
   const sizeImage = imageSize.imageSize(imagePath);
-
-  const maxSize = 600; //convertInchesToTwip(3);
+  const maxSizeStr = documentInfo?.params.imageWidth ?? '500';
+  const maxSize = parseInt(maxSizeStr);
 
   let width = sizeImage.width ?? 100;
   let height = sizeImage.height ?? 100;
