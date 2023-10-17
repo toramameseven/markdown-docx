@@ -1,4 +1,15 @@
+<!-- word placeholder subTitle subTitle -->
+<!-- word placeholder author author -->
+<!-- word placeholder division division -->
+<!-- word placeholder date date -->
+<!-- word placeholder docNumber XXXX-XXXX -->
+
+<!-- word docxTemplate _with_cover.docx -->
+
 # Markdown Docx README
+
+<!-- word toc 1 TOC -->
+<!-- word newPage -->
 
 This is the README **Markdown Docx**. 
 
@@ -62,6 +73,13 @@ We do not use Microsoft Word at version 0.0.2.
   
   `[[1.1 this section (p.10)]]`
 
+###### image
+
+* `<!-- word imageWidth 200 -->`
+
+  set max image size.
+ 
+
 ###### table
 
 * `<!-- word tableWidth 90 -->`
@@ -81,7 +99,10 @@ We do not use Microsoft Word at version 0.0.2.
   
   empty cells are merged. only row direction.
 
+## check box
 
+* ☑ check box: checked
+* ☐ check box: not checked
 
 ## sample markdown file
 
@@ -219,6 +240,8 @@ next styles are created.
 * The indent of table of contents is not good.
 
 ## vbs rendering does not support
+
+NOTE: vbs rendering does not support
 
 ## How to package
 

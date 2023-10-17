@@ -1,31 +1,31 @@
 section	1	emphasis
 text	Emphasis
-newLine	convertHeading End	tm
+newLine	convertHeading End		tm
 text	markdown
-newLine	convertParagraph	tm
-code	**This is bold text**
-code	
-code	**This is bold text**
-code	
-code	_This is italic text_
-code	
-code	_This is italic text_
-code	
-code	~~Strikethrough~~
-code	
-code	2<sup>x</sup><sub>y</sub>
-newLine	convertCode	tm
+newLine	convertParagraph		tm
+code/	**This is bold text**
+code/	
+code/	**This is bold text**
+code/	
+code/	_This is italic text_
+code/	
+code/	_This is italic text_
+code/	
+code/	~~Strikethrough~~
+code/	
+code/	2<sup>x</sup><sub>y</sub>
+newLine	convertCode		tm
 text	result
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm
 text	<b>This is bold text</b>
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm
 text	<b>This is bold text</b>
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm
 text	<i>This is italic text</i>
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm
 text	<i>This is italic text</i>
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm
 text	<~~>Strikethrough</~~>
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm
 text	2<sup>x</sup><sub>y</sub>
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm

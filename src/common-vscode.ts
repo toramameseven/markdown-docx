@@ -12,9 +12,9 @@ export const codeStatusBar = vscode.window.createStatusBarItem(
 
 /**
  * get vscode current folder
- * @returns 
+ * @returns
  */
-export function getWorkingDirectory(){
+export function getWorkingDirectory() {
   let wf = vscode.workspace.workspaceFolders?.[0];
   return wf;
 }
@@ -46,28 +46,39 @@ export function showMessage(
   }
 }
 
-function showMessageCore(msgType: MessageType, message: unknown, source: string, showNotification = false) {
+function showMessageCore(
+  msgType: MessageType,
+  message: unknown,
+  source: string,
+  showNotification = false
+) {
   const messageOut = `[${msgType}   - ${new Date().toLocaleTimeString()}] ${createMessage(
     message,
     source
   )}`;
   outputTab.appendLine(messageOut.trim());
+
   if (showNotification) {
+    const messageShow = `[${msgType}   - ${new Date().toLocaleTimeString()}] ${createMessage(
+      message,
+      ""
+    )}`;
+
     switch (msgType) {
       case MessageType.info:
-        vscode.window.showInformationMessage(messageOut);
+        vscode.window.showInformationMessage(messageShow);
         break;
       case MessageType.warn:
-        vscode.window.showWarningMessage(messageOut);
+        vscode.window.showWarningMessage(messageShow);
         break;
       case MessageType.debug:
         //
         break;
       case MessageType.err:
-        vscode.window.showErrorMessage(messageOut);
+        vscode.window.showErrorMessage(messageShow);
         break;
       default:
-        vscode.window.showErrorMessage(messageOut);
+        vscode.window.showErrorMessage(messageShow);
         break;
     }
   }

@@ -1,22 +1,22 @@
 section	1	merge-cells-no2
 text	merge cells No.2
-newLine	convertHeading End	tm
+newLine	convertHeading End		tm
 text	markdown
-newLine	convertParagraph	tm
-code	<!-- word emptyMerge -->
-code	
-code	cell(4,2) is not merged. (comment cell)
-code	
-code	| data1-1 | data1-2                 |
-code	| ------- | ----------------------- |
-code	| data2-1 | data2-2                 |
-code	|         | data3-2                 |
-code	| data4-1 | <!-- not merged -->     |
-newLine	convertCode	tm
+newLine	convertParagraph		tm
+code/	<!-- word emptyMerge -->
+code/	
+code/	cell(4,2) is not merged. (comment cell)
+code/	
+code/	| data1-1 | data1-2                 |
+code/	| ------- | ----------------------- |
+code/	| data2-1 | data2-2                 |
+code/	|         | data3-2                 |
+code/	| data4-1 | <!-- not merged -->     |
+newLine	convertCode		tm
 text	result
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm
 text	cell(4,2) is not merged. (comment cell)
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm
 param	pptxSettings	C:\Users\XXXX\Desktop\github\markdown-docx\master-settings2.js			tm
 tableCreate	4	2
 tableWidthInfo	6.5,5.625
@@ -46,17 +46,17 @@ tablecontentslist	endParagraph		tm
 tableMarge	1	0	2	0	text	data2-1
 section	1	table-with-emphasis
 text	table with emphasis
-newLine	convertHeading End	tm
+newLine	convertHeading End		tm
 text	markdown
-newLine	convertParagraph	tm
-code	| data1-1 | data1-2                   |
-code	| ------- | --------------------  --- |
-code	| data2-1 | _This is italic text_     |
-code	|         | 2<sup>x</sup><sub>y</sub> |
-code	| data4-1 | **This is bold text**     |
-newLine	convertCode	tm
+newLine	convertParagraph		tm
+code/	| data1-1 | data1-2                   |
+code/	| ------- | --------------------  --- |
+code/	| data2-1 | _This is italic text_     |
+code/	|         | 2<sup>x</sup><sub>y</sub> |
+code/	| data4-1 | **This is bold text**     |
+newLine	convertCode		tm
 text	result
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm
 tableCreate	4	2
 tableWidthInfo	6.5,13.25
 tablecontents	0	0	next	left

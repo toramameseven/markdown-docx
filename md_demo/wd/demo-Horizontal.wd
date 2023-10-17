@@ -1,16 +1,16 @@
 section	1	horizontal-rules
 text	Horizontal Rules
-newLine	convertHeading End	tm
+newLine	convertHeading End		tm
 text	markdown
-newLine	convertParagraph	tm
-code	___
-code	
-code	---
-code	
-code	***
-newLine	convertCode	tm
+newLine	convertParagraph		tm
+code/	___
+code/	
+code/	---
+code/	
+code/	***
+newLine	convertCode		tm
 text	result
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm
 hr	
 hr	
 hr	

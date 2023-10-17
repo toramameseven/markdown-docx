@@ -2,33 +2,33 @@ param	refFormat	[[$n $t ppp.$p]]			tm
 param	docxTemplate	_xxx.docx			tm
 section	2	cross-reference-in-a-docx
 text	cross reference in a docx
-newLine	convertHeading End	tm
+newLine	convertHeading End		tm
 text	markdown
-newLine	convertParagraph	tm
-code	## refs1
-code	
-code	## refs2 with space
-code	
-code	* look me [refs1](#refs1) send you
-code	* look me [refs2 with space](#refs2-with-space) send you
-newLine	convertCode	tm
+newLine	convertParagraph		tm
+code/	## refs1
+code/	
+code/	## refs2 with space
+code/	
+code/	* look me [refs1](#refs1) send you
+code/	* look me [refs2 with space](#refs2-with-space) send you
+newLine	convertCode		tm
 text	result
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm
 section	2	refs1
 text	refs1
-newLine	convertHeading End	tm
+newLine	convertHeading End		tm
 section	2	refs2-with-space
 text	refs2 with space
-newLine	convertHeading End	tm
+newLine	convertHeading End		tm
 indentPlus
 NormalList	1	
 text	look me 
 link	refs1			tm
 text	 send you
-newLine	convertListItem End	tm
+newLine	convertListItem End		tm
 NormalList	1	
 text	look me 
 link	refs2-with-space			tm
 text	 send you
-newLine	convertListItem End	tm
+newLine	convertListItem End		tm
 indentMinus

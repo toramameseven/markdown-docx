@@ -1,27 +1,27 @@
 section	1	blockquotes
 text	Blockquotes
-newLine	convertHeading End	tm
+newLine	convertHeading End		tm
 text	NOTE: <b>markdown to docx</b> does not support blockquote.
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm
 text	markdown
-newLine	convertParagraph	tm
-code	> Blockquotes can also be nested...
-code	>
-code	> > ...by using additional greater-than *signs* _right_ next to each other...
-code	> >
-code	> > * eeeeeeeee
-code	> > > ...or with spaces between arrows.
-newLine	convertCode	tm
+newLine	convertParagraph		tm
+code/	> Blockquotes can also be nested...
+code/	>
+code/	> > ...by using additional greater-than *signs* _right_ next to each other...
+code/	> >
+code/	> > * eeeeeeeee
+code/	> > > ...or with spaces between arrows.
+newLine	convertCode		tm
 text	result
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm
 text	Blockquotes can also be nested...
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm
 text	...by using additional greater-than <i>signs</i> <i>right</i> next to each other...
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm
 indentPlus
 NormalList	1	
 text	eeeeeeeee
 text	 				tm
 text	...or with spaces between arrows.
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm
 indentMinus

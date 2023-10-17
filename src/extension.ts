@@ -17,7 +17,7 @@ import {
 } from "./markdown-docx/markdown-to-xxxx";
 import { wdToPptx } from "./markdown-docx/wd-to-pptxJs";
 import { createDocxTemplateFile } from "./markdown-docx/common";
-import { getWorkingDirectory } from "./common-vscode";
+import { getWorkingDirectory, updateStatusBar } from "./common-vscode";
 import { textileToHtml } from "./markdown-docx/tools/toolsTextile";
 
 export let isDebug = false;
@@ -34,6 +34,7 @@ function resetAbortController() {
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
+
   // activate event
   vscodeCommon.showMessage(
     MessageType.info,
@@ -80,6 +81,13 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand(
       "explorer.htmlToInlineHtml",
       exportInlineHtmlFromMarkdown
+    )
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
+      "explorer.htmlToInlineHtmlNoMenu",
+      exportInlineHtmlFromMarkdownNoMenu
     )
   );
 
@@ -133,6 +141,9 @@ export function activate(context: vscode.ExtensionContext) {
     enableExperimentFeature();
   }
 
+  enableMainFeature();
+
+
   vscodeCommon.showMessage(
     MessageType.info,
     '"markdown-docx" is initialized.',
@@ -146,6 +157,7 @@ export function activate(context: vscode.ExtensionContext) {
  */
 function exportMarkdownFromHtml(uriFile: vscode.Uri) {
   try {
+    
     vscodeCommon.updateStatusBar(true);
     const filePath = uriFile.fsPath;
     if (filePath.match(/\.html$|\.htm$/i)) {
@@ -220,7 +232,7 @@ function exportHtmlFromMarkdown(uriFile: vscode.Uri) {
     if (filePath.match(/\.md$/i)) {
       // wordDown
       //const r = markdownToExDown(filePath, "");
-      const r = markdownToHtml(filePath, "", 0, thisOption);
+      const r = markdownToHtml(filePath, "", 0, thisOption, false, false);
       vscodeCommon.showMessage(MessageType.info, r, "extension");
     }
   } catch (error) {
@@ -231,16 +243,47 @@ function exportHtmlFromMarkdown(uriFile: vscode.Uri) {
 }
 
 async function exportInlineHtmlFromMarkdown(uriFile: vscode.Uri) {
+  resetAbortController();
   const thisOption = createDocxOptionExtension({
     ac,
     message: vscodeCommon.showMessage,
   });
 
+  if (thisOption.isShowOutputTab) {
+    vscodeCommon.outputTab.show();
+  }
+
   try {
     vscodeCommon.updateStatusBar(true);
     const filePath = uriFile.fsPath;
     if (filePath.match(/\.md$/i)) {
-      const r = await markdownToHtml(filePath, "", 0, thisOption, true);
+      const r = await markdownToHtml(filePath, "", 0, thisOption, true, true);
+
+      vscodeCommon.showMessage(MessageType.info, r, "extension");
+    }
+  } catch (error) {
+    vscodeCommon.showMessage(MessageType.err, error, "extension");
+  } finally {
+    vscodeCommon.updateStatusBar(false);
+  }
+}
+
+async function exportInlineHtmlFromMarkdownNoMenu(uriFile: vscode.Uri) {
+  resetAbortController();
+  const thisOption = createDocxOptionExtension({
+    ac,
+    message: vscodeCommon.showMessage,
+  });
+
+  if (thisOption.isShowOutputTab) {
+    vscodeCommon.outputTab.show();
+  }
+
+  try {
+    vscodeCommon.updateStatusBar(true);
+    const filePath = uriFile.fsPath;
+    if (filePath.match(/\.md$/i)) {
+      const r = await markdownToHtml(filePath, "", 0, thisOption, true, false);
 
       vscodeCommon.showMessage(MessageType.info, r, "extension");
     }
@@ -505,6 +548,14 @@ function enableExperimentFeature() {
   vscode.commands.executeCommand(
     "setContext",
     "markdown-docx.isExperimentFeature",
+    true
+  );
+}
+
+function enableMainFeature() {
+  vscode.commands.executeCommand(
+    "setContext",
+    "markdown-docx.isMainFeature",
     true
   );
 }

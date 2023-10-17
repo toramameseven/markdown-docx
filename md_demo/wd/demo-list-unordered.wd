@@ -1,57 +1,57 @@
 section	1	lists-unordered
 text	Lists Unordered
-newLine	convertHeading End	tm
+newLine	convertHeading End		tm
 text	NOTE: <b>markdown to docx</b>  supports only three layers.
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm
 text	markdown
-newLine	convertParagraph	tm
-code	- Create a list by starting a line with `+`, `-`, or `*`
-code	- Sub-lists are made by indenting 2 spaces:
-code	  - Marker character change forces new list start:
-code	    - Ac tristique libero volutpat at
-code	    * Facilisis in pretium nisl aliquet
-code	    - Nulla volutpat aliquam velit
-code	- Very easy!
-code	
-code	* look me [](#links) send you
-newLine	convertCode	tm
+newLine	convertParagraph		tm
+code/	- Create a list by starting a line with `+`, `-`, or `*`
+code/	- Sub-lists are made by indenting 2 spaces:
+code/	  - Marker character change forces new list start:
+code/	    - Ac tristique libero volutpat at
+code/	    * Facilisis in pretium nisl aliquet
+code/	    - Nulla volutpat aliquam velit
+code/	- Very easy!
+code/	
+code/	* look me [](#links) send you
+newLine	convertCode		tm
 text	result
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm
 indentPlus
 NormalList	1	
 text	Create a list by starting a line with <codespan>+</codespan>, <codespan>-</codespan>, or <codespan>*</codespan>
-newLine	convertListItem End	tm
+newLine	convertListItem End		tm
 NormalList	1	
 text	Sub-lists are made by indenting 2 spaces:
-newLine	convertList In	tm
+newLine	convertList In		tm
 indentPlus
 NormalList	2	
 text	Marker character change forces new list start:
-newLine	convertList In	tm
+newLine	convertList In		tm
 indentPlus
 NormalList	3	
 text	Ac tristique libero volutpat at
-newLine	convertListItem End	tm
+newLine	convertListItem End		tm
 indentMinus
 indentPlus
 NormalList	3	
 text	Facilisis in pretium nisl aliquet
-newLine	convertListItem End	tm
+newLine	convertListItem End		tm
 indentMinus
 indentPlus
 NormalList	3	
 text	Nulla volutpat aliquam velit
-newLine	convertListItem End	tm
+newLine	convertListItem End		tm
 indentMinus
 indentMinus
 NormalList	1	
 text	Very easy!
-newLine	convertListItem End	tm
+newLine	convertListItem End		tm
 indentMinus
 indentPlus
 NormalList	1	
 text	look me 
 link	links			tm
 text	 send you
-newLine	convertListItem End	tm
+newLine	convertListItem End		tm
 indentMinus

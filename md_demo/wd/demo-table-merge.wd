@@ -1,23 +1,23 @@
 section	2	merge-cells-no1
 text	merge cells No.1
-newLine	convertHeading End	tm
+newLine	convertHeading End		tm
 indentPlus
 NormalList	1	
 text	cell(3,1) and cell(4,2) are merged.
-newLine	convertListItem End	tm
+newLine	convertListItem End		tm
 indentMinus
 text	markdown
-newLine	convertParagraph	tm
-code	<!-- word emptyMerge -->
-code	
-code	| data1-1 | data1-2                 |
-code	| ------- | ----------------------- |
-code	| data2-1 | data2-2                 |
-code	|         | data3-2                 |
-code	| data4-1 |                         |
-newLine	convertCode	tm
+newLine	convertParagraph		tm
+code/	<!-- word emptyMerge -->
+code/	
+code/	| data1-1 | data1-2                 |
+code/	| ------- | ----------------------- |
+code/	| data2-1 | data2-2                 |
+code/	|         | data3-2                 |
+code/	| data4-1 |                         |
+newLine	convertCode		tm
 text	result
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm
 tableCreate	4	2
 tableWidthInfo	6.5,6.5
 tablecontents	0	0	next	left

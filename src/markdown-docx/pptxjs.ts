@@ -1,6 +1,32 @@
 import pptxGen from "pptxgenjs";
 import type PptxGenJS from "pptxgenjs";
 
+import { parse as JSONCParse } from "jsonc-parser";
+import Module = require("module");
+export type Position = { x: number; y: number; w: number; h: number };
+export type PositionP = {
+  x: `${number}%`;
+  y: `${number}%`;
+  w: `${number}%`;
+  h: `${number}%`;
+};
+export const initialPosition = { x: 0, y: 0, w: 100, h: 100 };
+export const initialPositionP: PositionP = {
+  x: "0%",
+  y: "0%",
+  w: "100%",
+  h: "100%",
+};
+
+type TableInfoOptions = {
+  titleRowColor: string;
+  titleRowFillColor: string;
+  oddRowColor: string;
+  oddRowFillColor: string;
+  evenRowColor: string;
+  evenRowFillColor: string;
+};
+
 export type PptStyle = {
   titleSlide: PptxGenJS.SlideMasterProps;
   masterSlide: PptxGenJS.SlideMasterProps;
@@ -14,16 +40,19 @@ export type PptStyle = {
   code: PptxGenJS.TextPropsOptions;
   codeSpan: PptxGenJS.TextPropsOptions;
   tableProps: PptxGenJS.TableProps;
+  tablePropsArray: PptxGenJS.TableProps[];
   tableHeaderColor: string;
   tableHeaderFillColor: string;
   layout: string;
   bodyFontFace: PptxGenJS.TableCellProps;
   headFontFace: PptxGenJS.ThemeProps;
+  defaultPositionPCT: string;
+  tableInfoOptions: TableInfoOptions[];
 };
 
 export type TextFrame = {
   textPropsArray: PptxGenJS.TextProps[];
-  outputPosition: {};
+  outputPosition: PositionP;
 };
 
 const _sp = "\t";
@@ -56,27 +85,37 @@ export const sheetObjectType = {
   text: "text",
   table: "table",
   image: "image",
+  shape: "shape",
 } as const;
 export type SheetObjectType =
   (typeof sheetObjectType)[keyof typeof sheetObjectType];
 
 export type SheetObject = {
   type: SheetObjectType;
-  sheetObject: pptxGen.ImageProps | TableProps | TextFrame;
+  sheetObject:
+    | pptxGen.ImageProps
+    | TableProps
+    | TextFrame
+    | pptxGen.TextPropsOptions;
 };
+
+type StatusP = "non" | "insideCover" | "insideSlideTitle";
 
 /**
  *
  */
-export class PptSheet {
+export class PptxDocument {
   sheetObjects: SheetObject[] = [];
   slide?: pptxGen.Slide;
   currentTextPropsArray: PptxGenJS.TextProps[] = [];
-  currentTextPropPositionPCT: {} = {};
-  defaultTextPropPositionPCT: {} = {};
+  currentTextPropPositionPCT: PositionP = { ...initialPositionP };
+  defaultTextPropPositionPCT: PositionP = { ...initialPositionP };
   pptx: PptxGenJS;
-  pptxParagraph: PptParagraph;
+  private pptxParagraph: PptParagraph;
   pptStyle: PptStyle;
+  isNewSheet: boolean = false;
+  status: StatusP = "non";
+  isParagraphFlush: boolean = false;
 
   constructor(pptx: PptxGenJS, pptStyle: PptStyle) {
     this.pptx = pptx;
@@ -87,7 +126,7 @@ export class PptSheet {
     );
   }
 
-  addTitleSlide(documentInfo: { [v: string]: string }) {
+  addPptxCover(documentInfo: { [v: string]: string }) {
     this.slide = this.pptx.addSlide({ masterName: "TITLE_SLIDE" });
     this.slide.addText(documentInfo.title!, {
       placeholder: "title",
@@ -104,48 +143,103 @@ export class PptSheet {
     // add position
   }
 
-  addHeader(
-    textPropsArray: pptxGen.TextProps[],
-    textPropsOptions: pptxGen.TextPropsOptions
-  ) {
+  addSlideHeader(textPropsOptions: pptxGen.TextPropsOptions) {
+    const textPropsArray = this.pptxParagraph.createTextPropsArray();
+
     this.slide!.addText(textPropsArray, {
       placeholder: "header",
       ...textPropsOptions,
     });
+    this.pptxParagraph.insideSlideTitle = false;
   }
 
-  addImage(image: pptxGen.ImageProps) {
+  addImageToSheetObjects(image: pptxGen.ImageProps) {
     this.sheetObjects.push({ type: "image", sheetObject: image });
   }
 
-  addTable(table: TableProps) {
+  addShapesToSheetObjects() {
+    const shapes = this.pptxParagraph.createTextCode();
+    shapes.forEach((s) =>
+      this.sheetObjects.push({ type: "shape", sheetObject: s })
+    );
+  }
+
+  // todo
+
+  addJsObjectToSheetObjects() {
+    const jsArray: any[] = this.pptxParagraph.createJsObjectCode();
+    for (let i = 0; i < jsArray.length; i++) {
+      let element = jsArray[i];
+      if (element.type === "text") {
+        let textFrame: TextFrame = {
+          textPropsArray: element.params[0],
+          outputPosition: element.params[1],
+        };
+        this.sheetObjects.push({ type: "text", sheetObject: textFrame });
+      }      
+      
+      if (element.type === "table") {
+        let table: TableProps = {
+          tableRows: element.params[0],
+          options: element.params[1],
+        };
+        this.sheetObjects.push({ type: "table", sheetObject: table });
+      }
+    }
+  }
+
+  addTableToSheetObjects(table: TableProps) {
     this.sheetObjects.push({ type: "table", sheetObject: table });
   }
 
-  addTextFrame(textPosition: {} = {}) {
-    const sheetObject = {
+  addTextFrameToSheetObjects(textPosition: PositionP | {} = {}) {
+    if (this.currentTextPropsArray.length === 0) {
+      return;
+    }
+
+    let outputPosition = this.currentTextPropPositionPCT;
+    if (Object.keys(textPosition).length) {
+      outputPosition = { ...this.currentTextPropPositionPCT, ...textPosition };
+    }
+
+    const textFrame: TextFrame = {
       textPropsArray: this.currentTextPropsArray,
-      outputPosition: { ...this.currentTextPropPositionPCT, ...textPosition },
+      outputPosition,
     };
-    this.sheetObjects.push({ type: "text", sheetObject });
+
+    this.sheetObjects.push({ type: "text", sheetObject: textFrame });
     this.currentTextPropsArray = [];
   }
 
-  addTextPropsArray() {
+  addTextPropsArrayFromParagraph() {
     const textPropsArray = this.pptxParagraph.createTextPropsArray();
-    this.currentTextPropsArray.push(...textPropsArray);
+    if (textPropsArray.length) {
+      this.currentTextPropsArray.push(...textPropsArray);
+    }
   }
 
-  setDefaultPositionPCT(position: {}) {
+  setDefaultPositionPCT(position: PositionP) {
     this.defaultTextPropPositionPCT = { ...position };
     this.setCurrentPositionPCT(position);
   }
 
-  setCurrentPositionPCT(position: {}) {
+  setCurrentPositionPCT(position: PositionP) {
     this.currentTextPropPositionPCT = {
       ...this.defaultTextPropPositionPCT,
       ...position,
     };
+  }
+
+  addTextProps(s: string | PptxGenJS.TextProps) {
+    this.pptxParagraph.addTextProps(s);
+  }
+
+  getCurrentParagraphLength() {
+    return this.pptxParagraph.children.length;
+  }
+
+  clearParagraph() {
+    this.pptxParagraph.clear();
   }
 
   createSheet() {
@@ -154,7 +248,12 @@ export class PptSheet {
         switch (x.type) {
           case "text":
             const o = x.sheetObject as TextFrame;
-            this.slide!.addText(o.textPropsArray, o.outputPosition);
+            // textPropsArray sentences
+            // outputPosition:or  now position, but all properties for textPropsArray
+            this.slide!.addText(o.textPropsArray, {
+              ...o.outputPosition,
+              valign: "top",
+            });
             break;
           case "table":
             const t = x.sheetObject as TableProps;
@@ -164,59 +263,134 @@ export class PptSheet {
             const i = x.sheetObject as pptxGen.ImageProps;
             this.slide!.addImage(i);
             break;
+          case "shape":
+            const textPropsOptions = x.sheetObject as pptxGen.TextPropsOptions;
+            const textInsideShape = textPropsOptions.objectName ?? "";
+            delete textPropsOptions.objectName;
+            this.slide!.addText(textInsideShape ?? "", textPropsOptions);
+            break;
           default:
             break;
         }
       });
     }
   }
+
+  addRawString(s: string) {
+    this.pptxParagraph.addRawString(s);
+  }
+
+  addIndent() {
+    this.pptxParagraph.addIndent();
+  }
+
+  removeIndent() {
+    this.pptxParagraph.removeIndent();
+  }
+
+  textPropsOptions() {
+    return this.pptxParagraph.textPropsOptions;
+  }
+
+  setTextPropsOptions(p: pptxGen.TextPropsOptions) {
+    this.pptxParagraph.textPropsOptions = p;
+  }
+
+  getCurrentParagraphNum() {
+    return this.pptxParagraph.children.length;
+  }
 }
 
-export class PptParagraph {
+class PptParagraph {
   isFlush: boolean = false;
   indent: number = 0;
 
-  // export interface TextProps {
-  // 	text?: string
-  // 	options?: TextPropsOptions
-  // }
-
   children: PptxGenJS.TextProps[] = [];
-  textPropsOptions: PptxGenJS.TextPropsOptions = {};
-  isNewSheet: boolean = false;
+  childrenRaw: string[] = [];
+  textPropsOptions: PptxGenJS.TextPropsOptions;
+  codeLang: string = "";
+
   defaultFontSize: number = 18;
-  currentFontSize: number = 18;
   defaultLineSpacing: number = 0;
-  currentLineSpacing: number = 0;
   insideSlideTitle: boolean = false;
-  insideDocumentTitle: boolean = false;
+  insideCover: boolean = false;
+  isBlock: boolean = false;
 
   constructor(defaultFontSize: number, defaultLineSpacing: number) {
     this.defaultFontSize = defaultFontSize;
-    this.currentFontSize = defaultFontSize;
+    //this.currentFontSize = defaultFontSize;
     this.defaultLineSpacing = defaultLineSpacing;
-    this.currentLineSpacing = defaultLineSpacing;
+    //this.currentLineSpacing = defaultLineSpacing;
+    this.textPropsOptions = {
+      fontSize: this.defaultFontSize,
+      lineSpacing: this.defaultLineSpacing,
+      valign: "top",
+    };
   }
 
   createTextPropsArray(): PptxGenJS.TextProps[] {
+    if (this.children.length === 0) {
+      return [];
+    }
+    // TextProps: {text: , options:}
+    //const mainOptions = this.children[0].options;
     const r = this.children.map((p) => {
       return {
         text: p.text,
         options: { ...this.textPropsOptions, ...p.options },
       };
     });
-    this.children = [];
-    this.isFlush = false;
-    this.currentFontSize = this.defaultFontSize;
-    this.currentLineSpacing = this.defaultLineSpacing;
+
+    this.clear();
     return r;
+  }
+
+  createTextCode() {
+    const shapeJson: pptxGen.TextPropsOptions[] = JSONCParse(
+      this.childrenRaw.join("\n")
+    );
+
+    const r = shapeJson;
+    for (let i = 1; i < r.length; i++) {
+      if (Object.keys(r[i]).length === 0) {
+        // clear
+        //rOut.push(r[i]);
+      } else {
+        //
+        r[i] = { ...r[i - 1], ...r[i] };
+      }
+    }
+
+    this.clear();
+    // remove empty obj
+    return r.filter((ro) => Object.keys(ro).length);
+  }
+
+  // not pending
+
+  createJsObjectCode() {
+    const m = new Module("");
+    const code = this.childrenRaw.join("\n");
+    // @ts-ignore
+    m._compile(code, "");
+    const exp: [] = m.exports.array;
+    this.clear();
+    return exp;
   }
 
   clear() {
     this.children = [];
     this.isFlush = false;
-    this.currentFontSize = this.defaultFontSize;
-    this.currentLineSpacing = this.defaultLineSpacing;
+    this.childrenRaw = [];
+    this.textPropsOptions = {
+      fontSize: this.defaultFontSize,
+      lineSpacing: this.defaultLineSpacing,
+      valign: "top",
+    };
+    this.codeLang = "";
+    this.insideSlideTitle = false;
+    this.insideCover = false;
+    this.isBlock = false;
   }
 
   addIndent() {
@@ -233,13 +407,17 @@ export class PptParagraph {
     }
   }
 
-  addChild(s: string | PptxGenJS.TextProps) {
-    const ss = typeof s === "string" ? { text: s } : s;
-    this.children.push(ss);
+  addTextProps(s: string | PptxGenJS.TextProps) {
+    if (typeof s === "string") {
+      this.children.push({ text: s });
+      this.childrenRaw.push(s);
+    } else {
+      this.children.push(s);
+    }
   }
 
-  addChildren(s: PptxGenJS.TextProps[]) {
-    this.children.push(...s);
+  addRawString(s: string) {
+    this.childrenRaw.push(s);
   }
 }
 
@@ -321,7 +499,10 @@ export class TableJs {
         for (let j = column; j <= column2; j++) {
           for (let i = row + 1; i <= row2; i++) {
             this.mergedCells[i][j] = [-1, -1];
-            this.cells[row][column].push(...this.cells[i][j]);
+            if (this.cells[i][j]) {
+              this.cells[row][column].push({ options: { breakLine: true } });
+              this.cells[row][column].push(...this.cells[i][j]);
+            }
           }
         }
         return;
@@ -332,23 +513,15 @@ export class TableJs {
     }
   }
 
-  createTable(pos: {}, tableProps?: PptxGenJS.TableProps) {
+  createTable(
+    pos: {},
+    tableProps: PptxGenJS.TableProps,
+    tableWidthInches: number
+  ) {
     let rows: pptxGen.TableRow[] = new Array(this.rows);
     for (let i = 0; i < this.rows; i++) {
       rows[i] = new Array<PptxGenJS.TableCell>(0);
       for (let j = 0; j < this.columns; j++) {
-        // let thisWidth = {
-        //   size: this.tableWidthArray[j],
-        //   //type: pptxGen .PERCENTAGE,
-        // };
-
-        // if (this.tableWidthArray.length > 0) {
-        //   thisWidth = {
-        //     size: this.tableWidthArray[j],
-        //     //type: WidthType.PERCENTAGE,
-        //   };
-        // }
-
         let pCell = this.cells[i][j];
         const [rowspan, colspan] = this.createRawColumnSpan(
           i,
@@ -375,7 +548,13 @@ export class TableJs {
           const textColor = i === 0 ? "F7F7F7" : "676767";
           rows[i].push({
             ...tCell,
-            options: { rowspan, colspan, valign: "middle", color: textColor , fill:{color: fillColor} },
+            options: {
+              rowspan,
+              colspan,
+              valign: "middle",
+              color: textColor,
+              fill: { color: fillColor },
+            },
           });
         }
       }
@@ -385,6 +564,7 @@ export class TableJs {
       x: 0,
       y: 2.1,
       w: "100%",
+      colW: this.tableWidthArray.map((w) => w * tableWidthInches * 0.01),
       rowH: 0.75,
       fill: { color: "F7F7F7" },
       color: "000000",

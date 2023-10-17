@@ -522,7 +522,8 @@ function convertCode(params: DocxParam, isCommandEnd?: boolean) {
     const code = popBlockInfo();
     code!.blockList.forEach((i) => {
       const codeParam = i.split(_sp);
-      const r = [wdCommand.code, codeParam[1]].join(_sp);
+      const codeLanguage = (code as Base).codeLanguage;
+      const r = [`${wdCommand.code}/${codeLanguage}`, codeParam[1]].join(_sp);
       outputWd(r);
     });
     addNewLine("convertCode", (code as Base).codeLanguage);

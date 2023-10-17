@@ -265,7 +265,8 @@ suite("Demo Test Suite", () => {
 
   Fs.readdir(r, (err, files) => {
     files
-      .filter((f) => f.match(/\.md$/i))
+      .filter((f) => f.match(/^(?!_).*\.md$/i))
+      .filter(e => e)
       .forEach(async (file) => {
         const baseName = path.basename(file).replace(/\.md$/i, "");
         testWd(baseName);

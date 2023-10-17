@@ -1,18 +1,18 @@
 section	2	right-aligned-and-rows-merge
 text	Right aligned and rows merge
-newLine	convertHeading End	tm
+newLine	convertHeading End		tm
 text	markdown
-newLine	convertParagraph	tm
-code	<!-- word cols 1,3 -->
-code	<!-- word rowMerge 3-4 -->
-code	| data1-1 | data1-2                 |
-code	| -------:| -----------------------:|
-code	| data2-1 | data2-2 XXXXX           |
-code	| data3-1 | data3-2                 |
-code	| data4-1 | data4-2                 |
-newLine	convertCode	tm
+newLine	convertParagraph		tm
+code/	<!-- word cols 1,3 -->
+code/	<!-- word rowMerge 3-4 -->
+code/	| data1-1 | data1-2                 |
+code/	| -------:| -----------------------:|
+code/	| data2-1 | data2-2 XXXXX           |
+code/	| data3-1 | data3-2                 |
+code/	| data4-1 | data4-2                 |
+newLine	convertCode		tm
 text	result
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm
 tableCreate	4	2
 tableWidthInfo	1,3
 tablecontents	0	0	next	right
@@ -42,22 +42,22 @@ tablecontentslist	endParagraph		tm
 tableMarge	2	0	3	0	text	data3-1
 tableMarge	2	1	3	1	text	data3-2
 text	NOTE: aligned is not worked
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm
 section	2	table-with-new-line
 text	table with new line
-newLine	convertHeading End	tm
+newLine	convertHeading End		tm
 text	markdown
-newLine	convertParagraph	tm
-code	| data1-1 | data1-2                 |
-code	| ------- | ----------------------- |
-code	| data2-1 | data2-2                 |
-code	| data3-1 | data3-2<bR>data3-2-2    |
-code	| data4-1 | data4-2                 |
-newLine	convertCode	tm
+newLine	convertParagraph		tm
+code/	| data1-1 | data1-2                 |
+code/	| ------- | ----------------------- |
+code/	| data2-1 | data2-2                 |
+code/	| data3-1 | data3-2<bR>data3-2-2    |
+code/	| data4-1 | data4-2                 |
+newLine	convertCode		tm
 text	result
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm
 tableCreate	4	2
-tableWidthInfo	6.5,7.5
+tableWidthInfo	6.5,7.666666666666667
 tablecontents	0	0	next	left
 tablecontentslist	text	data1-1
 tablecontentslist	endParagraph		tm
@@ -75,7 +75,7 @@ tablecontentslist	text	data3-1
 tablecontentslist	endParagraph		tm
 tablecontents	2	1	next	left
 tablecontentslist	text	data3-2
-tablecontentslist	newLine	wd0NewLine	tm
+tablecontentslist	newLine	wd0NewLine		tm
 tablecontentslist	text	data3-2-2
 tablecontentslist	endParagraph		tm
 tablecontents	3	0	next	left
@@ -85,7 +85,7 @@ tablecontents	3	1	next	left
 tablecontentslist	text	data4-2
 tablecontentslist	endParagraph		tm
 text	NOTE: does not work
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm
 section	1	links
 text	Links
-newLine	convertHeading End	tm
+newLine	convertHeading End		tm

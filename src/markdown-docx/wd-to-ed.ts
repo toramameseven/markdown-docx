@@ -160,12 +160,19 @@ function flushCommand(command: WdCommand = wdCommand.non, params = [""]) {
     mdCode.createCode();
   }
 
+  if (params[0] === 'convertHeading End' ){
+    excelLines.push(textBuffer);
+    createLineBlank("convertSection out");
+    textBuffer = "";
+  }
+
   if (lineCommand !== "" || textBuffer !== "") {
     if (!!getPreviousCommand(1) && lineCommand === "") {
       createLineBlank("flushCommand exist previous, no line command");
     }
     excelLines.push(`${lineCommand}\t\t${textBuffer}`);
   }
+
 
   mdTable.createWordDownTable();
 
@@ -209,8 +216,9 @@ function convertSection(params: string[]) {
   const sections = parseInt(params[0], 10);
   const sectionTitle = params[1];
   createLineBlank("convertSection in");
-  createLine("#".repeat(sections), "", sectionTitle);
-  createLineBlank("convertSection out");
+  //createLine("#".repeat(sections), "", sectionTitle);
+  textBuffer = "#".repeat(sections) + "\t\t";
+  // createLineBlank("convertSection out");
 }
 
 function convertCode(params: string[]) {

@@ -1,29 +1,29 @@
 section	2	normal-link
 text	normal link
-newLine	convertHeading End	tm
-code	look you [link text](http://dev.nodeca.com) see me
-code	
-code	Jason Campbell <jasoncampbell\@google.com> (http://twitter.com/jxson)
-code	
-code	* [link with title](http://nodeca.github.io/pica/demo/ "title text!")
-code	
-code	* Autoconverted link https://github.com/nodeca/pica (enable linkify to see)
-newLine	convertCode	tm
+newLine	convertHeading End		tm
+code/	look you [link text](http://dev.nodeca.com) see me
+code/	
+code/	Jason Campbell <jasoncampbell\@google.com> (http://twitter.com/jxson)
+code/	
+code/	* [link with title](http://nodeca.github.io/pica/demo/ "title text!")
+code/	
+code/	* Autoconverted link https://github.com/nodeca/pica (enable linkify to see)
+newLine	convertCode		tm
 text	look you 
 link	http://dev.nodeca.com		link text	tm
 text	 see me
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm
 text	Jason Campbell <jasoncampbell@google.com> (
 link	http://twitter.com/jxson		http://twitter.com/jxson	tm
 text	)
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm
 indentPlus
 NormalList	1	
 link	http://nodeca.github.io/pica/demo/	title text!	link with title	tm
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm
 NormalList	1	
 text	Autoconverted link 
 link	https://github.com/nodeca/pica		https://github.com/nodeca/pica	tm
 text	 (enable linkify to see)
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm
 indentMinus

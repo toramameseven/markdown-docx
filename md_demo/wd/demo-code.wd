@@ -1,15 +1,11 @@
 section	1	code
 text	Code
-newLine	convertHeading End	tm
+newLine	convertHeading End		tm
 text	markdown
-newLine	convertParagraph	tm
-code	Inline `code`
-code	tttttt
-code	gttttttt
-code	
-code	ttttttttt
-newLine	convertCode	tm
+newLine	convertParagraph		tm
+code/	Inline `code`
+newLine	convertCode		tm
 text	result
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm
 text	Inline <codespan>code</codespan>
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm

@@ -109,7 +109,7 @@
     "menus": {
       "explorer/context": [
         {
-          "when": "resourceExtname =~ /\\.wd$|\\.md$/i && !markdown-docx.isRunning",
+          "when": "resourceExtname =~ /\\.wd$|\\.md$/i && !markdown-docx.isRunning && markdown-docx.isMainFeature",
           "command": "explorer.ExportDocx",
           "group": "myGroup@1"
         },
@@ -151,7 +151,7 @@
       ],
       "editor/context": [
         {
-          "when": "resourceExtname =~ /\\.wd$|\\.md$/i && !markdown-docx.isRunning",
+          "when": "resourceExtname =~ /\\.wd$|\\.md$/i && !markdown-docx.isRunning && markdown-docx.isMainFeature",
           "command": "editor.ExportDocx",
           "group": "myGroup@1"
         },
@@ -238,7 +238,7 @@
     "package": "vsce package --target win32-x64",
     "clean": "rimraf out",
     "preesbuild-base": "npm run clean && npm run copy-wasm",
-    "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
+    "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --main-fields=module,main --external:vscode --format=cjs --platform=node",
     "esbuild-basex": "node buildme.js",
     "esbuild": "npm run esbuild-base -- --sourcemap",
     "esbuild-only": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node -- --sourcemap",
@@ -269,16 +269,15 @@
     "typescript": "^4.8.4"
   },
   "dependencies": {
-    "@mermaid-js/mermaid-cli": "^10.3.1",
     "docx": "^8.2.0",
     "encoding-japanese": "^2.0.0",
     "front-matter": "^4.0.2",
     "iconv-lite": "^0.6.3",
     "image-size": "^1.0.2",
     "inline-source": "^8.0.2",
+    "jsonc-parser": "^3.2.0",
     "lodash": "^4.17.21",
     "marked": "^4.2.4",
-    "mermaid": "^10.3.1",
     "node-html-parser": "^6.1.4",
     "pptxgenjs": "^3.12.0",
     "svg2png-wasm": "^1.4.0",

@@ -1,34 +1,34 @@
 section	1	heading
 text	Heading
-newLine	convertHeading End	tm
+newLine	convertHeading End		tm
 text	markdown
-newLine	convertParagraph	tm
-code	# Heading1
-code	
-code	## Heading2
-code	
-code	### Heading3
-code	
-code	#### Heading4
-code	
-code	##### Heading5
-code	
-code	###### Heading6
-newLine	convertCode	tm
+newLine	convertParagraph		tm
+code/	# Heading1
+code/	
+code/	## Heading2
+code/	
+code/	### Heading3
+code/	
+code/	#### Heading4
+code/	
+code/	##### Heading5
+code/	
+code/	###### Heading6
+newLine	convertCode		tm
 text	result
-newLine	convertParagraph	tm
+newLine	convertParagraph		tm
 section	2	heading2
 text	Heading2
-newLine	convertHeading End	tm
+newLine	convertHeading End		tm
 section	3	heading3
 text	Heading3
-newLine	convertHeading End	tm
+newLine	convertHeading End		tm
 section	4	heading4
 text	Heading4
-newLine	convertHeading End	tm
+newLine	convertHeading End		tm
 section	5	heading5
 text	Heading5
-newLine	convertHeading End	tm
+newLine	convertHeading End		tm
 section	6	heading6
 text	Heading6
-newLine	convertHeading End	tm
+newLine	convertHeading End		tm
