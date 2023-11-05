@@ -13,6 +13,6 @@ WARNING: admonition warning.
 result
 
 NOTE: admonition note.
-ddddddd
+
 
 WARNING: admonition warning.
