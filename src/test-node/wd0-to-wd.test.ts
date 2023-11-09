@@ -36,6 +36,10 @@ function removeTopN(s: string) {
   return s;
 }
 
+
+/**
+ * test parts
+ */
 suite("Extension Test Suite", () => {
   // ==========================================
   test("toc", async () => {
@@ -258,7 +262,7 @@ cell(4,2) is not merged. (comment cell)
 });
 
 /**
- *
+ * test demo files
  */
 suite("Demo Test Suite", () => {
   const r = path.resolve(__dirname, "../../md_demo/md");
