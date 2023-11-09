@@ -7,6 +7,8 @@ import path = require("path");
 import * as Fs from "fs";
 import { getFileContents } from "../markdown-docx/common";
 import { addTableSpanToMarkdown } from "../markdown-docx/add-table-span";
+import {isEnableExperimentalFeature } from "../common-settings";
+
 //import { assert } from "chai";
 // You can import and use all API from the 'vscode' module
 // as well as import your extension to test it
@@ -36,6 +38,10 @@ function removeTopN(s: string) {
   return s;
 }
 
+
+/**
+ * test parts
+ */
 suite("Extension Test Suite", () => {
   // ==========================================
   test("toc", async () => {
@@ -258,7 +264,7 @@ cell(4,2) is not merged. (comment cell)
 });
 
 /**
- *
+ * test demo files
  */
 suite("Demo Test Suite", () => {
   const r = path.resolve(__dirname, "../../md_demo/md");
@@ -297,5 +303,17 @@ suite("Demo Test Suite", () => {
       assert.strictEqual(wd, expect);
     });
   }
+  //
+});
+
+/**
+ * test extensions
+ */
+suite("test extensions is not experimental", () => {
+
+  test("test extensions is not experimental", async () => {
+    // assert
+    assert.strictEqual(isEnableExperimentalFeature, false);
+  });
   //
 });

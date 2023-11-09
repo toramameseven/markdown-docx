@@ -265,6 +265,9 @@ And we use some useful articles below.
 
 
 ## Release Notes
+* 0.0.3
+  * add check box.
+  
 
 * 0.0.2
   * use [DOCX](https://docx.js.org/#/) for creating word files.

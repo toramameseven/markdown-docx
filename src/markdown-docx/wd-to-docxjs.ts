@@ -40,6 +40,7 @@ import {
   TableLayoutType,
   PageBreak,
   CheckBox,
+  AlignmentType,
 } from "docx";
 import { svg2imagePng } from "./tools/svg-png-image";
 import { WdCommand, wdCommand } from "./wd0-to-wd";
@@ -88,6 +89,7 @@ const documentInfoParams = [
   "refFormat",
   "captionRefFormat",
   "tableWidth",
+  "tableAlign",
   "imageWidth",
   "tableCaption",
   "tablePrefix",
@@ -131,7 +133,7 @@ class TableJs {
     this.tableWidthArray = [];
   }
 
-  async doTableCommand(line: string) {
+  async doTableCommand(line: string, documentInfo: DocumentInfo) {
     const words = line.split(_sp);
     switch (words[0]) {
       case "tableWidthInfo":
@@ -161,8 +163,17 @@ class TableJs {
             })
           );
         } else {
+          // aligne
+          const aligneInfo = (documentInfo.params.tableAlign ?? "") + "llllllllllllllllllllllllllll";
+          let align: AlignmentType = AlignmentType.LEFT;
+          if ((aligneInfo[this.column]).toLowerCase() === 'c') {
+            align = AlignmentType.CENTER;
+          }
+          if ((aligneInfo[this.column]).toLowerCase() === 'r') {
+            align = AlignmentType.RIGHT;
+          }
           this.cells[this.row][this.column].push(
-            new Paragraph({ children: await resolveEmphasis(words[2]) })
+            new Paragraph({ children: await resolveEmphasis(words[2]), alignment: align })
           );
           return;
         }
@@ -485,7 +496,7 @@ export async function wdToDocxJs(
 
     // table command
     if (wdCommandList[0].includes("table")) {
-      tableJs?.doTableCommand(lines[i]);
+      tableJs?.doTableCommand(lines[i], documentInfo);
     } else {
       // in not table command, create table.
       if (tableJs) {

@@ -154,6 +154,7 @@ const documentInfoParams = [
   "refFormat",
   "captionRefFormat",
   "tableWidth",
+  "tableAlign",
   "imageWidth",
   "levelOffset",
   "tableCaption",

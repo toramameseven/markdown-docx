@@ -17,12 +17,12 @@ import {
 } from "./markdown-docx/markdown-to-xxxx";
 import { wdToPptx } from "./markdown-docx/wd-to-pptxJs";
 import { createDocxTemplateFile } from "./markdown-docx/common";
-import { getWorkingDirectory, updateStatusBar } from "./common-vscode";
+import { getWorkingDirectory } from "./common-vscode";
 import { textileToHtml } from "./markdown-docx/tools/toolsTextile";
-
+import { isEnableExperimentalFeature } from "./common-settings";
 export let isDebug = false;
 
-export const isEnableExperimentalFeature: boolean = true;
+//export const isEnableExperimentalFeature: boolean = true;
 
 // for cancel spawn
 let ac = new AbortController();
@@ -157,7 +157,7 @@ export function activate(context: vscode.ExtensionContext) {
  */
 function exportMarkdownFromHtml(uriFile: vscode.Uri) {
   try {
-    
+
     vscodeCommon.updateStatusBar(true);
     const filePath = uriFile.fsPath;
     if (filePath.match(/\.html$|\.htm$/i)) {
@@ -542,7 +542,7 @@ async function exportPptxFromEditorCore(
 }
 
 // This method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate() { }
 
 function enableExperimentFeature() {
   vscode.commands.executeCommand(

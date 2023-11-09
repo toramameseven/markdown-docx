@@ -7,6 +7,7 @@ node_modules
 *.wd0
 wasm
 others
+markdown-docx.code-workspace
 md_demo/md/*.wd
 md_demo/md/*.pptx
 md_demo/md/*.docx

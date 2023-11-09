@@ -14,4 +14,5 @@ result
 
 NOTE: admonition note.
 
+
 WARNING: admonition warning.
