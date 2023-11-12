@@ -80,22 +80,7 @@ const DocStyle = {
 } as const;
 type DocStyle = (typeof DocStyle)[keyof typeof DocStyle];
 
-// https://chaika.hatenablog.com/entry/2021/11/03/083000
-const documentInfoParams = [
-  "pptxSettings",
-  "position",
-  "dpi",
-  "docxTemplate",
-  "refFormat",
-  "captionRefFormat",
-  "tableWidth",
-  "tableAlign",
-  "imageWidth",
-  "tableCaption",
-  "tablePrefix",
-  "figurePrefix",
-] as const;
-type DocumentInfoParams = (typeof documentInfoParams)[number];
+import { DocumentInfoParams } from "./types";
 
 type DocumentInfo = {
   placeholders: { [v: string]: string };
