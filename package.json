@@ -245,6 +245,7 @@
     "test-compile": "tsc -p ./",
     "installEx": "npm run package && code --install-extension markdown-docx-win32-x64-0.0.3.vsix",
     "testm": "set TS_NODE_COMPILER_OPTIONS={\"module\":\"commonjs\"} && mocha -r ts-node/register src/test-node/**/*.ts",
+    "test-common": "set TS_NODE_COMPILER_OPTIONS={\"module\":\"commonjs\"} && mocha -r ts-node/register src/test-node/common.test.ts",
     "license": "npx license-report --config=./license-report-config.json > usedModules.md"
   },
   "devDependencies": {
