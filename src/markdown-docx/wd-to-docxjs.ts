@@ -148,13 +148,13 @@ class TableJs {
             })
           );
         } else {
-          // aligne
-          const aligneInfo = (documentInfo.params.tableAlign ?? "") + "llllllllllllllllllllllllllll";
+          // align
+          const alignInfo = (documentInfo.params.tableAlign ?? "") + "llllllllllllllllllllllllllll";
           let align: AlignmentType = AlignmentType.LEFT;
-          if ((aligneInfo[this.column]).toLowerCase() === 'c') {
+          if ((alignInfo[this.column]).toLowerCase() === 'c') {
             align = AlignmentType.CENTER;
           }
-          if ((aligneInfo[this.column]).toLowerCase() === 'r') {
+          if ((alignInfo[this.column]).toLowerCase() === 'r') {
             align = AlignmentType.RIGHT;
           }
           this.cells[this.row][this.column].push(
