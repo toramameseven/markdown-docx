@@ -175,6 +175,7 @@ function resolveHtmlComment(content: string) {
         });
       case wordCommand.param:
       case wordCommand.placeholder:
+      case wordCommand.tableParam:
         let r = "";
         for (let i = 1; i < params.length; i += 2) {
           if (params[i - 1]) {
