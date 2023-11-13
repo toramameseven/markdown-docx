@@ -3,7 +3,14 @@ import { Wd0Command, wd0Command } from "./markdown-to-wd0";
 
 let showMessage: ShowMessage | undefined;
 
+import { DocumentInfoParams } from "./types";
+
+type DocumentInfo = {
+  params: { [v in DocumentInfoParams]?: string };
+};
+
 type DocxParam = { [x: string]: string };
+
 const _sp = "\t";
 
 let wordDownLines: string[] = [""];
@@ -118,11 +125,11 @@ class Table implements BaseBlock {
   value(i: number, j: number) {
     try {
       return this.rows[i][j];
-    } catch {}
+    } catch { }
     return undefined;
   }
 
-  createWordDownTable() {
+  createWordDownTable(docInfo: DocumentInfo) {
     const commands: string[] = [];
     const commandContents: string[] = [];
     const commandMergeInfos: string[] = [];
@@ -137,6 +144,11 @@ class Table implements BaseBlock {
       ? this.tableWidthInfo
       : this.getColumnSize();
 
+    if (docInfo.params.cols) {
+      // from param
+      outTableInfo = docInfo.params.cols;
+    }
+
     commands.push(`${wdCommand.tableWidthInfo}\t${outTableInfo}`);
 
     // merge info rows
@@ -146,6 +158,16 @@ class Table implements BaseBlock {
     this.rowMerge = !!this.rowMerge.length
       ? `${this.rowMerge},${this.rowCount}-${this.rowCount}`
       : `${this.rowCount}-${this.rowCount}`;
+
+    if (docInfo.params.rowMerge) {
+      // from param
+      this.rowMerge = `${docInfo.params.rowMerge},${this.rowCount}-${this.rowCount}`;
+    }
+
+    if (docInfo.params.emptyMerge) {
+      // from param
+      this.emptyMerge = true;
+    }
 
     const rowMergeList = this.rowMerge.split(",");
     let rowCellMerge0 = 0;
@@ -267,6 +289,11 @@ class Table implements BaseBlock {
         commandContents.push(...tableCellCommands);
       }
     }
+
+    // clear table param
+    docInfo.params.emptyMerge = undefined;
+    docInfo.params.cols = undefined;
+    docInfo.params.rowMerge = undefined;
 
     const ret = [...commands, ...commandContents, ...commandMergeInfos];
     return ret;
@@ -417,10 +444,10 @@ function convertBlockquote(params: DocxParam, isCommandEnd?: boolean) {
   pushBlockInfo(block);
 }
 
-function convertTable(params: DocxParam, isCommandEnd?: boolean) {
+function convertTable(params: DocxParam, docInfo: DocumentInfo, isCommandEnd?: boolean) {
   if (isCommandEnd) {
     popBlockInfo();
-    const r = table.createWordDownTable();
+    const r = table.createWordDownTable(docInfo);
     r.map((l) => {
       outputWd(l);
     });
@@ -671,7 +698,7 @@ function outputWd(wdText: string) {
     blockInfos.slice(-1)[0].blockList.push(wdText);
     return;
   }
-  
+
   // do not duplicate new lines.
   if (wdText.split(_sp)[0] === wdCommand.newLine) {
     if (
@@ -719,6 +746,9 @@ export function wd0ToDocx(wd0: string, sm?: ShowMessage): string {
   wordDownLines = [];
   blockInfos = [new Base(wd0Command.non)];
 
+
+  const docInfo: DocumentInfo = { params: {} };
+
   // now not use front matter
   // option from front matter.
   // convertDocxEngine({
@@ -743,7 +773,7 @@ export function wd0ToDocx(wd0: string, sm?: ShowMessage): string {
     }
     // convert
     const toCommand = command as Wd0Command;
-    resolveCommand(toCommand, params, isCommandEnd);
+    resolveCommand(toCommand, params, docInfo, isCommandEnd);
   }
 
   return wordDownLines.map((i) => i).join("\n");
@@ -752,6 +782,7 @@ export function wd0ToDocx(wd0: string, sm?: ShowMessage): string {
 function resolveCommand(
   command: Wd0Command,
   params: DocxParam,
+  docInfo: DocumentInfo,
   isCommandEnd?: boolean
 ) {
   switch (command) {
@@ -780,7 +811,7 @@ function resolveCommand(
       convertImage(params, isCommandEnd);
       break;
     case wd0Command.table:
-      convertTable(params, isCommandEnd);
+      convertTable(params, docInfo, isCommandEnd);
       break;
     case wd0Command.blockquote:
       convertBlockquote(params, isCommandEnd);
@@ -819,10 +850,13 @@ function resolveCommand(
       convertNewPage(params, isCommandEnd);
       break;
     case wd0Command.param:
+    case wd0Command.tableParam:
       if (isCommandEnd) {
         return;
       }
       convertParameter(params, isCommandEnd);
+      docInfo.params[params.key as DocumentInfoParams] =
+        params.value;
       break;
     case wd0Command.placeholder:
       if (isCommandEnd) {
