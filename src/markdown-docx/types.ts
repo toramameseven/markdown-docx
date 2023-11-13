@@ -3,36 +3,43 @@ export const wordCommand = {
   cols: "cols",
   rowMerge: "rowMerge",
   emptyMerge: "emptyMerge",
+
   newPage: "newPage",
   newLine: "newLine",
   toc: "toc",
   export: "export",
+  
   placeholder: "placeholder",
   param: "param",
+  tableParam: "tableParam"
 } as const;
 
 
 // https://chaika.hatenablog.com/entry/2021/11/03/083000
-// <!-- word param|placeholder params -->
+// <!-- word param|placeholder|tableParam params -->
 export const documentInfoParams = [
-  "pptxSettings",
-  "position",
-  "dpi",
+  /** */
   "docxTemplate",
+  "tablePrefix",
+  "figurePrefix",
+  "levelOffset",
   "refFormat",
   "captionRefFormat",
+
   "cols",
   "tableStyle",
   "rowMerge",
   "emptyMerge",
   "tableWidth",
   "tableAlign",
-  "imageWidth",
-  "levelOffset",
   "tableCaption",
   "tableCaptionId",
-  "tablePrefix",
-  "figurePrefix",
+
+  "imageWidth",
+
+  "pptxSettings",
+  "position",
+  "dpi",
 ] as const;
 export type DocumentInfoParams = (typeof documentInfoParams)[number];
 
