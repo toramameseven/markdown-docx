@@ -8,7 +8,7 @@ export const wordCommand = {
   newLine: "newLine",
   toc: "toc",
   export: "export",
-  
+
   placeholder: "placeholder",
   param: "param",
   tableParam: "tableParam"
@@ -25,6 +25,8 @@ export const documentInfoParams = [
   "levelOffset",
   "refFormat",
   "captionRefFormat",
+
+  "useCheckBox",
 
   "cols",
   "tableStyle",

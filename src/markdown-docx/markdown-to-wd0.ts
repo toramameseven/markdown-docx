@@ -174,18 +174,38 @@ function resolveHtmlComment(content: string) {
           info: "export",
         });
       case wordCommand.param:
-      case wordCommand.placeholder:
       case wordCommand.tableParam:
         let r = "";
         for (let i = 1; i < params.length; i += 2) {
-          if (params[i - 1]) {
+          let thisKey = params[i - 1];
+          let thisInclude = documentInfoParams.includes(thisKey as DocumentInfoParams);
+          if (thisKey && thisInclude) {
             r += createBlockCommand(command, {
+              key: thisKey,
+              value: params[i],
+            });
+          } else {
+            showMessage?.(
+              MessageType.warn,
+              `Next param is not allowed: ${thisKey}`,
+              source,
+              false
+            );
+          }
+        }
+        return r;
+
+      case wordCommand.placeholder:
+        let r2 = "";
+        for (let i = 1; i < params.length; i += 2) {
+          if (params[i - 1]) {
+            r2 += createBlockCommand(command, {
               key: params[i - 1],
               value: params[i],
             });
           }
         }
-        return r;
+        return r2;
       default:
         // todo error parameters
         let defaultParam = "";
