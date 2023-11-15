@@ -6,7 +6,7 @@
 
 ## shapes1
 
-```ppt
+```json:ppt
 [
 {"objectName": "","shape": "rect","x":0.5,"y":0.8,"w":1.5,"h":0.5,"fill":{ "color": "bbbbbb" },"align":"center","fontSize":10},
 {"objectName": "accentBorderCallout1","shape": "accentBorderCallout1","x":2,"y":1},
@@ -70,7 +70,7 @@ out
 
 ## shapes2
 
-```ppt
+```json:ppt
 [
 {"objectName": "","shape": "rect","x":0.5,"y":0.8,"w":1.5,"h":0.5,"fill":{ "color": "bbbbbb" },"align":"center","fontSize":10},
 {"objectName": "ellipse","shape": "ellipse","x":2,"y":1},
@@ -134,7 +134,7 @@ out
 
 ## shapes3
 
-```ppt
+```json:ppt
 [
 {"objectName": "","shape": "rect","x":0.5,"y":0.8,"w":1.5,"h":0.5,"fill":{ "color": "bbbbbb" },"align":"center","fontSize":10},
 {"objectName": "nonIsoscelesTrapezoid","shape": "nonIsoscelesTrapezoid","x":2,"y":1},
@@ -188,7 +188,7 @@ out
 
 ## shapes3
 
-```ppt
+```json:ppt
 [
 {"objectName": "","shape": "rect","x":0.5,"y":0.8,"w":1.5,"h":0.5,"fill":{ "color": "bbbbbb" },"align":"center","fontSize":10},
 {"objectName": "teardrop","shape": "teardrop","x":2,"y":1},

@@ -17,7 +17,7 @@ above is lsit
 
 ## position
 
-<!-- ppt position 10,10,30,50-->
+<!-- ppt param positions 10,10,30,50-->
 
 
 * sssss
@@ -28,6 +28,6 @@ above is lsit
 
 
 * sssss
-* sssss
+* sssss1
 
 
