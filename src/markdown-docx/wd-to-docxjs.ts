@@ -241,6 +241,10 @@ class TableJs {
           rows[i][j] = tCell;
         }
       }
+      
+      // clear table info
+      documentInfo.params.tableAlign = undefined;
+      documentInfo.params.tableStyle = undefined;
     }
 
     let tableRaws = rows.map((r) => {
