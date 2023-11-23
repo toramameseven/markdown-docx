@@ -287,7 +287,7 @@ export async function wdToPptxJs(
     // shape command
     if (
       wdCommandList[0].split("/")[0] === "code" &&
-      ( wdCommandList[0].split("/")[1] === "json:ppt" || wdCommandList[0].split("/")[1] === "js:ppt")
+      (wdCommandList[0].split("/")[1] === "json:ppt" || wdCommandList[0].split("/")[1] === "js:ppt")
     ) {
       //create text frame
       pptDocument.addTextPropsArrayFromParagraph();
@@ -402,9 +402,22 @@ export async function wdToPptxJs(
     throw error;
   }
 
+  // open the ppt file
+  if (!option.isOpenPpt) {
+    return;
+  }
+
+  option.message?.(
+    MessageType.info,
+    `open pptx: ${pptFilePath}.`,
+    "wd-to-pptxjs",
+    false
+  );
+
   // open ppt
   const pptExe = await selectExistsPath(
     [
+      option.pptPath ?? "",
       "C:\\Program Files (x86)\\Microsoft Office\\root\\Office16\\POWERPNT.EXE",
       "C:\\Program Files\\Microsoft Office\\root\\Office16\\POWERPNT.EXE",
     ],

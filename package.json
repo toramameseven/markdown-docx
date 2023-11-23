@@ -114,7 +114,7 @@
           "group": "myGroup@1"
         },
         {
-          "when": "resourceExtname =~ /\\.wd$|\\.md$/i && !markdown-docx.isRunning && markdown-docx.isExperimentFeature",
+          "when": "resourceExtname =~ /\\.wd$|\\.md$/i && !markdown-docx.isRunning && markdown-docx.enablePpt",
           "command": "explorer.mdToPptx",
           "group": "myGroup@1"
         },
@@ -156,7 +156,7 @@
           "group": "myGroup@1"
         },
         {
-          "when": "resourceExtname =~ /\\.wd$|\\.md$/i && !markdown-docx.isRunning && markdown-docx.isExperimentFeature",
+          "when": "resourceExtname =~ /\\.wd$|\\.md$/i && !markdown-docx.isRunning && markdown-docx.enablePpt",
           "command": "editor.ExportPptx",
           "group": "myGroup@1"
         },
@@ -211,23 +211,29 @@
           "description": "word exe path.",
           "order": 9
         },
-        "markdown-docx.docxEngine.pptExePath": {
-          "type": "string",
-          "default": "",
-          "description": "ppt exe path.",
-          "order": 10
-        },
         "markdown-docx.docxEngine.isOpenWord": {
           "type": "boolean",
           "default": false,
           "description": "If true, open the word file.",
+          "order": 10
+        },
+        "markdown-docx.docxEngine.enablePpt": {
+          "type": "boolean",
+          "default": false,
+          "description": "If true, enable creating ppt.",
           "order": 11
+        },
+        "markdown-docx.docxEngine.pptExePath": {
+          "type": "string",
+          "default": "",
+          "description": "ppt exe path.",
+          "order": 12
         },
         "markdown-docx.docxEngine.isOpenPpt": {
           "type": "boolean",
           "default": false,
           "description": "If true, open the ppt file.",
-          "order": 12
+          "order": 13
         }
       }
     }

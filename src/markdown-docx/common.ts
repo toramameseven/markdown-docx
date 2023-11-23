@@ -27,6 +27,7 @@ export type DocxOption = {
   isOpenWord?: boolean;
   isOpenPpt?: boolean;
   pptPath?: string;
+  enablePpt?:boolean;
   message?: ShowMessage;
 };
 
