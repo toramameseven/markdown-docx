@@ -222,6 +222,12 @@
           "default": false,
           "description": "If true, open the word file.",
           "order": 11
+        },
+        "markdown-docx.docxEngine.isOpenPpt": {
+          "type": "boolean",
+          "default": false,
+          "description": "If true, open the ppt file.",
+          "order": 12
         }
       }
     }

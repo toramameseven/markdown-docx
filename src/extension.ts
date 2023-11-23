@@ -585,6 +585,8 @@ function createDocxOptionExtension(option: DocxOption) {
     isOverWrite: getIsOverWrite(),
     wordPath: getWordPath(),
     isOpenWord: getIsWordOpen(),
+    isOpenPpt: getIsPptOpen(),
+    pptPath: getPptPath(),
   };
   return { ...r, ...option };
 
@@ -675,11 +677,26 @@ function createDocxOptionExtension(option: DocxOption) {
     return isOpenWord;
   }
 
+  function getIsPptOpen() {
+    const isPptWord =
+      vscode.workspace
+        .getConfiguration("markdown-docx")
+        .get<boolean>("docxEngine.isPptWord") ?? true;
+    return isPptWord;
+  }
+
   function getWordPath() {
     const wordPath =
       vscode.workspace
         .getConfiguration("markdown-docx")
         .get<string>("docxEngine.wordExePath") ?? "";
     return wordPath;
+  }
+  function getPptPath() {
+    const pptPath =
+      vscode.workspace
+        .getConfiguration("markdown-docx")
+        .get<string>("docxEngine.pptExePath") ?? "";
+    return pptPath;
   }
 }
