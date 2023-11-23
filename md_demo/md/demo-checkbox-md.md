@@ -1,14 +1,27 @@
-☐ test
-☑ not test
+## demo check box
 
-aaaa
-aaaaa
+as field code
 
-aaaa
-aaaaa
+* ☐ test
+* ☑ not test
+
+<!-- word param useCheckBox "" -->
+
+as string
+
+* ☐ test
+* ☑ not test
+
+as string
+<!-- word param useCheckBox "" -->
+|ssss|dddd|
+|----|----|
+|   ☐ test |  ☑ not test  |
 
 
-<!-- word param useCheckbox "" -->
+as field code
+
+<!-- word param useCheckBox "1" -->
 |ssss|dddd|
 |----|----|
 |   ☐ test |  ☑ not test  |
