@@ -16,11 +16,12 @@ text	title subtitle and table of content
 newLine	convertHeading End		tm
 text	markdown
 newLine	convertParagraph		tm
-code/	<!-- word title sample document title -->
-code/	<!-- word subTitle sample document subTitle -->
-code/	<!-- word toc 3 -->
+code/	# this is sample document
+code/	<!-- word toc 3 "toc caption" -->
 newLine	convertCode		tm
-text	The result is above.
+text	The result is above. <codespan>#</codespan> is for the document title.
+newLine	convertParagraph		tm
+text	The table of contents above is to level <codespan>3</codespan> and the caption is <codespan>toc caption</codespan>
 newLine	convertParagraph		tm
 text	This sample markdown is modified from the document of 
 link	https://markdown-it.github.io/		markdown-it	tm
@@ -92,9 +93,6 @@ text	upper line is <codespan><br></codespan>
 newLine	convertParagraph		tm
 section	2	new-page
 text	new page
-newLine	convertHeading End		tm
-section	3	markdown
-text	markdown
 newLine	convertHeading End		tm
 text	markdown
 newLine	convertParagraph		tm

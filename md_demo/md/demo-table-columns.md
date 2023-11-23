@@ -16,7 +16,7 @@ markdown
 
 result
 
-<!-- word cols 2,1 -->
+<!-- word tableParam cols 2,1 -->
 <!-- word emptyMerge -->
 | data1-1 | data1-2                 |
 | ------- | ----------------------- |
