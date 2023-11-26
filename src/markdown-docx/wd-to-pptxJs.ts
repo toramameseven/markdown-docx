@@ -368,6 +368,23 @@ export async function wdToPptxJs(
     }
   }
 
+  // create table (this code is duplicate!)
+  if (tableJs) {
+    let slideWidth = percentToInches(
+      pptDocument.currentTextPropPositionPCT.w,
+      pptx
+    );
+
+    const r = tableJs!.createTable(
+      pptDocument.currentTextPropPositionPCT,
+      pptStyle.tableProps,
+      slideWidth
+    );
+
+    pptDocument.addTableToSheetObjects(r);
+  }
+
+
   // end loop lines
   pptDocument.addTextPropsArrayFromParagraph();
   pptDocument.addTextFrameToSheetObjects(); //getPosition(documentInfo.position, pptx));
@@ -673,6 +690,7 @@ async function resolveWordDownCommandEx(
             fontSize: pptxDocument.textPropsOptions().fontSize ?? 18,
             lineSpacing: pptxDocument.textPropsOptions().lineSpacing ?? 0,
             valign: "top",
+            color: pptxDocument.textPropsOptions().color ?? pptStyle.body.color, // if this is set, all words color is same one.
           },
         })
       );

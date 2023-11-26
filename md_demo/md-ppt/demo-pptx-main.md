@@ -1,4 +1,4 @@
-
+<!-- ppt parm pptxSettings clear.ppt.js -->
 # Demo PPtx
 
 ## Typographic replacements
@@ -116,7 +116,7 @@ console.log(foo(5));
 
 
 ## merge cells No.1
-
+<!-- word emptyMerge -->
 
 | data1-1 | data1-2                 |
 | ------- | ----------------------- |
@@ -126,7 +126,7 @@ console.log(foo(5));
 
 
 ## merge cells No.2
-
+<!-- word emptyMerge -->
 
 
 

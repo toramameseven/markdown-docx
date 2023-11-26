@@ -544,8 +544,12 @@ export class TableJs {
         ) {
           //rows[i][j] = null;
         } else {
-          const fillColor = i === 0 ? "676767" : "F7F7F7";
-          const textColor = i === 0 ? "F7F7F7" : "676767";
+          const tableFillColor = tableProps.fill?.color ?? "F7F7F7";
+          const tableColor = tableProps.color ?? "676767";
+
+          const fillColor = i === 0 ? tableColor : tableFillColor; // #676767, #F7F7F7
+          const textColor = i === 0 ? tableFillColor: tableColor;
+
           rows[i].push({
             ...tCell,
             options: {
