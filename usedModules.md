@@ -6,6 +6,7 @@
 | iconv-lite                       | MIT          | git://github.com/ashtuchkin/iconv-lite.git                     | Alexander Shtuchkin <ashtuchkin@gmail.com>                           |
 | image-size                       | MIT          | git://github.com/image-size/image-size.git                     | netroy <aditya@netroy.in> (http://netroy.in/)                        |
 | inline-source                    | MIT          | git://github.com/popeindustries/inline-source.git              | Alexander Pope <alex@pope.industries>                                |
+| jsonc-parser                     | MIT          | git+https://github.com/microsoft/node-jsonc-parser.git         | Microsoft Corporation                                                |
 | lodash                           | MIT          | git+https://github.com/lodash/lodash.git                       | John-David Dalton <john.david.dalton@gmail.com>                      |
 | marked                           | MIT          | git://github.com/markedjs/marked.git                           | Christopher Jeffrey                                                  |
 | node-html-parser                 | MIT          | https://github.com/taoqf/node-fast-html-parser.git             | Xiaoyi Shi <ashi009@gmail.com>                                       |

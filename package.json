@@ -66,7 +66,7 @@
         "title": "Convert me to textile"
       },
       {
-        "enablement": "markdown-docx.isExperimentFeature",
+        "enablement": "true",
         "command": "explorer.mdToPptx",
         "title": "Convert to Pptx"
       },
@@ -81,7 +81,7 @@
         "title": "Convert to Docx"
       },
       {
-        "enablement": "markdown-docx.isExperimentFeature",
+        "enablement": "true",
         "command": "editor.ExportPptx",
         "title": "Convert to Pptx"
       },
