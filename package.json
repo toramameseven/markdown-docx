@@ -2,7 +2,7 @@
   "name": "markdown-docx",
   "displayName": "Markdown Docx",
   "description": "Markdown docx converter",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "publisher": "toramameseven",
   "author": {
     "name": "toramame-seven"
@@ -68,7 +68,7 @@
       {
         "enablement": "markdown-docx.isExperimentFeature",
         "command": "explorer.mdToPptx",
-        "title": "Convert me to pptx"
+        "title": "Convert to Pptx"
       },
       {
         "enablement": "markdown-docx.isExperimentFeature",
@@ -255,7 +255,7 @@
     "esbuild": "npm run esbuild-base -- --sourcemap",
     "esbuild-only": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node -- --sourcemap",
     "test-compile": "tsc -p ./",
-    "installEx": "npm run package && code --install-extension markdown-docx-win32-x64-0.0.3.vsix",
+    "installEx": "npm run package && code --install-extension markdown-docx-win32-x64-0.0.4.vsix",
     "testm": "set TS_NODE_COMPILER_OPTIONS={\"module\":\"commonjs\"} && mocha -r ts-node/register src/test-node/**/*.ts",
     "test-common": "set TS_NODE_COMPILER_OPTIONS={\"module\":\"commonjs\"} && mocha -r ts-node/register src/test-node/common.test.ts",
     "license": "npx license-report --config=./license-report-config.json > usedModules.md"
