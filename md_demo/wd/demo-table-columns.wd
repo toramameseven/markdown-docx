@@ -14,6 +14,7 @@ code/	| data4-1 | data4-2                 |
 newLine	convertCode		tm
 text	result
 newLine	convertParagraph		tm
+param	cols	2,1			tm
 tableCreate	4	2
 tableWidthInfo	2,1
 tablecontents	0	0	next	left

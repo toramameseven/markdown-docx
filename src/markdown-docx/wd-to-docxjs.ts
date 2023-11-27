@@ -80,22 +80,7 @@ const DocStyle = {
 } as const;
 type DocStyle = (typeof DocStyle)[keyof typeof DocStyle];
 
-// https://chaika.hatenablog.com/entry/2021/11/03/083000
-const documentInfoParams = [
-  "pptxSettings",
-  "position",
-  "dpi",
-  "docxTemplate",
-  "refFormat",
-  "captionRefFormat",
-  "tableWidth",
-  "tableAlign",
-  "imageWidth",
-  "tableCaption",
-  "tablePrefix",
-  "figurePrefix",
-] as const;
-type DocumentInfoParams = (typeof documentInfoParams)[number];
+import { DocumentInfoParams } from "./types";
 
 type DocumentInfo = {
   placeholders: { [v: string]: string };
@@ -163,17 +148,17 @@ class TableJs {
             })
           );
         } else {
-          // aligne
-          const aligneInfo = (documentInfo.params.tableAlign ?? "") + "llllllllllllllllllllllllllll";
+          // align
+          const alignInfo = (documentInfo.params.tableAlign ?? "") + "llllllllllllllllllllllllllll";
           let align: AlignmentType = AlignmentType.LEFT;
-          if ((aligneInfo[this.column]).toLowerCase() === 'c') {
+          if ((alignInfo[this.column]).toLowerCase() === 'c') {
             align = AlignmentType.CENTER;
           }
-          if ((aligneInfo[this.column]).toLowerCase() === 'r') {
+          if ((alignInfo[this.column]).toLowerCase() === 'r') {
             align = AlignmentType.RIGHT;
           }
           this.cells[this.row][this.column].push(
-            new Paragraph({ children: await resolveEmphasis(words[2]), alignment: align })
+            new Paragraph({ children: await resolveEmphasis(words[2], documentInfo), alignment: align })
           );
           return;
         }
@@ -256,6 +241,10 @@ class TableJs {
           rows[i][j] = tCell;
         }
       }
+      
+      // clear table info
+      documentInfo.params.tableAlign = undefined;
+      documentInfo.params.tableStyle = undefined;
     }
 
     let tableRaws = rows.map((r) => {
@@ -405,7 +394,7 @@ class DocParagraph {
     this.docStyle = DocStyle.Body;
     this.isImage = false;
     this.refId = "";
-    this.isListBefore =false;
+    this.isListBefore = false;
   }
 
   addIndent() {
@@ -473,6 +462,7 @@ export async function wdToDocxJs(
   // initialize params
   documentInfo.params.tablePrefix = "Table";
   documentInfo.params.figurePrefix = "Fig.";
+  documentInfo.params.useCheckBox = "true";
 
   // patch parameter
 
@@ -528,7 +518,7 @@ export async function wdToDocxJs(
 
     // when paragraph end, flush paragraph
     if (currentParagraph.isFlush) {
-      if (currentParagraph.isListBefore && currentParagraph.docStyle.substring(0, 2) === 'hh'){
+      if (currentParagraph.isListBefore && currentParagraph.docStyle.substring(0, 2) === 'hh') {
         patches.push(new Paragraph(" "));
       }
       currentParagraph.isListBefore = false;
@@ -731,7 +721,7 @@ async function resolveWDCommandEx(
         const child = await createMathImage(mathBlock[1]);
         currentParagraph.addChild(child, true);
       } else {
-        const stack = await resolveEmphasis(s);
+        const stack = await resolveEmphasis(s, documentInfo);
         stack.forEach((x) => currentParagraph.addChild(x));
       }
 
@@ -807,11 +797,11 @@ async function resolveWDCommandEx(
   }
 }
 
-function getLinkType(linkRef: string): "section"|"caption" {
-  if (linkRef.slice(0, "fig-".length) === "fig-"){
+function getLinkType(linkRef: string): "section" | "caption" {
+  if (linkRef.slice(0, "fig-".length) === "fig-") {
     return "caption";
   }
-  if (linkRef.slice(0, "table-".length) === "table-"){
+  if (linkRef.slice(0, "table-".length) === "table-") {
     return "caption";
   }
   return "section";
@@ -974,7 +964,7 @@ export async function createDocxPatch(
   fs.writeFileSync(docxOutPath, patchDoc);
 }
 
-async function resolveEmphasis(source: string) {
+async function resolveEmphasis(source: string, documentInfo: DocumentInfo) {
   let rg =
     /<(|\/)sub>|<(|\/)sup>|<(|\/)codespan>|<(|\/)i>|<(|\/)b>|<(|\/)~~>|☑|☐|\$/g;
 
@@ -991,22 +981,24 @@ async function resolveEmphasis(source: string) {
   let result: any;
   let insideMath: boolean = false;
   let mathString: string = "";
-  showMessageThis?.(
-    MessageType.debug,
-    `source: ${source}`,
-    "resolveEmphasis",
-    false
-  );
+
+  // showMessageThis?.(
+  //   MessageType.debug,
+  //   `source: ${source}`,
+  //   "resolveEmphasis",
+  //   false
+  // );
+
   while ((result = rg.exec(source)) !== null) {
     // text
     let text = source.substring(indexBefore, result.index);
     if (text) {
-      showMessageThis?.(
-        MessageType.debug,
-        `text: ${text}`,
-        "resolveEmphasis",
-        false
-      );
+      // showMessageThis?.(
+      //   MessageType.debug,
+      //   `text: ${text}`,
+      //   "resolveEmphasis",
+      //   false
+      // );
 
       if (insideMath) {
         mathString = text;
@@ -1016,12 +1008,12 @@ async function resolveEmphasis(source: string) {
     }
     // tag
     text = source.substring(result.index + 1, rg.lastIndex - 1);
-    showMessageThis?.(
-      MessageType.debug,
-      `tag : ${text}`,
-      "resolveEmphasis",
-      false
-    );
+    // showMessageThis?.(
+    //   MessageType.debug,
+    //   `tag : ${text}`,
+    //   "resolveEmphasis",
+    //   false
+    // );
     const tag = text.replace("/", "");
     const isOn = text === tag;
 
@@ -1050,19 +1042,24 @@ async function resolveEmphasis(source: string) {
 
     // add checkbox
     if (tag === "☑" || tag === "☐") {
-      stack.push(new CheckBox({ checked: tag === "☑" }));
+      if (documentInfo.params.useCheckBox) {
+        stack.push(new CheckBox({ checked: tag === "☑" }));
+      } else {
+        let a = tag === "☑" ? "☑" : "☐";
+        stack.push(new TextRun(a));
+      }
     }
   }
 
   // text
   let text = source.substring(indexBefore);
   if (text) {
-    showMessageThis?.(
-      MessageType.debug,
-      `text: ${text}`,
-      "resolveEmphasis",
-      false
-    );
+    // showMessageThis?.(
+    //   MessageType.debug,
+    //   `text: ${text}`,
+    //   "resolveEmphasis",
+    //   false
+    // );
     stack.push(new TextRun({ text, ...textProp }));
   }
   return stack;

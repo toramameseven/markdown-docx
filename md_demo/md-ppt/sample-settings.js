@@ -275,5 +275,5 @@ module.exports = {
   headFontFace,
   defaultPositionPCT,
   tablePropsArray,
-  tableInfoOptions
+  // tableInfoOptions
 };

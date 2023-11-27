@@ -1,0 +1,58 @@
+section	2	demo-check-box
+text	demo check box
+newLine	convertHeading End		tm
+text	as field code
+newLine	convertParagraph		tm
+indentPlus
+NormalList	1	
+text	☐ test
+newLine	convertListItem End		tm
+NormalList	1	
+text	☑ not test
+newLine	convertListItem End		tm
+indentMinus
+param	useCheckBox				tm
+text	as string
+newLine	convertParagraph		tm
+indentPlus
+NormalList	1	
+text	☐ test
+newLine	convertListItem End		tm
+NormalList	1	
+text	☑ not test
+newLine	convertListItem End		tm
+indentMinus
+text	as string
+newLine	convertParagraph		tm
+param	useCheckBox				tm
+tableCreate	2	2
+tableWidthInfo	5.75,6.75
+tablecontents	0	0	next	left
+tablecontentslist	text	ssss
+tablecontentslist	endParagraph		tm
+tablecontents	0	1	next	left
+tablecontentslist	text	dddd
+tablecontentslist	endParagraph		tm
+tablecontents	1	0	next	left
+tablecontentslist	text	☐ test
+tablecontentslist	endParagraph		tm
+tablecontents	1	1	next	left
+tablecontentslist	text	☑ not test
+tablecontentslist	endParagraph		tm
+text	as field code
+newLine	convertParagraph		tm
+param	useCheckBox	1			tm
+tableCreate	2	2
+tableWidthInfo	5.75,6.75
+tablecontents	0	0	next	left
+tablecontentslist	text	ssss
+tablecontentslist	endParagraph		tm
+tablecontents	0	1	next	left
+tablecontentslist	text	dddd
+tablecontentslist	endParagraph		tm
+tablecontents	1	0	next	left
+tablecontentslist	text	☐ test
+tablecontentslist	endParagraph		tm
+tablecontents	1	1	next	left
+tablecontentslist	text	☑ not test
+tablecontentslist	endParagraph		tm

@@ -25,6 +25,9 @@ export type DocxOption = {
   isOverWrite?: boolean;
   wordPath?: string;
   isOpenWord?: boolean;
+  isOpenPpt?: boolean;
+  pptPath?: string;
+  enablePpt?:boolean;
   message?: ShowMessage;
 };
 
@@ -40,7 +43,9 @@ export function createDocxOption(option: DocxOption = {}) {
     isUseDocxJs: option.isUseDocxJs ?? true,
     isOverWrite: option.isOverWrite ?? false,
     wordPath: option.wordPath ?? "",
+    pptPath: option.pptPath ?? "",
     isOpenWord: option.isOpenWord ?? false,
+    isOpenPpt: option.isOpenPpt ?? false,
     ac: option.ac,
     message: option.message,
   };
@@ -119,9 +124,10 @@ export function getFileContents(filePath: string) {
 }
 
 export function getWordDownCommand(wd: string) {
-  const testMatch = wd.match(/^<!--(?<name>.*)-->/i);
+  const noNewLine = wd.replace(/\n/g, " ");
+  const testMatch = noNewLine.match(/^<!--(?<name>.*)-->/i);
   const command = testMatch?.groups?.name ?? "";
-  const commandList = command.trim().split(/\s(?=(?:[^"]*"[^"]*")*[^"]*$)/i);
+  const commandList = command.trim().split(/\s+(?=(?:[^"]*"[^"]*")*[^"]*$)/i);
   if (commandList[0].match(/word|ppt|oox/i) && commandList[1]) {
     const params = (commandList.slice(2) ?? []).map((l) =>
       l.replace(/\"/g, "")

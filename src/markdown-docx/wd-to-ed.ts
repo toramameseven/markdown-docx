@@ -293,7 +293,7 @@ export function wdToEd(wd: string, sm?: ShowMessage): string {
   const lines = wd.split(/\r?\n/);
   for (let i = 0; i < lines.length; i++) {
     const words = lines[i].split(_sp);
-    const command = words[0];
+    const command = words[0].split("/")[0];
     const params = words.slice(1);
     // convert
     const toCommand = command as WdCommand;

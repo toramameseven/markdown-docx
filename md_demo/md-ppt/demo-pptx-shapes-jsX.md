@@ -24,7 +24,7 @@ const array = [
 		]
 	},
 ];
-module.exports = { array}; // もしくは module.exports = config
+module.exports = { array }; // もしくは module.exports = config
 ```
 sss
 

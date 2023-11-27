@@ -18,16 +18,17 @@
 markdown
 
 ```
-<!-- word title sample document title -->
-<!-- word subTitle sample document subTitle -->
-<!-- word toc 3 -->
+# this is sample document
+<!-- word toc 3 "toc caption" -->
 ```
 
-The result is above.
+The result is above. `#` is for the document title.
+
+The table of contents above is to level `3` and the caption is `toc caption`
+
 
 This sample markdown is modified from the document of [markdown-it](https://markdown-it.github.io/).
 
-<!-- word export demo-headings.md-->
 ## Heading
 
 markdown
@@ -100,8 +101,6 @@ upper line is `<br>`
 
 <!-- word export demo-newpage.md-->
 ## new page
-
-### markdown
 
 markdown
 

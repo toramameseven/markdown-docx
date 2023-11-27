@@ -1,5 +1,6 @@
 <!-- word export demo-table.md-->
-<!-- word tableWidth 50 -->
+<!-- word tableWidth
+ 50 -->
 # Tables
 
 ## normal table

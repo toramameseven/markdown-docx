@@ -38,36 +38,15 @@ const markedCommand = {
 } as const;
 // type MarkedCommand = typeof markedCommand[keyof typeof markedCommand];
 
-const wordCommand = {
-  cols: "cols",
-  rowMerge: "rowMerge",
-  emptyMerge: "emptyMerge",
-  newPage: "newPage",
-  newLine: "newLine",
-  toc: "toc",
-  export: "export",
-  placeholder: "placeholder",
-  param: "param",
-  } as const;
-
-const ooxParameters = {
-  pptxSettings: "pptxSettings",
-  position: "position",
-  dpi: "dpi",
-  docxTemplate: "docxTemplate",
-  refFormat: "refFormat",
-  captionRefFormat: "captionRefFormat",
-  figurePrefix: "figurePrefix",
-  tablePrefix: "tablePrefix",
-} as const;
-
-// export type OoxParameters = (typeof ooxParameters)[keyof typeof ooxParameters];
+import { wordCommand } from "./types";
 
 export const wd0Command = {
   ...markedCommand,
   ...wordCommand,
 } as const;
 export type Wd0Command = (typeof wd0Command)[keyof typeof wd0Command];
+
+
 
 const _sp = "\t";
 const _newline = "\n";
@@ -146,23 +125,8 @@ const htmlBlock = (content: string) => {
   return "";
 };
 
-const documentInfoParams = [
-  "pptxSettings",
-  "position",
-  "dpi",
-  "docxTemplate",
-  "refFormat",
-  "captionRefFormat",
-  "tableWidth",
-  "tableAlign",
-  "imageWidth",
-  "levelOffset",
-  "tableCaption",
-  "tableCaptionId",
-  "tablePrefix",
-  "figurePrefix"
-] as const;
-type DocumentInfoParams = (typeof documentInfoParams)[number];
+import { DocumentInfoParams, documentInfoParams } from "./types";
+
 
 const isDocumentInfoParams = (name: string): name is DocumentInfoParams => {
   return documentInfoParams.some((value) => value === name);
@@ -210,17 +174,38 @@ function resolveHtmlComment(content: string) {
           info: "export",
         });
       case wordCommand.param:
-      case wordCommand.placeholder:
+      case wordCommand.tableParam:
         let r = "";
         for (let i = 1; i < params.length; i += 2) {
-          if (params[i - 1]) {
+          let thisKey = params[i - 1];
+          let thisInclude = documentInfoParams.includes(thisKey as DocumentInfoParams);
+          if (thisKey && thisInclude) {
             r += createBlockCommand(command, {
+              key: thisKey,
+              value: params[i],
+            });
+          } else {
+            showMessage?.(
+              MessageType.warn,
+              `Next param is not allowed: ${thisKey}`,
+              source,
+              false
+            );
+          }
+        }
+        return r;
+
+      case wordCommand.placeholder:
+        let r2 = "";
+        for (let i = 1; i < params.length; i += 2) {
+          if (params[i - 1]) {
+            r2 += createBlockCommand(command, {
               key: params[i - 1],
               value: params[i],
             });
           }
         }
-        return r;
+        return r2;
       default:
         // todo error parameters
         let defaultParam = "";
@@ -260,7 +245,7 @@ export function getWordTitle(wd: string) {
 // -----------------------------------
 
 const blockHeading = (content: string, index: number) => {
-  //title for asciidoc type
+//title for asciidoc type
   const isAdocTypeTitle = false;
   if (index === 1 && isAdocTypeTitle) {
     //TODO // title
@@ -344,15 +329,15 @@ const blockCodeParagraph =
 
 const blockParagraph =
   (blokType: string, isNeedEmptyLine = false) =>
-  (content: string) => {
-    const lines = isNeedEmptyLine
-      ? splitCodeBlockContents(content)
-      : splitBlockContents(content);
-    const params = {
-      body: lines.join(_newline),
+    (content: string) => {
+      const lines = isNeedEmptyLine
+        ? splitCodeBlockContents(content)
+        : splitBlockContents(content);
+      const params = {
+        body: lines.join(_newline),
+      };
+      return createBlockCommand(blokType, params);
     };
-    return createBlockCommand(blokType, params);
-  };
 
 const blockList = (body: string, ordered: boolean, start: number) => {
   const params = {
@@ -377,14 +362,14 @@ const blockListItem = (content: string, task: boolean, checked: boolean) => {
 // command href, text, title
 const blockImage =
   (blokType: string) =>
-  (href: string | null, title: string | null, content: string) => {
-    const params = {
-      href: href ?? "",
-      text: content,
-      title: title ?? "",
+    (href: string | null, title: string | null, content: string) => {
+      const params = {
+        href: href ?? "",
+        text: content,
+        title: title ?? "",
+      };
+      return createBlockCommand(blokType, params);
     };
-    return createBlockCommand(blokType, params);
-  };
 
 const blockTable = (header: string, body: string) => {
   const params = {
@@ -495,8 +480,8 @@ export async function markdownToWd0(
   );
   let levelOffset = parseInt(offsetMatch?.groups?.name ?? "0");
   levelOffset = Number.isNaN(levelOffset) ? 0 : levelOffset;
-  
-  
+
+
   const walkTokens = (token: any) => {
     if (token.type === "heading") {
       token.depth += levelOffset;

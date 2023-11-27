@@ -141,7 +141,13 @@ export function activate(context: vscode.ExtensionContext) {
     enableExperimentFeature();
   }
 
+  context.subscriptions.push(
+    vscode.workspace.onDidChangeConfiguration((event) => updatePptEnable())
+  );
+
   enableMainFeature();
+
+  updatePptEnable();
 
 
   vscodeCommon.showMessage(
@@ -150,6 +156,22 @@ export function activate(context: vscode.ExtensionContext) {
     "extension"
   );
 }
+
+function updatePptEnable(){
+  const thisOption = createDocxOptionExtension({
+    ac,
+    message: vscodeCommon.showMessage,
+  });
+
+  const enablePpt = thisOption.enablePpt;
+
+  vscode.commands.executeCommand(
+    "setContext",
+    "markdown-docx.enablePpt",
+    enablePpt
+  );
+}
+
 
 /**
  * convert html to markdown
@@ -585,6 +607,9 @@ function createDocxOptionExtension(option: DocxOption) {
     isOverWrite: getIsOverWrite(),
     wordPath: getWordPath(),
     isOpenWord: getIsWordOpen(),
+    isOpenPpt: getIsPptOpen(),
+    pptPath: getPptPath(),
+    enablePpt: getEnablePpt(),
   };
   return { ...r, ...option };
 
@@ -675,11 +700,34 @@ function createDocxOptionExtension(option: DocxOption) {
     return isOpenWord;
   }
 
+  function getIsPptOpen() {
+    const isPptWord =
+      vscode.workspace
+        .getConfiguration("markdown-docx")
+        .get<boolean>("docxEngine.isOpenPpt") ?? true;
+    return isPptWord;
+  }
+
+  function getEnablePpt() {
+    const enablePpt =
+      vscode.workspace
+        .getConfiguration("markdown-docx")
+        .get<boolean>("docxEngine.enablePpt") ?? false;
+    return enablePpt;
+  }
+
   function getWordPath() {
     const wordPath =
       vscode.workspace
         .getConfiguration("markdown-docx")
         .get<string>("docxEngine.wordExePath") ?? "";
     return wordPath;
+  }
+  function getPptPath() {
+    const pptPath =
+      vscode.workspace
+        .getConfiguration("markdown-docx")
+        .get<string>("docxEngine.pptExePath") ?? "";
+    return pptPath;
   }
 }
