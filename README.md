@@ -12,7 +12,7 @@
 <!-- word newPage -->
 
 This is the README **Markdown Docx**. 
-This extension converts a markdown file to a Docx or  a Pptx (experimental).
+This extension converts a markdown file to a Docx or a Pptx (experimental).
 This uses next two excellent modules.
 
 * [DOCX](https://docx.js.org/#/)
@@ -111,7 +111,7 @@ docx template
 
 ## How to package
 
-1. npm install -g vsce
+1. npm install -g @vscode/vsce
 1. vsce package --target win32-x64
 1. vsce publish
 
@@ -131,6 +131,9 @@ And we use some useful articles below.
 
 
 ## Release Notes
+* 0.0.5
+  * add new line under a image.
+
 * 0.0.4
   * experimental feature creating pptx.
 
