@@ -2,7 +2,7 @@
   "name": "markdown-docx",
   "displayName": "Markdown Docx",
   "description": "Markdown docx converter",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "publisher": "toramameseven",
   "author": {
     "name": "toramame-seven"
@@ -258,9 +258,12 @@
     "installEx": "npm run package && code --install-extension markdown-docx-win32-x64-0.0.4.vsix",
     "testm": "set TS_NODE_COMPILER_OPTIONS={\"module\":\"commonjs\"} && mocha -r ts-node/register src/test-node/**/*.ts",
     "test-common": "set TS_NODE_COMPILER_OPTIONS={\"module\":\"commonjs\"} && mocha -r ts-node/register src/test-node/common.test.ts",
-    "license": "npx license-report --config=./license-report-config.json > usedModules.md"
+    "license": "npx license-report --config=./license-report-config.json > usedModules.md",
+    "prepare": "husky"
   },
   "devDependencies": {
+    "@commitlint/cli": "^19.6.1",
+    "@commitlint/config-conventional": "^19.6.0",
     "@types/encoding-japanese": "^2.0.1",
     "@types/glob": "^8.0.0",
     "@types/lodash": "^4.14.191",
@@ -275,6 +278,7 @@
     "esbuild": "^0.16.13",
     "eslint": "^8.26.0",
     "glob": "^8.0.3",
+    "husky": "^9.1.7",
     "license-report": "^6.4.0",
     "mocha": "^10.1.0",
     "rimraf": "^3.0.2",
