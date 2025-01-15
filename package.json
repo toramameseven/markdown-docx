@@ -2,7 +2,7 @@
   "name": "markdown-docx",
   "displayName": "Markdown Docx",
   "description": "Markdown docx converter",
-  "version": "0.0.5.rc",
+  "version": "0.0.5-rc.0",
   "publisher": "toramameseven",
   "author": {
     "name": "toramame-seven"
