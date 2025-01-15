@@ -1,3 +1,8 @@
+/*
+for creating a word file with out docx テンプレート
+*/
+
+
 import {
   DocxOption,
   MessageType,
