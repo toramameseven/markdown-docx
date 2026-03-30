@@ -150,5 +150,3 @@ And we use some useful articles below.
     
 * 0.0.1
   * first Release.
-
-
