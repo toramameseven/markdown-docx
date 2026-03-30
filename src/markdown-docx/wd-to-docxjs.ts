@@ -689,13 +689,19 @@ async function resolveWDCommandEx(
         currentParagraph.addChildren(children);
       } else {
         // external link
+        let link = words[1]
+          .replace(/&/g, '&amp;')   // this is first.
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
         child = new ExternalHyperlink({
           children: [
             new TextRun({
               text: words[3],
             }),
           ],
-          link: words[1],
+          link: link,
         });
         currentParagraph.addChild(child);
       }
@@ -877,7 +883,7 @@ async function createMathImage(mathEq: string) {
 
   // create png
   const pngArray = await svg2imagePng(svgStr);
-  let pngBuffer = Buffer.from(pngArray);
+  let pngBuffer = Buffer.isBuffer(pngArray) ? pngArray : Buffer.from(pngArray);
   const sizeImageMath = imageSize.imageSize(pngBuffer);
 
   const child = new ImageRun({
@@ -965,7 +971,8 @@ export async function createDocxPatch(
       ...patchInfo,
     },
   });
-  fs.writeFileSync(docxOutPath, patchDoc);
+  const uint8 = new Uint8Array(patchDoc.buffer, patchDoc.byteOffset, patchDoc.byteLength);
+  fs.writeFileSync(docxOutPath, uint8);
 }
 
 async function resolveEmphasis(source: string, documentInfo: DocumentInfo) {

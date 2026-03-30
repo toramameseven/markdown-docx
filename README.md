@@ -131,6 +131,10 @@ And we use some useful articles below.
 
 
 ## Release Notes
+
+* 0.0.6
+  * Added support for entering HTML special characters (<, >, &, ", ', etc.) directly in the link address input field.
+
 * 0.0.5
   * add new line under a image.
 
@@ -146,5 +150,3 @@ And we use some useful articles below.
     
 * 0.0.1
   * first Release.
-
-
