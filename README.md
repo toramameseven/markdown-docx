@@ -132,11 +132,11 @@ And we use some useful articles below.
 
 ## Release Notes
 
+* 0.0.7
+  * fix: Extra blank lines are showing up.
+
 * 0.0.6
   * Added support for entering HTML special characters (<, >, &, ", ', etc.) directly in the link address input field.
-
-* 0.0.5
-  * add new line under a image.
 
 * 0.0.4
   * experimental feature creating pptx.

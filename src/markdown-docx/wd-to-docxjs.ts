@@ -353,11 +353,7 @@ class DocParagraph {
     documentInfo: DocumentInfo
   ): Paragraph | Table | undefined {
     if (this.imageCaption === "") {
-      const newline = new Paragraph({
-        children: [new TextRun(" ")],
-        style: DocStyle.Body1,
-      });
-      return newline;
+      return undefined;
     }
 
     const imageCaptionId = documentInfo.bookmarks.slugify("fig-" + this.imageCaption);
